@@ -1,0 +1,6 @@
+# Normalise line endings so notebooks, data files and tests behave the same on every OS.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary

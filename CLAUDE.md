@@ -1,0 +1,30 @@
+# Notes for Claude Code — 15 Days of RAG from Scratch
+
+A public, day-by-day learning series on Retrieval-Augmented Generation. Each day adds a lesson, a runnable notebook, LinkedIn slides and a post. Read `README.md`, `ROADMAP.md` and `VISUAL_STYLE_GUIDE.md` before changing anything substantial. If a local planning/ folder exists (it is gitignored), also read the project instructions and notes in it.
+
+## Commands
+
+```bash
+python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt               # Python 3.11+
+python -m pytest                                        # executes every notebook in a fresh kernel
+
+# Slides (optional; fonts and icons are bundled)
+python -m pip install -r requirements-assets.txt
+python scripts/slides/day01.py && python scripts/slides/render.py assets/day-01
+```
+
+## Layout per day
+
+`docs/day-XX/LEARN.md` · `notebooks/day_XX_<topic>.ipynb` · `linkedin/day-XX.md` · `assets/day-XX/` (PNG + SVG + PDF) · `scripts/slides/dayXX.py` · a test in `tests/`. Add the day to the README index. Tag each published day: `git tag -a day-XX -m "..."`.
+
+## Rules
+
+- **Never claim a result you didn't run.** Label untested parts as untested. No invented benchmarks or metrics.
+- **Notebooks must run top to bottom in a fresh kernel** from the repo root or `notebooks/`, with relative paths only. Commit them with outputs, but no error outputs and no machine-specific paths (a test checks this).
+- **Slides must match the code.** Each `scripts/slides/dayXX.py` checks its numbers and IDs against the executed notebook's outputs. Re-run the notebook before rebuilding slides.
+- **Pinned dependencies.** Only add a package when a lesson needs it, pin the version you tested, and note the date and Python versions in `requirements.txt`.
+- **Secrets:** never commit `.env`, keys, `.venv` or caches. Put placeholders in `.env.example` and always offer a free/local path when a paid API is used.
+- **Sample data** in `data/sample/` is synthetic. Changing it changes results: update the notebook sanity checks and the slides together.
+- **Security framing:** permissions are enforced in the retrieval/data layer, never by prompt instructions. Retrieved documents are untrusted input.
+- **Visual style:** whiteboard sketch (see `VISUAL_STYLE_GUIDE.md`), built with `scripts/slides/kit.py`. Keep text to short labels; let icons and arrows explain.

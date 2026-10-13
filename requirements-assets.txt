@@ -1,0 +1,7 @@
+# Optional: only needed to rebuild the LinkedIn slide PNGs from their SVG sources.
+# Learners do not need these to run the notebooks.
+# Tested on 2026-10-13 with Python 3.13 on Linux. Fonts and icons are bundled in
+# scripts/slides/ (see scripts/slides/README.md), so nothing else needs installing.
+
+resvg-py==0.5.0
+pillow==12.3.0
