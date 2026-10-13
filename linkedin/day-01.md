@@ -1,11 +1,13 @@
 # LinkedIn — Day 01: RAG Foundations
 
-**Status:** ready to post once the repository is pushed and the GitHub Actions run is green.
+**Status:** posted on LinkedIn on 2026-10-13, with the series label as its first line and the hashtags below.
 **Matches:** `docs/day-01/LEARN.md`, `notebooks/day_01_rag_foundations.ipynb` (outputs from the 2026-10-13 run).
 
 ---
 
 ## Post text
+
+15 Days of RAG from Scratch · Day 1/15: RAG foundations
 
 Ask a language model about your company's expense policy and, without the document, it can only guess or say it doesn't know.
 
