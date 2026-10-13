@@ -437,6 +437,6 @@ All links checked on **2026-10-13**. Version-specific pages may change; re-check
 - AWS, [Retrieving information from data sources using Amazon Bedrock Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-retrieval.html)
 - Python Developer's Guide, [Status of Python versions](https://devguide.python.org/versions/)
 
-## Next: Day 02 — Ingestion, parsing and metadata
+## Next: [Day 02 — Ingestion, parsing and metadata](../day-02/LEARN.md)
 
 Real documents arrive as PDFs, HTML and tables; they change, get deleted and have owners and permissions. Day 02 builds a reproducible ingestion pipeline with stable IDs and provenance, and shows where PDF and table extraction goes wrong.

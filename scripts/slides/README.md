@@ -9,6 +9,7 @@ The LinkedIn images in `assets/day-XX/` are hand-drawn-style whiteboard diagrams
 python -m pip install -r requirements-assets.txt
 python scripts/slides/day01.py                    # writes assets/day-01/*.svg
 python scripts/slides/render.py assets/day-01     # writes assets/day-01/*.png and the PDF
+python scripts/slides/day02.py && python scripts/slides/render.py assets/day-02
 ```
 
 ## How the sketch look works
@@ -17,7 +18,7 @@ python scripts/slides/render.py assets/day-01     # writes assets/day-01/*.png a
 
 ## Built-in checks
 
-- **Facts:** `day01.py` refuses to build if any number, keyword or chunk ID on the slides is missing from the executed notebook's saved outputs.
+- **Facts:** each `dayXX.py` refuses to build if any number, keyword or ID on its slides is missing from that day's executed notebook outputs.
 - **Overflow:** every text element is measured with the bundled font files; a line that would not fit its box stops the build.
 - **Contrast:** every text colour must reach at least 4.5:1 (WCAG AA) on white and on every pastel zone background.
 
@@ -27,7 +28,7 @@ python scripts/slides/render.py assets/day-01     # writes assets/day-01/*.png a
 |---|---|---|
 | [Shantell Sans](https://github.com/arrowtype/shantell-sans) variable font (hand-drawn text) | `fonts/` | SIL Open Font License 1.1 (`fonts/OFL-ShantellSans.txt`) |
 | [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) variable font (IDs) | `fonts/` | SIL Open Font License 1.1 (`fonts/OFL-JetBrainsMono.txt`) |
-| [Lucide](https://lucide.dev) icons (v1.56.0, a subset) | `icons/` | ISC (`icons/LICENSE-lucide.txt`) |
+| [Lucide](https://lucide.dev) icons (v1.56.0, a subset; copied unmodified from the `lucide-static` package) | `icons/` | ISC (`icons/LICENSE-lucide.txt`) |
 
 The font files are unmodified copies from the Google Fonts repository; only the file names were simplified. `render.py` loads them directly, so you don't need to install anything system-wide. To edit an SVG by hand and see the same result, install Shantell Sans and JetBrains Mono locally (both are on Google Fonts).
 

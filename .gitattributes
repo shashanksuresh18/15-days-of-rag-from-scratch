@@ -4,3 +4,5 @@
 *.png binary
 *.jpg binary
 *.jpeg binary
+# PDFs contain byte offsets: any line-ending conversion would corrupt them.
+*.pdf binary

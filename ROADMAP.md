@@ -15,10 +15,10 @@
 | **01** | **RAG fundamentals and when to use it** | Retrieval vs. generation, grounding, common failures, and when long-context prompting or ordinary search may suffice | Small **API-free** retriever that displays its evidence; draw a basic RAG pipeline |
 | **02** | **Ingestion, document parsing, and metadata** | Ingest text/PDF-like sources; retain source, section, timestamps, ownership/authorization metadata, and provenance | Reproducible sample ingestion pipeline with stable document IDs; show a table/PDF extraction caveat |
 | **03** | **Chunking and document structure** | Fixed/token/section-based splitting; overlap trade-offs; tables, headings, and lost context | Compare at least two chunking methods on real example queries and visualize differences |
-| **04** | **Embeddings, lexical matching, and similarity** | Dense vs. keyword signals; embedding model choices; cosine/dot-product caveats; the importance of simple baselines | Run lexical and embedding-based retrieval on the same corpus; inspect where each fails |
+| **04** | **Embeddings, lexical matching, and similarity** | Dense vs. keyword signals; embedding model choices; cosine/dot-product caveats; the importance of simple baselines | Run lexical and embedding-based retrieval on the same corpus; inspect where each fails. **Reuse Day 01's BM25 as the lexical baseline** rather than re-teaching it |
 | **05** | **Local vector search and data lifecycle** | Indexing, metadata filters, persistence, updates, deletes, and why filters are not automatically authorization | Create/query a local vector index; demonstrate metadata filtering and document re-index/delete |
 | **06** | **First end-to-end grounded RAG** | Retrieve → assemble context → generate; citation traceability, uncertainty, abstention, and prompt boundaries | Small working RAG Q&A with identifiable source references; configurable local/hosted model option |
-| **07** | **Build an evaluation baseline early** | Label a small query set; inspect missing/irrelevant evidence; top-k, hit rate/recall@k, and why a metric needs ground truth | Version a **small labeled test set**, run baseline retrieval metrics and record errors |
+| **07** | **Build an evaluation baseline early** | Label a small query set; inspect missing/irrelevant evidence; top-k, hit rate/recall@k, and why a metric needs ground truth | Version a **small labeled test set**, run baseline retrieval metrics and record errors. **Seed it with Day 01's recorded failure questions** (vocabulary mismatch, relevant-but-wrong, out-of-scope, stemming, answer at rank 3) and Day 02's table question |
 | **08** | **Hybrid search and rank fusion** | BM25/keyword + vector search; score mismatch; Reciprocal Rank Fusion (RRF) | Compare lexical, dense, and hybrid retrieval on **Day 07's same queries** |
 | **09** | **Reranking and context selection** | Candidate retrieval vs. reranking; cross-encoder trade-offs; deduplication, source diversity, and token budgets | Add optional reranker and show **measured** quality/latency changes vs. baseline |
 | **10** | **Query understanding and transformations** | Rewrite, multi-query, decomposition, filtering/routing, failure modes, and when *not* to rewrite | Implement one query-improvement method and compare with a no-rewrite baseline |
@@ -75,6 +75,7 @@ Not every folder needs content from Day 1. Grow the project day by day; don't in
 
 ## Tooling and architectural guardrails
 
+- **Python 3.11+:** every day targets Python 3.11 or newer (3.10 reached end of life on 2026-10-01, and the pinned Jupyter kernel needs 3.11).
 - **Tool-agnostic first:** Teach retrieval and data flow independently of one framework; use thin integrations where they save time. Pin and test package versions in the working implementation; review official docs on each day.
 - **Accessibility:** Prefer low-cost, locally reproducible examples. For any hosted LLM, clearly name the provider requirement, expected cost considerations, and a local/mock alternative when appropriate.
 - **Evaluation discipline:** Use the same labeled queries and data snapshots for before/after tests. Report quality, latency, cost, and sample size; never infer causality from one cherry-picked example.
@@ -89,7 +90,8 @@ If the audience asks for more after Day 15, consider separate mini-series on **m
 ## Reference material and maintenance
 
 - Original notebooks cover numerous classic RAG concepts; they are reference material, not confirmed working code against current packages.
-- Day 01 is implemented and was verified on 2026-10-13 (Python 3.11–3.14 on Linux). **Days 02–15 are planned, not implemented.**
+- Day 01 is implemented and verified (Python 3.11–3.14 on Linux, Windows 11, CI on Linux/Windows/macOS). Day 02 is implemented and was tested on 2026-10-13 (Python 3.11–3.14 on Linux; CI on every push). **Days 03–15 are planned, not implemented.**
+- Day 02's ingestion output (`Document` records with `allowed_groups`, `content_hash` and `## ` headings) is the intended input for Day 03 (chunking), Day 05 (metadata filters, re-index and delete) and Day 14 (enforced permissions).
 - **Image guidance:** `VISUAL_STYLE_GUIDE.md` already specifies a solid mobile-first visual format; keep it unless the branding preference changes.
 - Revisit this roadmap when official documentation, supported models/APIs, evaluation findings, or reader feedback warrant it.
 

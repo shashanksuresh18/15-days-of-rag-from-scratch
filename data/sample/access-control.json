@@ -1,0 +1,18 @@
+{
+  "description": "Simulated export of document permissions from Acme's document management system, the system of record for who may read what. Synthetic data for the 15 Days of RAG series. Keys are paths relative to data/sample/; values are the groups allowed to read the document.",
+  "exported_at": "2026-10-13",
+  "permissions": {
+    "acme-handbook/data-retention-policy.md": ["all-employees"],
+    "acme-handbook/expense-reimbursement-policy.md": ["all-employees"],
+    "acme-handbook/it-software-requests.html": ["all-employees"],
+    "acme-handbook/manager-pay-review-guide.txt": ["managers", "people-team"],
+    "acme-handbook/new-starter-it-checklist.md": ["all-employees"],
+    "acme-handbook/parental-leave-policy.md": ["all-employees"],
+    "acme-handbook/password-and-mfa-standard.md": ["all-employees"],
+    "acme-handbook/remote-work-policy.md": ["all-employees"],
+    "acme-handbook/scanned-visitor-policy.pdf": ["all-employees"],
+    "acme-handbook/security-incident-reporting.md": ["all-employees"],
+    "acme-handbook/travel-policy.pdf": ["all-employees"],
+    "acme-handbook/vpn-access-guide.md": ["all-employees"]
+  }
+}

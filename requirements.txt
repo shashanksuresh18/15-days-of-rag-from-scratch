@@ -1,16 +1,20 @@
 # 15 Days of RAG from Scratch — Python dependencies
 #
-# Day 01's notebook code uses only the Python standard library.
-# These packages are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
+# Day 01's notebook code uses only the Python standard library. Day 02 adds pypdf.
+# The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
-# Exact versions below were installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13
-# and 3.14 on Linux (x86_64) and Python 3.11.9 on Windows 11. GitHub Actions also runs the
-# tests on Linux, Windows and macOS with Python 3.11 and 3.14.
+# Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux
+# (x86_64) and Python 3.11.9 on Windows 11; GitHub Actions runs the tests on Linux, Windows and
+# macOS with Python 3.11 and 3.14.
+# pypdf (Day 02): tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux (x86_64).
 # Python 3.11 is the minimum because ipykernel 7.4 requires it.
-# New days will add packages here only when a lesson needs them.
+# New days add packages here only when a lesson needs them.
 
 jupyterlab==4.6.4
 ipykernel==7.4.0
 nbclient==0.11.0
 nbformat==5.11.1
 pytest==9.1.1
+
+# Day 02: PDF text extraction. Pure Python, BSD-3-Clause, no required dependencies.
+pypdf==6.20.1
