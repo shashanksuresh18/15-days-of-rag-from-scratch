@@ -10,7 +10,7 @@
 | **Cost** | Free. No API key, no internet access, no paid services |
 | **Code** | [`notebooks/day_01_rag_foundations.ipynb`](../../notebooks/day_01_rag_foundations.ipynb) — Python standard library only |
 | **Visuals** | [`assets/day-01/`](../../assets/day-01/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux. Windows and macOS not yet tested. |
+| **Verified** | Notebook executed top to bottom on 2026-10-13 on Linux (Python 3.11, 3.12, 3.13, 3.14) and Windows 11 (Python 3.11.9). GitHub Actions also passes on Linux, Windows and macOS with Python 3.11 and 3.14. |
 
 ---
 
@@ -367,11 +367,11 @@ if results[0].score < min_score:
 
 | Item | Status |
 |---|---|
-| Notebook runs top to bottom in a fresh kernel | **Tested** on Python 3.11, 3.12, 3.13, 3.14 (Linux), from both the repo root and `notebooks/` |
+| Notebook runs top to bottom in a fresh kernel | **Tested** on Linux (Python 3.11, 3.12, 3.13, 3.14) and Windows 11 (Python 3.11.9), from both the repo root and `notebooks/` |
 | Outputs in sections 5 and 6 of this guide | **Tested**: copied from the executed notebook |
-| `python -m pytest` (3 tests) | **Tested**: passes on the same four Python versions |
-| Windows and macOS | **Not tested yet.** The CI workflow in `.github/workflows/tests.yml` runs both once the repo is on GitHub |
-| GitHub rendering of the Mermaid diagram and math | **Not verified** until pushed to GitHub |
+| `python -m pytest` (3 tests) | **Tested**: passes on all of the above |
+| Linux, Windows and macOS in CI | **Tested**: GitHub Actions (`.github/workflows/tests.yml`) passes on all three with Python 3.11 and 3.14 |
+| GitHub rendering of the Mermaid diagram and math | **Not checked yet**: open this lesson on GitHub to confirm the diagram and formula display |
 | Pasting prompts into a chatbot (optional experiment) | **Not tested**: depends on the tool you use |
 
 ## 13. Common errors and mistakes
@@ -385,6 +385,7 @@ if results[0].score < min_score:
 | `pip install` fails resolving `ipykernel==7.4.0` | Python 3.10 or older | Install Python 3.11+ and recreate `.venv` |
 | Kernel shows a different Python than your venv | A user-level `python3` kernel spec points elsewhere | Run `jupyter kernelspec list` and choose the environment's kernel |
 | `Kernel is running over TCP without encryption` warning | Printed by recent ipykernel when a kernel starts locally | Harmless for local work on your own machine. Never expose a Jupyter server to a network without authentication |
+| A warning from zmq about the Windows event loop when running `pytest` on Windows | zmq (the messaging library Jupyter kernels use) prefers a different asyncio event loop than Windows' default | Harmless: the tests still pass. You can ignore it |
 | Sanity check fails after you edit a document | The checks expect the original corpus | Expected — read the assertion, then update it deliberately |
 
 ### Conceptual mistakes (the expensive ones)

@@ -57,7 +57,7 @@ python -m pytest
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_01_rag_foundations.ipynb` |
 | **What you build** | An API-free RAG baseline in pure Python: ingest 8 synthetic policy files → 34 citable chunks → BM25 index from scratch → explainable top-3 retrieval → cited extractive answer or "I don't know" → the grounded prompt an LLM would receive |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Python 3.11, 3.12, 3.13 and 3.14 (Linux, 2026-10-13), from both the repo root and `notebooks/`. Windows and macOS run in CI once the repository is on GitHub; not yet verified |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux (Python 3.11, 3.12, 3.13, 3.14) and Windows 11 (Python 3.11.9) on 2026-10-13, from both the repo root and `notebooks/`. GitHub Actions passes on Linux, Windows and macOS with Python 3.11 and 3.14 |
 | **Known limitations** | Keyword matching only (no synonyms or stemming); abstention threshold chosen by eye on a tiny corpus; no LLM, so answers are copied sentences; no access control — every user sees every document; English-centric tokenizer and stopwords |
 | **Cost** | Free. No network access, no paid services, no environment variables |
 
@@ -71,6 +71,7 @@ python -m pytest
 ├── CLAUDE.md                     conventions for AI coding assistants working in this repo
 ├── requirements.txt              tested, pinned dependencies (Python 3.11+)
 ├── requirements-assets.txt       optional: only for re-rendering slide PNGs
+├── LICENSE                       MIT
 ├── .env.example                  placeholders only; Day 01 needs none
 ├── data/sample/acme-handbook/    synthetic corpus (see data/sample/README.md)
 ├── docs/day-01/LEARN.md          the lesson
@@ -96,7 +97,7 @@ Folders such as `src/` and `evals/` appear when a day needs them (evaluation sta
 
 - The sample corpus is **synthetic** and written for this repository; Acme Corp is fictional. Details in [`data/sample/README.md`](data/sample/README.md).
 - **Third-party assets:** the slide tooling bundles two fonts (SIL Open Font License) and a subset of Lucide icons (ISC licence). Details and licence files are in [`scripts/slides/README.md`](scripts/slides/README.md).
-- **Licence:** _to be added before the repository is made public._
+- **Licence:** [MIT](LICENSE) for the code, lessons, slides and posts. The bundled fonts (SIL Open Font License) and icons (ISC) keep their own licences, listed above.
 
 ## Contributing and feedback
 

@@ -2,6 +2,7 @@ name: tests
 
 on:
   push:
+    branches: ["**"]   # branch pushes only; tag pushes reuse a commit that was already tested
   pull_request:
 
 permissions:

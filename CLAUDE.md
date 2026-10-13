@@ -1,6 +1,6 @@
 # Notes for Claude Code — 15 Days of RAG from Scratch
 
-A public, day-by-day learning series on Retrieval-Augmented Generation. Each day adds a lesson, a runnable notebook, LinkedIn slides and a post. Read `README.md`, `ROADMAP.md` and `VISUAL_STYLE_GUIDE.md` before changing anything substantial. If a local planning/ folder exists (it is gitignored), also read the project instructions and notes in it.
+A public, day-by-day learning series on Retrieval-Augmented Generation. Each day adds a lesson, a runnable notebook, LinkedIn slides and a post. Read `README.md`, `ROADMAP.md` and `VISUAL_STYLE_GUIDE.md` before changing anything substantial. If a local `planning/` folder exists (it is gitignored), also read the project instructions and notes in it.
 
 ## Commands
 

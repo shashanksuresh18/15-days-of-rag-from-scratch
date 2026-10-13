@@ -4,8 +4,9 @@
 # These packages are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Exact versions below were installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13
-# and 3.14 on Linux (x86_64). Python 3.11 is the minimum because ipykernel 7.4 requires it.
-# Windows and macOS have not been tested yet.
+# and 3.14 on Linux (x86_64) and Python 3.11.9 on Windows 11. GitHub Actions also runs the
+# tests on Linux, Windows and macOS with Python 3.11 and 3.14.
+# Python 3.11 is the minimum because ipykernel 7.4 requires it.
 # New days will add packages here only when a lesson needs them.
 
 jupyterlab==4.6.4
