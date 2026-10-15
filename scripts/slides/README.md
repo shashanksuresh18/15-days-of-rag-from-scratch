@@ -21,6 +21,7 @@ python scripts/slides/day02.py && python scripts/slides/render.py assets/day-02
 - **Facts:** each `dayXX.py` refuses to build if any number, keyword or ID on its slides is missing from that day's executed notebook outputs.
 - **Overflow:** every text element is measured with the bundled font files; a line that would not fit its box stops the build.
 - **Contrast:** every text colour must reach at least 4.5:1 (WCAG AA) on white and on every pastel zone background.
+- **Reproducible:** rebuilding gives byte-identical SVGs, PNGs and PDFs. `render.py` writes a fixed creation date into the carousel PDF instead of the build time, so Git only shows a slide as changed when it really changed. With `requirements-assets.txt` installed, `python -m pytest tests/test_slides.py` checks that each committed PDF matches its PNGs (the test is skipped otherwise).
 
 ## Bundled third-party assets
 
