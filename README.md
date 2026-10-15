@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–02 are available. Days 03–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–03 are available. Days 04–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -14,7 +14,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 |---|---|---|---|---|---|---|
 | 01 | RAG foundations | [LEARN.md](docs/day-01/LEARN.md) | [notebook](notebooks/day_01_rag_foundations.ipynb) | [slides](assets/day-01/) | [post](linkedin/day-01.md) | ✅ Verified 2026-10-13 |
 | 02 | Ingestion, parsing and metadata | [LEARN.md](docs/day-02/LEARN.md) | [notebook](notebooks/day_02_ingestion_and_metadata.ipynb) | [slides](assets/day-02/) | [post](linkedin/day-02.md) | ✅ Verified 2026-10-13 |
-| 03 | Chunking and document structure | — | — | — | — | Planned |
+| 03 | Chunking and document structure | [LEARN.md](docs/day-03/LEARN.md) | [notebook](notebooks/day_03_chunking_and_structure.ipynb) | [slides](assets/day-03/) | [post](linkedin/day-03.md) | ✅ Tested 2026-10-15 |
 | 04 | Embeddings, lexical matching and similarity | — | — | — | — | Planned |
 | 05 | Local vector search and data lifecycle | — | — | — | — | Planned |
 | 06 | First end-to-end grounded RAG | — | — | — | — | Planned |
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`).
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing).
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -73,6 +73,16 @@ python -m pytest
 | **Known limitations** | Heuristic cleaning tuned to clean sample files (de-hyphenation, 3-space table columns, numbered headings); no OCR (scanned PDFs are detected and quarantined); file names as document IDs, so renames look like delete + add; permissions are recorded but not yet enforced at query time (Days 05 and 14); no connectors, retries or monitoring |
 | **Cost** | Free. Runs offline, no paid services, no environment variables. One new dependency: `pypdf` (pure Python, BSD-3-Clause) |
 
+## Day 03 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_03_chunking_and_structure.ipynb` |
+| **What you build** | Two chunkers for Day 02's 11 records: fixed-size word windows and structure-aware chunks (split at headings, never inside a sentence or table row, header row repeated when a table is split, `Title > Section` context header) → a boundary map of where each one cuts → the same BM25 retriever on 13 diagnostic questions, including the Singapore hotel-limit table question → measured effects of overlap, window size and headers → chunks that inherit permissions and hashes, written to `outputs/day-03/chunks.jsonl` |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-15, from both the repo root and `notebooks/`. New `tests/test_shared_code.py` checks that `src/rag_from_scratch` returns exactly what the Day 01 and Day 02 notebooks return. GitHub Actions runs the same tests on Linux, Windows and macOS with Python 3.11 and 3.14 on every push |
+| **Known limitations** | Sizes in words, not model tokens; only `## ` sections (no nested heading paths); assumes a table's first row is its header; 13 hand-written questions on 11 short documents are a diagnostic, not a benchmark; permissions are carried on every chunk but not yet enforced (Days 05 and 14) |
+| **Cost** | Free. Runs offline, no paid services, no environment variables, no new dependencies |
+
 ## Repository layout
 
 ```text
@@ -89,7 +99,8 @@ python -m pytest
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── tests/                        smoke tests that execute the notebooks + sample-data checks
+├── src/rag_from_scratch/         code reused by later days (Day 02 ingestion, Day 01 BM25), see below
+├── tests/                        smoke tests that execute the notebooks, shared-code and sample-data checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
 ├── scripts/slides/               reproducible slide build (SVG -> PNG)
@@ -98,7 +109,9 @@ python -m pytest
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
-Folders such as `src/` and `evals/` appear when a day needs them (evaluation starts on Day 07).
+`evals/` appears when evaluation starts on Day 07.
+
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 

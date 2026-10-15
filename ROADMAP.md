@@ -90,8 +90,9 @@ If the audience asks for more after Day 15, consider separate mini-series on **m
 ## Reference material and maintenance
 
 - Original notebooks cover numerous classic RAG concepts; they are reference material, not confirmed working code against current packages.
-- Day 01 is implemented and verified (Python 3.11–3.14 on Linux, Windows 11, CI on Linux/Windows/macOS). Day 02 is implemented and was tested on 2026-10-13 (Python 3.11–3.14 on Linux; CI on every push). **Days 03–15 are planned, not implemented.**
+- Day 01 is implemented and verified (Python 3.11–3.14 on Linux, Windows 11, CI on Linux/Windows/macOS). Day 02 is implemented and verified (Python 3.11–3.14 on Linux, Windows 11, CI on every push). Day 03 is implemented and was tested on 2026-10-15 (Python 3.11–3.14 on Linux; CI on every push). **Days 04–15 are planned, not implemented.**
 - Day 02's ingestion output (`Document` records with `allowed_groups`, `content_hash` and `## ` headings) is the intended input for Day 03 (chunking), Day 05 (metadata filters, re-index and delete) and Day 14 (enforced permissions).
+- Day 03's structure-aware chunks (`outputs/day-03/chunks.jsonl`: stable IDs, `allowed_groups`, `doc_hash`, `chunk_hash`) are the intended input for Day 04 (embeddings) and Day 05 (indexing, updates). Code reused by a later day moves to `src/rag_from_scratch/` on its first reuse, with a test that it still matches the notebook it came from.
 - **Image guidance:** `VISUAL_STYLE_GUIDE.md` already specifies a solid mobile-first visual format; keep it unless the branding preference changes.
 - Revisit this roadmap when official documentation, supported models/APIs, evaluation findings, or reader feedback warrant it.
 

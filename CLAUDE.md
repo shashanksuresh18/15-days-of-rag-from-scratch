@@ -11,7 +11,8 @@ python -m pytest                                        # executes every noteboo
 
 # Slides (optional; fonts and icons are bundled)
 python -m pip install -r requirements-assets.txt
-python scripts/slides/day02.py && python scripts/slides/render.py assets/day-02
+python scripts/slides/day03.py && python scripts/slides/render.py assets/day-03   # same pattern for every day
+python -m pytest tests/test_slides.py                    # carousel PDFs match their PNGs (needs Pillow)
 
 # Sample PDFs (standard library only); --check verifies the committed files
 python scripts/data/make_sample_pdfs.py --check
@@ -21,9 +22,12 @@ python scripts/data/make_sample_pdfs.py --check
 
 `docs/day-XX/LEARN.md` · `notebooks/day_XX_<topic>.ipynb` · `linkedin/day-XX.md` · `assets/day-XX/` (PNG + SVG + PDF) · `scripts/slides/dayXX.py` · a test in `tests/`. Add the day to the README index. Tag each published day: `git tag -a day-XX -m "..."`.
 
+Shared code lives in `src/rag_from_scratch/` (Day 02 `ingest.py`, Day 01 `bm25.py`). Notebooks import it after adding `src/` to `sys.path`; `pytest.ini` sets `pythonpath = src`.
+
 ## Rules
 
 - **Never claim a result you didn't run.** Label untested parts as untested. No invented benchmarks or metrics.
+- **Teach in the notebook, reuse from `src/`.** A technique is written out in full in the notebook that teaches it. Copy it into `src/rag_from_scratch/` only when a later day reuses it, keep the copy behaviourally identical, and extend `tests/test_shared_code.py` so the copy is checked against the original notebook. Don't edit a published day's notebook to import from `src/`.
 - **Notebooks must run top to bottom in a fresh kernel** from the repo root or `notebooks/`, with relative paths only. Commit them with outputs, but no error outputs and no machine-specific paths (a test checks this).
 - **Slides must match the code.** Each `scripts/slides/dayXX.py` checks its numbers and IDs against the executed notebook's outputs. Re-run the notebook before rebuilding slides.
 - **Pinned dependencies.** Only add a package when a lesson needs it, pin the version you tested, and note the date and Python versions in `requirements.txt`.
