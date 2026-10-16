@@ -25,5 +25,13 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
+      # Day 04 downloads its embedding model (133 MB) into models/. Keep it between runs instead of
+      # fetching it from Hugging Face on every push. The key is the pinned model revision, so a new
+      # pin downloads once and the notebook still verifies every file's SHA-256.
+      - name: Cache the embedding model
+        uses: actions/cache@v6
+        with:
+          path: models
+          key: models-${{ runner.os }}-bge-small-en-v1.5-5c38ec7c405ec4b44b94cc5a9bb96e735b38267a
       - name: Execute notebooks and run tests
         run: python -m pytest

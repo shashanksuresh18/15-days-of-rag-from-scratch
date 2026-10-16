@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–03 are available. Days 04–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–04 are available. Days 05–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -15,7 +15,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 01 | RAG foundations | [LEARN.md](docs/day-01/LEARN.md) | [notebook](notebooks/day_01_rag_foundations.ipynb) | [slides](assets/day-01/) | [post](linkedin/day-01.md) | ✅ Verified 2026-10-13 |
 | 02 | Ingestion, parsing and metadata | [LEARN.md](docs/day-02/LEARN.md) | [notebook](notebooks/day_02_ingestion_and_metadata.ipynb) | [slides](assets/day-02/) | [post](linkedin/day-02.md) | ✅ Verified 2026-10-13 |
 | 03 | Chunking and document structure | [LEARN.md](docs/day-03/LEARN.md) | [notebook](notebooks/day_03_chunking_and_structure.ipynb) | [slides](assets/day-03/) | [post](linkedin/day-03.md) | ✅ Tested 2026-10-15 |
-| 04 | Embeddings, lexical matching and similarity | — | — | — | — | Planned |
+| 04 | Embeddings, lexical matching and similarity | [LEARN.md](docs/day-04/LEARN.md) | [notebook](notebooks/day_04_embeddings_and_similarity.ipynb) | [slides](assets/day-04/) | [post](linkedin/day-04.md) | ✅ Tested 2026-10-16 |
 | 05 | Local vector search and data lifecycle | — | — | — | — | Planned |
 | 06 | First end-to-end grounded RAG | — | — | — | — | Planned |
 | 07 | Evaluation baseline | — | — | — | — | Planned |
@@ -30,7 +30,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 ## Quick start
 
-**You need:** Python **3.11 or newer**, Git, and about 200 MB of disk space. No API keys.
+**You need:** Python **3.11 or newer**, Git, and about 600 MB of disk space (from Day 04: a 133 MB embedding model and its runtime). No API keys. Day 04 downloads its model from Hugging Face on first run; every other day runs offline.
 
 ```bash
 git clone https://github.com/shashanksuresh18/15-days-of-rag-from-scratch.git
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing).
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -83,6 +83,16 @@ python -m pytest
 | **Known limitations** | Sizes in words, not model tokens; only `## ` sections (no nested heading paths); assumes a table's first row is its header; 13 hand-written questions on 11 short documents are a diagnostic, not a benchmark; permissions are carried on every chunk but not yet enforced (Days 05 and 14) |
 | **Cost** | Free. Runs offline, no paid services, no environment variables, no new dependencies |
 
+## Day 04 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_04_embeddings_and_similarity.ipynb`. The first run downloads the model (133 MB) into `models/` |
+| **What you build** | A dense retriever from first principles on Day 03's 44 chunks: a small open embedding model (`BAAI/bge-small-en-v1.5`, MIT) pinned to a commit and checked by SHA-256 → tokens, `[CLS]` pooling, normalisation and the attention mask, step by step → cosine vs dot product vs distance → BM25 and embeddings on the same 17 questions (Day 03's 13 and 4 of Day 01's failures) and 30 exact-value lookups → a threshold test for out-of-scope questions → Day 03's context headers re-measured per retriever → vectors with a manifest (model, revision, chunk hash, permissions) and a re-embedding cache, written to `outputs/day-04/` |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-16, from both the repo root and `notebooks/`. With the model present, the notebook makes no network connections. The first download from Hugging Face could not be run in the test environment (the files came from a copy matching the published SHA-256 values); GitHub Actions runs it on Linux, Windows and macOS. Day 03's chunker was copied to `src/` with a test that it matches the Day 03 notebook |
+| **Known limitations** | One small English model; 17 diagnostic questions on 11 short documents, not a benchmark; brute-force search (no vector index until Day 05); scores can differ slightly across CPUs (checks use ranks and tolerances); no Intel Mac support in `onnxruntime`; permissions are carried with every vector but not yet enforced (Days 05 and 14) |
+| **Cost** | Free. No API key, no paid services. One-time downloads: about 50 MB of Python packages and the 133 MB model. Needs internet only for that first download |
+
 ## Repository layout
 
 ```text
@@ -94,24 +104,25 @@ python -m pytest
 ├── requirements.txt              tested, pinned dependencies (Python 3.11+)
 ├── requirements-assets.txt       optional: only for re-rendering slide PNGs
 ├── LICENSE                       MIT
-├── .env.example                  placeholders only; Days 01–02 need none
+├── .env.example                  placeholders only; no day needs secrets so far
 ├── data/sample/acme-handbook/    synthetic corpus: md, html, pdf, txt (see data/sample/README.md)
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (Day 02 ingestion, Day 01 BM25), see below
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions), see below
 ├── tests/                        smoke tests that execute the notebooks, shared-code and sample-data checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
 ├── scripts/slides/               reproducible slide build (SVG -> PNG)
 ├── scripts/data/                 generator for the synthetic sample PDFs (standard library only)
 ├── outputs/                      created when you run a notebook; ignored by Git
+├── models/                       Day 04's downloaded embedding model; ignored by Git
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
 `evals/` appears when evaluation starts on Day 07.
 
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 
@@ -124,6 +135,7 @@ python -m pytest
 ## Data and licence
 
 - The sample corpus is **synthetic** and written for this repository; Acme Corp is fictional. The two sample PDFs are generated by [`scripts/data/make_sample_pdfs.py`](scripts/data/make_sample_pdfs.py). Details in [`data/sample/README.md`](data/sample/README.md).
+- **Downloaded model (Day 04):** [`BAAI/bge-small-en-v1.5`](https://huggingface.co/BAAI/bge-small-en-v1.5), MIT licence, is downloaded by the notebook at run time into `models/` and is not redistributed in this repository.
 - **Third-party assets:** the slide tooling bundles two fonts (SIL Open Font License) and a subset of Lucide icons (ISC licence). Details and licence files are in [`scripts/slides/README.md`](scripts/slides/README.md).
 - **Licence:** [MIT](LICENSE) for the code, lessons, slides and posts. The bundled fonts (SIL Open Font License) and icons (ISC) keep their own licences, listed above.
 

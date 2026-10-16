@@ -1,6 +1,7 @@
 # 15 Days of RAG from Scratch — Python dependencies
 #
 # Day 01's notebook code uses only the Python standard library. Day 02 adds pypdf. Day 03 adds nothing.
+# Day 04 adds numpy, onnxruntime and tokenizers to run a small local embedding model.
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux
@@ -18,3 +19,15 @@ pytest==9.1.1
 
 # Day 02: PDF text extraction. Pure Python, BSD-3-Clause, no required dependencies.
 pypdf==6.20.1
+
+# Day 04: a local embedding model (BAAI/bge-small-en-v1.5, MIT licence, downloaded once by the notebook).
+# numpy (BSD-3-Clause) for vector maths; onnxruntime (MIT) runs the model's ONNX file on the CPU;
+# tokenizers (Apache-2.0) turns text into the model's token IDs; huggingface-hub (Apache-2.0) downloads the
+# model files at a pinned revision (tokenizers depends on it too). Together with their dependencies:
+# about 50 MB to download, about 180 MB installed (measured on Linux x86_64, Python 3.13).
+# numpy stays on 2.4.x because numpy 2.5 needs Python 3.12+. onnxruntime has no wheels for Intel Macs.
+# Tested on 2026-10-16 with Python 3.11, 3.12, 3.13 and 3.14 on Linux (x86_64).
+numpy==2.4.6
+onnxruntime==1.31.0
+tokenizers==0.23.3
+huggingface-hub==2.2.0

@@ -11,6 +11,7 @@ python scripts/slides/day01.py                    # writes assets/day-01/*.svg
 python scripts/slides/render.py assets/day-01     # writes assets/day-01/*.png and the PDF
 python scripts/slides/day02.py && python scripts/slides/render.py assets/day-02
 python scripts/slides/day03.py && python scripts/slides/render.py assets/day-03
+python scripts/slides/day04.py && python scripts/slides/render.py assets/day-04
 ```
 
 ## How the sketch look works

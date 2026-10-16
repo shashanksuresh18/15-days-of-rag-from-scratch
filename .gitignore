@@ -28,6 +28,9 @@ planning/
 outputs/
 *.log
 
+# --- Downloaded model files (Day 04+): fetched by the notebooks, verified by SHA-256, never committed ---
+models/
+
 # --- Editors and OS files ---
 .vscode/
 .idea/
