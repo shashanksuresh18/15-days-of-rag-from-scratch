@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–04 are available. Days 05–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–05 are available. Days 06–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -16,7 +16,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 02 | Ingestion, parsing and metadata | [LEARN.md](docs/day-02/LEARN.md) | [notebook](notebooks/day_02_ingestion_and_metadata.ipynb) | [slides](assets/day-02/) | [post](linkedin/day-02.md) | ✅ Verified 2026-10-13 |
 | 03 | Chunking and document structure | [LEARN.md](docs/day-03/LEARN.md) | [notebook](notebooks/day_03_chunking_and_structure.ipynb) | [slides](assets/day-03/) | [post](linkedin/day-03.md) | ✅ Tested 2026-10-15 |
 | 04 | Embeddings, lexical matching and similarity | [LEARN.md](docs/day-04/LEARN.md) | [notebook](notebooks/day_04_embeddings_and_similarity.ipynb) | [slides](assets/day-04/) | [post](linkedin/day-04.md) | ✅ Tested 2026-10-16 |
-| 05 | Local vector search and data lifecycle | — | — | — | — | Planned |
+| 05 | Local vector search and data lifecycle | [LEARN.md](docs/day-05/LEARN.md) | [notebook](notebooks/day_05_vector_search_and_lifecycle.ipynb) | [slides](assets/day-05/) | [post](linkedin/day-05.md) | ✅ Tested 2026-10-18 |
 | 06 | First end-to-end grounded RAG | — | — | — | — | Planned |
 | 07 | Evaluation baseline | — | — | — | — | Planned |
 | 08 | Hybrid search and rank fusion | — | — | — | — | Planned |
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Day 05 adds nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -89,9 +89,19 @@ python -m pytest
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_04_embeddings_and_similarity.ipynb`. The first run downloads the model (133 MB) into `models/` |
 | **What you build** | A dense retriever from first principles on Day 03's 44 chunks: a small open embedding model (`BAAI/bge-small-en-v1.5`, MIT) pinned to a commit and checked by SHA-256 → tokens, `[CLS]` pooling, normalisation and the attention mask, step by step → cosine vs dot product vs distance → BM25 and embeddings on the same 17 questions (Day 03's 13 and 4 of Day 01's failures) and 30 exact-value lookups → a threshold test for out-of-scope questions → Day 03's context headers re-measured per retriever → vectors with a manifest (model, revision, chunk hash, permissions) and a re-embedding cache, written to `outputs/day-04/` |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-16, from both the repo root and `notebooks/`. With the model present, the notebook makes no network connections. The first download from Hugging Face could not be run in the test environment (the files came from a copy matching the published SHA-256 values); GitHub Actions runs it on Linux, Windows and macOS. Day 03's chunker was copied to `src/` with a test that it matches the Day 03 notebook |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-16, from both the repo root and `notebooks/`. With the model present, the notebook makes no network connections. The first download from Hugging Face could not be run in the test environment (the files came from a copy matching the published SHA-256 values); it has since been verified on Windows 11 (Python 3.11.9) and in GitHub Actions on Linux, Windows and macOS (runs 38915667595 and 38921548369). Day 03's chunker was copied to `src/` with a test that it matches the Day 03 notebook |
 | **Known limitations** | One small English model; 17 diagnostic questions on 11 short documents, not a benchmark; brute-force search (no vector index until Day 05); scores can differ slightly across CPUs (checks use ranks and tolerances); no Intel Mac support in `onnxruntime`; permissions are carried with every vector but not yet enforced (Days 05 and 14) |
 | **Cost** | Free. No API key, no paid services. One-time downloads: about 50 MB of Python packages and the 133 MB model. Needs internet only for that first download |
+
+## Day 05 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_05_vector_search_and_lifecycle.ipynb`. Uses Day 04's model (downloaded once if it isn't in `models/` yet) |
+| **What you build** | An exact vector index in plain NumPy for Day 03's 44 chunks: vectors + records + the model, keyed by `chunk_id` → metadata filters for scope, freshness and permissions, applied before or after the ranking → one-file persistence with an atomic swap, no pickle, and a refusal to load with the wrong model → a sync that follows document changes by `chunk_id` and `chunk_hash` (add, re-embed, update metadata, delete) with a guard against wiping the index → four demonstrations that a permission filter is not access control, and a sketch of a check that holds → a measurement of when exact search stops being enough |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-18, from both the repo root and `notebooks/`. Day 04's embedding code was copied to `src/rag_from_scratch/embeddings.py` with a test that it returns exactly the Day 04 notebook's vectors; deliberate bugs in the copy and in the notebook were each caught. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **Known limitations** | Exact search only (fine to roughly 100,000 chunks, measured); the whole index file is rewritten on every save; filters are evaluated in Python; the sync assumes it receives the complete current corpus; permissions are copied into the index and are only as fresh as the last sync; `retrieve_for()` is a sketch without authentication, tenants or audit logging (Day 14) |
+| **Cost** | Free. No new packages, no API key, no paid services. Runs offline once Day 04's model is in `models/` |
 
 ## Repository layout
 
@@ -109,20 +119,20 @@ python -m pytest
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions), see below
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings), see below
 ├── tests/                        smoke tests that execute the notebooks, shared-code and sample-data checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
 ├── scripts/slides/               reproducible slide build (SVG -> PNG)
 ├── scripts/data/                 generator for the synthetic sample PDFs (standard library only)
 ├── outputs/                      created when you run a notebook; ignored by Git
-├── models/                       Day 04's downloaded embedding model; ignored by Git
+├── models/                       the embedding model downloaded by Day 04 (and later days); ignored by Git
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
 `evals/` appears when evaluation starts on Day 07.
 
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 

@@ -7,6 +7,7 @@ it again, a copy moves here so the new notebook can import it instead of repeati
 - bm25.py:     Day 01's BM25 keyword retriever
 - chunking.py: Day 03's structure-aware chunker (Document records -> Chunk records)
 - probes.py:   Day 03's 13 diagnostic questions with their evidence strings
+- embeddings.py: Day 04's pinned local embedding model (Embedder: text -> unit-length vectors)
 
 tests/test_shared_code.py checks each module against the notebook it came from.
 """

@@ -10,7 +10,7 @@
 | **Cost** | Free. No API key, no paid services. One-time download of a 133 MB model; after that, no internet needed |
 | **Code** | [`notebooks/day_04_embeddings_and_similarity.ipynb`](../../notebooks/day_04_embeddings_and_similarity.ipynb) — `numpy`, `onnxruntime`, `tokenizers`, `huggingface-hub`, plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/) |
 | **Visuals** | [`assets/day-04/`](../../assets/day-04/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-16 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. The model's first download from Hugging Face was **not** run in that environment (see section 13). CI runs the same tests, including the download, on Linux, Windows and macOS on every push. |
+| **Verified** | Notebook executed top to bottom on 2026-10-16 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. The model's first download from Hugging Face was **not** run in that environment (see section 13); it has since been verified on Windows 11 (Python 3.11.9) and in GitHub Actions on Linux, Windows and macOS. CI runs the same tests on every push. |
 
 ---
 
@@ -361,6 +361,8 @@ This is **exact** (brute-force) search: every chunk is scored for every question
 - The pinned model files were checked against the SHA-256 values Hugging Face publishes for revision `5c38ec7c…`.
 
 **Not tested here:** the first download from Hugging Face. The test environment couldn't reach huggingface.co, so the model files were placed from a copy whose SHA-256 matched the published values. The download code path (`hf_hub_download`) and its error message for a blocked network were exercised; a successful download was not. GitHub Actions runs it on Linux, Windows and macOS on the first push. Windows and macOS were not tested locally.
+
+**Verified after publication (2026-10-16):** the first download from Hugging Face succeeded on Windows 11 with Python 3.11.9 (`pytest`: 25 passed, 1 skipped; afterwards the Day 04 tests also passed with the network pointed at a dead address, so no network is needed once the files are on disk), and in GitHub Actions on Linux, Windows and macOS: run [38915667595](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/38915667595) on the `day-04` branch, where every job downloaded the model from Hugging Face and passed, and run [38921548369](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/38921548369) on `main`.
 
 **Expected differences on your machine:** timings; scores in the last decimal places (CPUs differ). The sanity checks compare ranks, counts and rounded values, so they should pass everywhere. If one fails, please open an issue with your OS, CPU and Python version.
 

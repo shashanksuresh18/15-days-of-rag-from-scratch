@@ -11,9 +11,10 @@ import types
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy as np
 import pytest
 
-from rag_from_scratch import chunking
+from rag_from_scratch import chunking, embeddings
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -126,3 +127,94 @@ def test_chunking_helpers_match_day_03_notebook_on_edge_cases(day03: dict) -> No
     assert chunking.to_units(lines) == day03["to_units"](lines)
     body = "Preface text.\n## One\n" + "\n".join(lines) + "\n\n## Two?\n" + EDGE_PARAGRAPH
     assert chunking.split_sections(body) == day03["split_sections"](body)
+
+
+# ----------------------------------------------------------------------------- Day 04: embeddings
+@pytest.fixture(scope="module")
+def day04() -> dict:
+    # Runs the whole Day 04 notebook (downloads the model on first use, then embeds offline).
+    return run_notebook_code("day_04_embeddings_and_similarity.ipynb")
+
+
+@pytest.fixture(scope="module")
+def embedder() -> embeddings.Embedder:
+    return embeddings.Embedder(REPO_ROOT)
+
+
+def test_embedding_settings_match_day_04_notebook(day04: dict, embedder: embeddings.Embedder) -> None:
+    assert embeddings.MODEL == day04["MODEL"]
+    assert embeddings.QUERY_INSTRUCTION == day04["QUERY_INSTRUCTION"]
+    assert embeddings.MAX_TOKENS == day04["MAX_TOKENS"]
+    assert embeddings.default_model_dir(REPO_ROOT) == day04["MODEL_DIR"] == embedder.model_dir
+    assert embedder.revision == day04["MODEL"]["revision"] and embedder.dimensions == 384
+    assert embedder.tokenizer.truncation == day04["tokenizer"].truncation
+    assert embedder.tokenizer.padding == day04["tokenizer"].padding
+    assert embedder.input_names == day04["INPUT_NAMES"]
+
+
+LONG_TEXT = " ".join(f"word{i} policy approval" for i in range(700))   # over 512 tokens: truncation path
+EDGE_TEXTS = ["", "x", "USD 220", "How much time off do new dads get?", LONG_TEXT, "Ünïcödé — ✓ 15:00"]
+
+
+def test_embeddings_match_day_04_notebook(day04: dict, embedder: embeddings.Embedder) -> None:
+    chunk_texts = [c.text for c in day04["chunks"]]
+    headerless_texts = [c.text for c in day04["headerless"]]
+    # The 44 chunk vectors the notebook computed, recomputed by the module: identical, not just close
+    assert np.array_equal(embedder.embed(chunk_texts), day04["chunk_vectors"])
+    assert np.array_equal(embedder.embed(headerless_texts), day04["headerless_vectors"])
+    # The same function on other inputs and batch sizes (16 is the default; 17 texts cross a batch boundary)
+    for texts in (EDGE_TEXTS, chunk_texts[:17], chunk_texts[5:6]):
+        for batch_size in (1, 5, 16):
+            assert np.array_equal(embedder.embed(texts, batch_size=batch_size),
+                                  day04["embed"](texts, batch_size=batch_size))
+    # Queries: with the model card's instruction, and without it (section 8's knob)
+    questions = [p.question for p in day04["QUESTIONS"]] + [p.question for p in day04["LOOKUPS"]["values"][:5]]
+    for question in questions + EDGE_TEXTS:
+        assert np.array_equal(embedder.embed_query(question), day04["embed_query"](question))
+        assert np.array_equal(embedder.embed_query(question, instruction=""), day04["embed_query"](question, ""))
+    batch = embedder.tokenizer.encode_batch(EDGE_TEXTS)
+    for name, array in embeddings.model_inputs(batch).items():
+        assert np.array_equal(array, day04["model_inputs"](day04["tokenizer"].encode_batch(EDGE_TEXTS))[name])
+
+
+def test_model_file_checks_match_day_04_notebook(day04: dict, tmp_path: Path, monkeypatch, capsys) -> None:
+    # Point both versions at a scratch model folder, so the real files are never touched.
+    model_dir = tmp_path / "models" / "bge-small-en-v1.5" / embeddings.MODEL["revision"][:12]
+    model_dir.mkdir(parents=True)
+    monkeypatch.setitem(day04, "REPO_ROOT", tmp_path)
+    monkeypatch.setitem(day04, "MODEL_DIR", model_dir)
+    real = (embeddings.default_model_dir(REPO_ROOT) / "tokenizer.json").read_bytes()
+    target = model_dir / "tokenizer.json"
+
+    def both(name: str):
+        results = []
+        for call in (lambda: day04["model_file"](name), lambda: embeddings.model_file(name, model_dir, tmp_path)):
+            try:
+                results.append(("ok", call()))
+            except Exception as error:   # compare the type and the full message
+                results.append((type(error).__name__, str(error)))
+        return results
+
+    # 1. A good file: same path, same printed line
+    target.write_bytes(real)
+    capsys.readouterr()
+    notebook, module = both("tokenizer.json")
+    printed = capsys.readouterr().out.splitlines()
+    assert notebook == module == ("ok", target) and printed[0] == printed[1] and printed[0].endswith("verified")
+    assert embeddings.file_sha256(target) == day04["file_sha256"](target) == embeddings.MODEL["files"]["tokenizer.json"][0]
+
+    # 2. One byte changed: both refuse to load it, with the same message
+    target.write_bytes(real[:-1] + bytes([real[-1] ^ 1]))
+    notebook, module = both("tokenizer.json")
+    assert notebook == module and notebook[0] == "ValueError" and "Never load a model file" in notebook[1]
+
+    # 3. Missing file and a failing download (no network needed): same helpful error
+    target.unlink()
+
+    def no_network(*args, **kwargs):
+        raise OSError("network unreachable (simulated by the test)")
+
+    monkeypatch.setitem(day04, "hf_hub_download", no_network)
+    monkeypatch.setattr(embeddings, "hf_hub_download", no_network)
+    notebook, module = both("tokenizer.json")
+    assert notebook == module and notebook[0] == "RuntimeError" and "HF_ENDPOINT" in notebook[1]
