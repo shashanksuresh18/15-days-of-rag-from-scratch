@@ -10,7 +10,7 @@
 | **Cost** | Free. No API key, no paid services, **no new packages**. Uses Day 04's model (133 MB, downloaded once if it isn't already in `models/`) |
 | **Code** | [`notebooks/day_05_vector_search_and_lifecycle.ipynb`](../../notebooks/day_05_vector_search_and_lifecycle.ipynb) — NumPy plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 04's embedding model today |
 | **Visuals** | [`assets/day-05/`](../../assets/day-05/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-18 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. Details in section 13. |
+| **Verified** | Notebook executed top to bottom on 2026-10-18 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`; since verified on Windows 11 (Python 3.11.9) and in GitHub Actions on Linux, Windows and macOS. CI runs the same tests on every push. Details in section 13. |
 
 ---
 
@@ -429,7 +429,9 @@ def sync(index: VectorIndex, current: list[Chunk], embed, max_delete_fraction: f
 - The notebook's sanity checks were themselves tested: eight deliberate bugs (skipped deletes, missing dates passing the freshness filter, saving in place, post-filter as default, no delete guard, ignored metadata changes, no model check, "any" treated as "all") each make the notebook fail.
 - With the model files present, the notebook makes no network connections.
 
-**In the test environment** Hugging Face wasn't reachable, so the model files came from a copy whose SHA-256 values match the published ones. The download itself is Day 04's code path, which has run successfully on Windows 11 (Python 3.11.9) and in CI on Linux, Windows and macOS. CI runs today's notebook on all three on every push; Windows and macOS were not tested locally for Day 05.
+**In the test environment** Hugging Face wasn't reachable, so the model files came from a copy whose SHA-256 values match the published ones. The download itself is Day 04's code path, which has run successfully on Windows 11 (Python 3.11.9) and in CI on Linux, Windows and macOS. CI runs today's notebook on all three on every push.
+
+**Verified after publication (2026-10-19 and 2026-10-20):** on Windows 11 with Python 3.11.9, `pytest` passed (31 passed, 1 skipped: the slide test without Pillow); with the network pointed at a dead address, the Day 05 notebook test and the shared-code tests passed too (17 passed), so no network is needed once the model is on disk. In GitHub Actions on Linux, Windows and macOS with Python 3.11 and 3.14: run [39261318687](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39261318687) on the `day-05` branch (6 of 6 jobs passed) and run [39430351485](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39430351485) on `main` both succeeded.
 
 **Expected differences on your machine:** timings (section 9), and scores in the last decimal places. The sanity checks compare IDs, counts and ranks exactly and scores with a tolerance, so they should pass everywhere. If one fails, please open an issue with your OS, CPU and Python version.
 

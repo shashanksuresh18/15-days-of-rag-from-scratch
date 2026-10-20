@@ -3,6 +3,8 @@
 # Day 01's notebook code uses only the Python standard library. Day 02 adds pypdf. Day 03 adds nothing.
 # Day 04 adds numpy, onnxruntime and tokenizers to run a small local embedding model. Day 05 adds nothing
 # (its vector index is plain NumPy; checked on 2026-10-18 with Python 3.11, 3.12, 3.13 and 3.14 on Linux).
+# Day 06 adds nothing either: its optional language model is called with Python's own urllib (checked on
+# 2026-10-20 with Python 3.11, 3.12, 3.13 and 3.14 on Linux).
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux

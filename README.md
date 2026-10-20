@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–05 are available. Days 06–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–06 are available. Days 07–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -17,7 +17,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 03 | Chunking and document structure | [LEARN.md](docs/day-03/LEARN.md) | [notebook](notebooks/day_03_chunking_and_structure.ipynb) | [slides](assets/day-03/) | [post](linkedin/day-03.md) | ✅ Tested 2026-10-15 |
 | 04 | Embeddings, lexical matching and similarity | [LEARN.md](docs/day-04/LEARN.md) | [notebook](notebooks/day_04_embeddings_and_similarity.ipynb) | [slides](assets/day-04/) | [post](linkedin/day-04.md) | ✅ Tested 2026-10-16 |
 | 05 | Local vector search and data lifecycle | [LEARN.md](docs/day-05/LEARN.md) | [notebook](notebooks/day_05_vector_search_and_lifecycle.ipynb) | [slides](assets/day-05/) | [post](linkedin/day-05.md) | ✅ Tested 2026-10-18 |
-| 06 | First end-to-end grounded RAG | — | — | — | — | Planned |
+| 06 | First end-to-end grounded RAG | [LEARN.md](docs/day-06/LEARN.md) | [notebook](notebooks/day_06_grounded_rag.ipynb) | [slides](assets/day-06/) | [post](linkedin/day-06.md) | ✅ Tested 2026-10-20 |
 | 07 | Evaluation baseline | — | — | — | — | Planned |
 | 08 | Hybrid search and rank fusion | — | — | — | — | Planned |
 | 09 | Reranking and context selection | — | — | — | — | Planned |
@@ -30,7 +30,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 ## Quick start
 
-**You need:** Python **3.11 or newer**, Git, and about 600 MB of disk space (from Day 04: a 133 MB embedding model and its runtime). No API keys. Day 04 downloads its model from Hugging Face on first run; every other day runs offline.
+**You need:** Python **3.11 or newer**, Git, and about 600 MB of disk space (from Day 04: a 133 MB embedding model and its runtime). No API keys: Day 06 can optionally call a language model you configure, local or hosted, but runs without one. Day 04 downloads its model from Hugging Face on first run; every other day runs offline.
 
 ```bash
 git clone https://github.com/shashanksuresh18/15-days-of-rag-from-scratch.git
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Day 05 adds nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 and 06 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -99,9 +99,19 @@ python -m pytest
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_05_vector_search_and_lifecycle.ipynb`. Uses Day 04's model (downloaded once if it isn't in `models/` yet) |
 | **What you build** | An exact vector index in plain NumPy for Day 03's 44 chunks: vectors + records + the model, keyed by `chunk_id` → metadata filters for scope, freshness and permissions, applied before or after the ranking → one-file persistence with an atomic swap, no pickle, and a refusal to load with the wrong model → a sync that follows document changes by `chunk_id` and `chunk_hash` (add, re-embed, update metadata, delete) with a guard against wiping the index → four demonstrations that a permission filter is not access control, and a sketch of a check that holds → a measurement of when exact search stops being enough |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-18, from both the repo root and `notebooks/`. Day 04's embedding code was copied to `src/rag_from_scratch/embeddings.py` with a test that it returns exactly the Day 04 notebook's vectors; deliberate bugs in the copy and in the notebook were each caught. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-18, from both the repo root and `notebooks/`. Day 04's embedding code was copied to `src/rag_from_scratch/embeddings.py` with a test that it returns exactly the Day 04 notebook's vectors; deliberate bugs in the copy and in the notebook were each caught. Verified after publication on Windows 11 (Python 3.11.9: 31 passed, 1 skipped; also offline) and in GitHub Actions on Linux, Windows and macOS (runs 39261318687 and 39430351485). CI runs the same tests on every push |
 | **Known limitations** | Exact search only (fine to roughly 100,000 chunks, measured); the whole index file is rewritten on every save; filters are evaluated in Python; the sync assumes it receives the complete current corpus; permissions are copied into the index and are only as fresh as the last sync; `retrieve_for()` is a sketch without authentication, tenants or audit logging (Day 14) |
 | **Cost** | Free. No new packages, no API key, no paid services. Runs offline once Day 04's model is in `models/` |
+
+## Day 06 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_06_grounded_rag.ipynb`. It reads Day 05's saved index if present and syncs it, or builds it on a fresh clone |
+| **What you build** | An end-to-end grounded RAG pipeline in five steps: retrieve as a specific user (permissions from a directory, filter always on) → a gate that abstains without calling anything when nothing is close → a budgeted context with citation ids and review dates → a prompt that keeps instructions apart from escaped, untrusted text (a planted note with fake tags shows why) → an API-free extractive reader, or any OpenAI-compatible model (Ollama locally, or a hosted one with the key in `.env`) → a citation check that blocks answers citing nothing, citing sources they weren't given, or changing numbers. Measured on 24 questions, including four that are cited, pass every check, and are still wrong |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-20, from both the repo root and `notebooks/`, with and without Day 05's saved index. Day 05's index code was copied to `src/rag_from_scratch/index.py` (and `corpus.py`) with a test that it matches the Day 05 notebook; deliberate bugs in the copy and in the notebook were each caught. The optional live model was tested only against local fake servers, not a real model. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **Known limitations** | The API-free reader copies sentences: it can't judge whether one answers the question, so similar-but-wrong answers get through; its thresholds were chosen by eye on 15 questions (Day 07 measures them); the citation check verifies sources and numbers, not meaning; escaping protects the prompt's structure, not the model's judgement; no retries, streaming or conversation history; no real language model was run for the recorded outputs |
+| **Cost** | Free by default: no new packages, no API key. Optional live model: free with Ollama on your own computer; with OpenAI's `gpt-6-luna`, at most about USD 0.0044 for the notebook's eight live questions (prices checked 2026-10-20) |
 
 ## Repository layout
 
@@ -114,12 +124,12 @@ python -m pytest
 ├── requirements.txt              tested, pinned dependencies (Python 3.11+)
 ├── requirements-assets.txt       optional: only for re-rendering slide PNGs
 ├── LICENSE                       MIT
-├── .env.example                  placeholders only; no day needs secrets so far
+├── .env.example                  placeholders only; Day 06's optional model settings (copy to .env, never commit it)
 ├── data/sample/acme-handbook/    synthetic corpus: md, html, pdf, txt (see data/sample/README.md)
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings), see below
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index), see below
 ├── tests/                        smoke tests that execute the notebooks, shared-code and sample-data checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
@@ -132,7 +142,7 @@ python -m pytest
 
 `evals/` appears when evaluation starts on Day 07.
 
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 
