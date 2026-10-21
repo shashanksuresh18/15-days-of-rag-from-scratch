@@ -14,6 +14,7 @@ python scripts/slides/day03.py && python scripts/slides/render.py assets/day-03
 python scripts/slides/day04.py && python scripts/slides/render.py assets/day-04
 python scripts/slides/day05.py && python scripts/slides/render.py assets/day-05
 python scripts/slides/day06.py && python scripts/slides/render.py assets/day-06
+python scripts/slides/day07.py && python scripts/slides/render.py assets/day-07
 ```
 
 ## How the sketch look works

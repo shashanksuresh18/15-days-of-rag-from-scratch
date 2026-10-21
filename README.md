@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–06 are available. Days 07–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–07 are available. Days 08–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -18,7 +18,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 04 | Embeddings, lexical matching and similarity | [LEARN.md](docs/day-04/LEARN.md) | [notebook](notebooks/day_04_embeddings_and_similarity.ipynb) | [slides](assets/day-04/) | [post](linkedin/day-04.md) | ✅ Tested 2026-10-16 |
 | 05 | Local vector search and data lifecycle | [LEARN.md](docs/day-05/LEARN.md) | [notebook](notebooks/day_05_vector_search_and_lifecycle.ipynb) | [slides](assets/day-05/) | [post](linkedin/day-05.md) | ✅ Tested 2026-10-18 |
 | 06 | First end-to-end grounded RAG | [LEARN.md](docs/day-06/LEARN.md) | [notebook](notebooks/day_06_grounded_rag.ipynb) | [slides](assets/day-06/) | [post](linkedin/day-06.md) | ✅ Tested 2026-10-20 |
-| 07 | Evaluation baseline | — | — | — | — | Planned |
+| 07 | Evaluation baseline | [LEARN.md](docs/day-07/LEARN.md) | [notebook](notebooks/day_07_evaluation_baseline.ipynb) · [evals/](evals/) | [slides](assets/day-07/) | [post](linkedin/day-07.md) | ✅ Tested 2026-10-22 |
 | 08 | Hybrid search and rank fusion | — | — | — | — | Planned |
 | 09 | Reranking and context selection | — | — | — | — | Planned |
 | 10 | Query understanding and transformations | — | — | — | — | Planned |
@@ -43,14 +43,15 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 and 06 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05, 06 and 07 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
 Run the automated checks (they execute each notebook in a fresh kernel):
 
 ```bash
-python -m pytest
+python -m pytest                          # everything
+python -m pytest tests/test_evals.py      # one file at a time uses the least memory
 ```
 
 ## Day 01 at a glance
@@ -109,9 +110,19 @@ python -m pytest
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_06_grounded_rag.ipynb`. It reads Day 05's saved index if present and syncs it, or builds it on a fresh clone |
 | **What you build** | An end-to-end grounded RAG pipeline in five steps: retrieve as a specific user (permissions from a directory, filter always on) → a gate that abstains without calling anything when nothing is close → a budgeted context with citation ids and review dates → a prompt that keeps instructions apart from escaped, untrusted text (a planted note with fake tags shows why) → an API-free extractive reader, or any OpenAI-compatible model (Ollama locally, or a hosted one with the key in `.env`) → a citation check that blocks answers citing nothing, citing sources they weren't given, or changing numbers. Measured on 24 questions, including four that are cited, pass every check, and are still wrong |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-20, from both the repo root and `notebooks/`, with and without Day 05's saved index. Day 05's index code was copied to `src/rag_from_scratch/index.py` (and `corpus.py`) with a test that it matches the Day 05 notebook; deliberate bugs in the copy and in the notebook were each caught. The optional live model was tested only against local fake servers, not a real model. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
-| **Known limitations** | The API-free reader copies sentences: it can't judge whether one answers the question, so similar-but-wrong answers get through; its thresholds were chosen by eye on 15 questions (Day 07 measures them); the citation check verifies sources and numbers, not meaning; escaping protects the prompt's structure, not the model's judgement; no retries, streaming or conversation history; no real language model was run for the recorded outputs |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-20, from both the repo root and `notebooks/`, with and without Day 05's saved index. Day 05's index code was copied to `src/rag_from_scratch/index.py` (and `corpus.py`) with a test that it matches the Day 05 notebook; deliberate bugs in the copy and in the notebook were each caught. The optional live model was tested against local fake servers. Verified after publication on Windows 11 (Python 3.11.9: 43 passed, 1 skipped, one test file per process; also offline) and in GitHub Actions on Linux, Windows and macOS (runs 39481113937 and 39482676106). One live run with `gpt-6-luna` after publication (8 questions, about USD 0.0005): it abstained on alice's pay question and the meeting-room question, two that the API-free reader answers wrongly (LEARN.md, section 14). CI runs the same tests on every push |
+| **Known limitations** | The API-free reader copies sentences: it can't judge whether one answers the question, so similar-but-wrong answers get through; its thresholds were chosen by eye on 15 questions (Day 07 measured them: the gate could be 0.62 instead of 0.50); the citation check verifies sources and numbers, not meaning, and splits a copied list number such as "3." into its own sentence (found on Day 07); escaping protects the prompt's structure, not the model's judgement; no retries, streaming or conversation history; the recorded outputs use the API-free reader |
 | **Cost** | Free by default: no new packages, no API key. Optional live model: free with Ollama on your own computer; with OpenAI's `gpt-6-luna`, at most about USD 0.0044 for the notebook's eight live questions (prices checked 2026-10-20) |
+
+## Day 07 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_07_evaluation_baseline.ipynb` (about 15 seconds). Uses Day 04's model (downloaded once if it isn't in `models/` yet) |
+| **What you build** | An evaluation baseline before any optimisation: 81 labelled queries in [`evals/`](evals/) (who asks, the evidence, the chunks that hold it, a dev/test split, tied to a recorded snapshot of the documents and permissions) → a check that stops when documents change and lists the stale labels → BM25 and dense retrieval as each user, on the same queries and snapshot → hit rate@k, recall@k and MRR with 95% intervals and a paired comparison → every miss in the top 3 with a hand-written diagnosis → Day 06's thresholds measured with a rule on dev and reported on test → a committed baseline that every later run is compared with, near ties reported apart |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-22, from both the repo root and `notebooks/`. Day 06's pipeline was copied to `src/rag_from_scratch/answering.py` with a test that it matches the Day 06 notebook, also with other thresholds; deliberate bugs in the copy and in the notebook were each caught. `tests/test_shared_code.py` now releases each day's notebook and model when its tests finish: its peak memory fell from 1,459 MB to 724 MB, the whole suite's from 1,632 MB to 766 MB (Linux, Python 3.13). GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **Known limitations** | 81 queries written by one author: intervals are wide (94% means 79% to 98% on 31 questions); labels from evidence strings miss answers phrased differently from the evidence; the test split has 27 questions and can be used to decide something only once; answers are graded by fact strings, not judged (Day 12); the measured thresholds are recorded, not yet adopted; known failures (names rule, the checker's list numbers) are written down, not fixed |
+| **Cost** | Free. No new packages, no API key, no paid services. Runs offline once Day 04's model is in `models/` |
 
 ## Repository layout
 
@@ -129,8 +140,9 @@ python -m pytest
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index), see below
-├── tests/                        smoke tests that execute the notebooks, shared-code and sample-data checks
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index, answering), see below
+├── evals/                        labelled questions, the document snapshot they belong to, accepted baselines (Day 07)
+├── tests/                        smoke tests that execute the notebooks, shared-code, sample-data and label checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
 ├── scripts/slides/               reproducible slide build (SVG -> PNG)
@@ -140,9 +152,7 @@ python -m pytest
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
-`evals/` appears when evaluation starts on Day 07.
-
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync; Day 07 also imports Day 06's answering pipeline). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 

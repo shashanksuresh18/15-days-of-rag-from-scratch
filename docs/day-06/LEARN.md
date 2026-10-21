@@ -10,7 +10,7 @@
 | **Cost** | Free by default: no API key, no paid services, **no new packages**. Optional: a real language model, local and free (Ollama) or hosted and paid per token (OpenAI's `gpt-6-luna`: at most about USD 0.0044 for the notebook's eight live questions, section 8) |
 | **Code** | [`notebooks/day_06_grounded_rag.ipynb`](../../notebooks/day_06_grounded_rag.ipynb) — Python's standard library plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 05's vector index today |
 | **Visuals** | [`assets/day-06/`](../../assets/day-06/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-20 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. No real language model was run: the optional live path was tested against local fake servers (section 14). |
+| **Verified** | Notebook executed top to bottom on 2026-10-20 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. The recorded outputs use the API-free reader; the optional live path was tested against local fake servers. Verified after publication on Windows 11 and in CI, and run once with a real model, `gpt-6-luna` (section 14). |
 
 ---
 
@@ -412,7 +412,24 @@ def answer(user_id: str, question: str, generator, from_index: VectorIndex | Non
 
 **In the test environment** Hugging Face wasn't reachable, so the model files came from a copy whose SHA-256 values match the published ones; the download itself is Day 04's code path, verified on Windows 11 and in CI. CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push.
 
-**Not tested here:** a real language model. The `ollama` and `openai` presets were exercised only against local fake servers (in the notebook and in `tests/test_day_06_notebook.py`), and the whole live-run cell was run against a fake OpenAI-compatible server in a scratch copy of the repository. The request format follows the providers' documentation as checked on 2026-10-20, but whether `gpt-6-luna` or an Ollama model accepts it, and how either answers the eight live questions, has not been observed. If you run it, please share the output (an issue is fine).
+**Not tested in the content session:** a real language model. The `ollama` and `openai` presets were exercised only against local fake servers (in the notebook and in `tests/test_day_06_notebook.py`), and the whole live-run cell was run against a fake OpenAI-compatible server in a scratch copy of the repository. The request format follows the providers' documentation as checked on 2026-10-20, but whether `gpt-6-luna` or an Ollama model accepts it, and how either answers the eight live questions, has not been observed. If you run it, please share the output (an issue is fine).
+
+**Verified after publication (2026-10-20; recorded on 2026-10-22):** on Windows 11 with Python 3.11.9, every test file passed when run one file per `pytest` process (43 passed, 1 skipped: the slide test without Pillow). A first attempt to run the whole suite in one process was stopped because the machine ran low on memory; Day 07 made the shared-code tests release each notebook's model when its tests finish ([Day 07 LEARN.md](../day-07/LEARN.md), section 14). With the network pointed at a dead address, the Day 06 notebook test and the shared-code tests passed too (26 passed). In GitHub Actions on Linux, Windows and macOS with Python 3.11 and 3.14: run [39481113937](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39481113937) on the `day-06` branch and run [39482676106](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39482676106) on `main` both succeeded (6 of 6 jobs each).
+
+**One live run with `gpt-6-luna` (2026-10-20):** the live cell was run once, on Windows, into a temporary copy of the notebook (`jupyter nbconvert --execute` with `DAY06_LIVE_MODEL=1`; the key read only from `.env`, and checked to appear in no output). The committed notebook keeps its API-free outputs. The `openai` preset was accepted as it is (`developer` role, `max_completion_tokens`, `reasoning_effort: "low"`). The eight requests used 3,658 input and 215 output tokens, about USD 0.00047 at the prices in section 8: about 457 input tokens per question, close to the notebook's estimate of 458. Five replies were answers whose citations passed every check; three were the abstention sentence.
+
+| Question (user) | `gpt-6-luna` | The API-free reader (section 10) |
+|---|---|---|
+| When do pay rises take effect? (alice) | abstained | answered wrongly (an expense-payment sentence) |
+| When do pay rises take effect? (maria) | answered with 1 April, citing the manager guide | correct |
+| What is Google's remote work policy? | abstained | abstained |
+| How do I book a meeting room? | abstained | answered wrongly (travel booking) |
+| How much time off do new dads get? | answered; citations passed | wrong (returning to work) |
+| What is the hotel limit per night in Singapore? | answered; citations passed | correct |
+| How soon must I report a lost laptop? | answered; citations passed | incomplete ("straight away") |
+| My account is locked, what now? (poisoned index) | answered; citations passed | correct (the real lockout policy) |
+
+The answer texts of the last four, including whether the reply on the poisoned index repeated the planted note, aren't recorded here yet: passing the citation checks doesn't rule that out, because the note sits in a chunk the model was sent. They will be added once available. Eight questions are an observation, not a measurement: Day 07 builds the labelled set, and Day 12 evaluates answers on it.
 
 **Expected differences on your machine:** timings, and scores in the last decimal places. The sanity checks compare ids, statuses and counts exactly and scores with a tolerance, so they should pass everywhere. If one fails, please open an issue with your OS, CPU and Python version.
 

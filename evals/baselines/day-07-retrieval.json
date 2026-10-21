@@ -1,0 +1,1979 @@
+{
+ "name": "Day 07 retrieval baseline",
+ "dataset": {
+  "questions": "evals/questions-v1.jsonl",
+  "version": 1,
+  "sha256": "56d356f9cf8e13bbd0ed71b79c6dc96cb67dc0e074479873beeb9791ddf9e90b",
+  "snapshot": "3f8344d00b8b4878291cd7c156631ce8bc21345219083f8444afb4054fc89342"
+ },
+ "retrievers": {
+  "BM25": {
+   "code": "rag_from_scratch.bm25 (Day 01)",
+   "k1": 1.2,
+   "b": 0.75,
+   "indexed_text": "chunk text with its Title > Section header",
+   "permissions": "one index of each user's readable chunks (filter before the ranking)"
+  },
+  "dense": {
+   "code": "rag_from_scratch.answering.Pipeline.retrieve (Day 06)",
+   "model": "BAAI/bge-small-en-v1.5",
+   "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+   "query_instruction": true,
+   "indexed_text": "chunk text with its Title > Section header",
+   "permissions": "metadata filter before the ranking"
+  }
+ },
+ "top_k": 3,
+ "metrics": {
+  "questions, BM25": {
+   "n": 31,
+   "hit@1": 24,
+   "hit@3": 29,
+   "hit@5": 29,
+   "hit@10": 30,
+   "recall@3": 0.9355,
+   "MRR@10": 0.8495
+  },
+  "questions, dense": {
+   "n": 31,
+   "hit@1": 26,
+   "hit@3": 29,
+   "hit@5": 31,
+   "hit@10": 31,
+   "recall@3": 0.9355,
+   "MRR@10": 0.8978
+  },
+  "lookups, BM25": {
+   "n": 30,
+   "hit@1": 30,
+   "hit@3": 30,
+   "hit@5": 30,
+   "hit@10": 30,
+   "recall@3": 1.0,
+   "MRR@10": 1.0
+  },
+  "lookups, dense": {
+   "n": 30,
+   "hit@1": 12,
+   "hit@3": 19,
+   "hit@5": 26,
+   "hit@10": 29,
+   "recall@3": 0.6167,
+   "MRR@10": 0.5596
+  }
+ },
+ "queries": {
+  "d03-01": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 8.3085,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#eligibility"
+    ],
+    "top_score": 11.232
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1761,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 0.708
+   }
+  },
+  "d03-02": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 6.0274,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "travel-policy#claiming-travel-costs",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 8.818
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1076,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#travel"
+    ],
+    "top_score": 0.758
+   }
+  },
+  "d03-03": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 5.4413,
+    "top3": [
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#approval-and-payment",
+     "new-starter-it-checklist#accounts-and-access"
+    ],
+    "top_score": 8.026
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0711,
+    "top3": [
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#approval-and-payment",
+     "new-starter-it-checklist#accounts-and-access"
+    ],
+    "top_score": 0.672
+   }
+  },
+  "d03-04": {
+   "BM25": {
+    "first_relevant": 3,
+    "margin": 0.3189,
+    "top3": [
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#how-to-request-leave",
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "top_score": 6.741
+   },
+   "dense": {
+    "first_relevant": 2,
+    "margin": 0.005,
+    "top3": [
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 0.815
+   }
+  },
+  "d03-05": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 7.0837,
+    "top3": [
+     "password-and-mfa-standard#account-lockout",
+     "vpn-access-guide#connecting",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 13.094
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.2014,
+    "top3": [
+     "password-and-mfa-standard#account-lockout",
+     "password-and-mfa-standard#passwords",
+     "password-and-mfa-standard#resetting-your-password"
+    ],
+    "top_score": 0.824
+   }
+  },
+  "d03-06": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 7.8061,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#purpose",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 10.835
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1323,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#legal-holds",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 0.769
+   }
+  },
+  "d03-07": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 8.3464,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "top_score": 10.975
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1588,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 0.761
+   }
+  },
+  "d03-08": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 9.4906,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "data-retention-policy#purpose",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 12.519
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0165,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#submitting-a-claim",
+     "parental-leave-policy#who-is-eligible"
+    ],
+    "top_score": 0.739
+   }
+  },
+  "d03-09": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.237,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "vpn-access-guide#when-to-use-the-vpn",
+     "remote-work-policy#eligibility"
+    ],
+    "top_score": 4.313
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0502,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "top_score": 0.667
+   }
+  },
+  "d03-10": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.0382,
+    "top3": [
+     "it-software-requests#overview",
+     "vpn-access-guide#installing-the-client",
+     "it-software-requests#how-to-request-software"
+    ],
+    "top_score": 8.612
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.046,
+    "top3": [
+     "it-software-requests#overview",
+     "it-software-requests#how-to-request-software",
+     "vpn-access-guide#installing-the-client"
+    ],
+    "top_score": 0.749
+   }
+  },
+  "d03-11": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 7.0031,
+    "top3": [
+     "new-starter-it-checklist#training",
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 9.981
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.081,
+    "top3": [
+     "new-starter-it-checklist#training",
+     "new-starter-it-checklist#your-first-day",
+     "parental-leave-policy#who-is-eligible"
+    ],
+    "top_score": 0.626
+   }
+  },
+  "d03-12": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.6292,
+    "top3": [
+     "security-incident-reporting#after-you-report",
+     "security-incident-reporting#how-to-report",
+     "travel-policy#safety-while-travelling"
+    ],
+    "top_score": 8.861
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0908,
+    "top3": [
+     "security-incident-reporting#after-you-report",
+     "security-incident-reporting#what-counts-as-an-incident",
+     "security-incident-reporting#how-to-report"
+    ],
+    "top_score": 0.856
+   }
+  },
+  "d03-13": {
+   "BM25": {
+    "first_relevant": 3,
+    "margin": 0.61,
+    "top3": [
+     "travel-policy#safety-while-travelling",
+     "security-incident-reporting#what-counts-as-an-incident",
+     "security-incident-reporting#how-to-report"
+    ],
+    "top_score": 7.276
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0001,
+    "top3": [
+     "security-incident-reporting#what-not-to-do",
+     "travel-policy#safety-while-travelling",
+     "security-incident-reporting#after-you-report"
+    ],
+    "top_score": 0.676
+   }
+  },
+  "d01-01": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "security-incident-reporting#what-not-to-do",
+     "remote-work-policy#purpose",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 3.45
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.0073,
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "top_score": 0.721
+   }
+  },
+  "d01-02": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.7197,
+    "top3": [
+     "password-and-mfa-standard#account-lockout",
+     "vpn-access-guide#connecting"
+    ],
+    "top_score": 3.912
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1017,
+    "top3": [
+     "password-and-mfa-standard#account-lockout",
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 0.746
+   }
+  },
+  "d01-03": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#eligibility",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 6.081
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#purpose",
+     "remote-work-policy#eligibility"
+    ],
+    "top_score": 0.71
+   }
+  },
+  "d01-04": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [],
+    "top_score": null
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel",
+     "travel-policy#safety-while-travelling"
+    ],
+    "top_score": 0.425
+   }
+  },
+  "d06-01": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 4.506,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "parental-leave-policy#returning-to-work",
+     "expense-reimbursement-policy#scope"
+    ],
+    "top_score": 7.478
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1139,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "expense-reimbursement-policy#approval-and-payment",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 0.704
+   }
+  },
+  "d06-02": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "expense-reimbursement-policy#scope"
+    ],
+    "top_score": 3.312
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "parental-leave-policy#returning-to-work",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "top_score": 0.59
+   }
+  },
+  "d06-03": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "top_score": 2.919
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "expense-reimbursement-policy#travel",
+     "travel-policy#booking-travel",
+     "security-incident-reporting#what-counts-as-an-incident"
+    ],
+    "top_score": 0.567
+   }
+  },
+  "d06-04": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "travel-policy#purpose",
+     "expense-reimbursement-policy#scope",
+     "vpn-access-guide#connecting"
+    ],
+    "top_score": 1.706
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#purpose",
+     "expense-reimbursement-policy#scope",
+     "travel-policy#purpose"
+    ],
+    "top_score": 0.585
+   }
+  },
+  "d06-05": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "travel-policy#purpose",
+     "expense-reimbursement-policy#travel",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 2.72
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "travel-policy#booking-travel",
+     "new-starter-it-checklist#getting-help",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 0.59
+   }
+  },
+  "d06-06": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "new-starter-it-checklist#your-first-day",
+     "password-and-mfa-standard#resetting-your-password",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 3.361
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#your-first-day",
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "top_score": 0.621
+   }
+  },
+  "d06-07": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "top_score": 2.991
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#eligibility"
+    ],
+    "top_score": 0.551
+   }
+  },
+  "d04-v01": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.5377,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "expense-reimbursement-policy#approval-and-payment",
+     "it-software-requests#how-to-request-software"
+    ],
+    "top_score": 4.171
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0512,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "remote-work-policy#equipment-and-home-office",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 0.54
+   }
+  },
+  "d04-v02": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#core-hours"
+    ],
+    "top_score": 8.394
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0916,
+    "top3": [
+     "remote-work-policy#core-hours",
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel"
+    ],
+    "top_score": 0.616
+   }
+  },
+  "d04-v03": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.6454,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible",
+     "data-retention-policy#retention-periods"
+    ],
+    "top_score": 5.512
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0412,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible",
+     "data-retention-policy#retention-periods"
+    ],
+    "top_score": 0.643
+   }
+  },
+  "d04-v04": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.8114,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "top_score": 5.678
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.0049,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible",
+     "data-retention-policy#retention-periods"
+    ],
+    "top_score": 0.623
+   }
+  },
+  "d04-v05": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.7838,
+    "top3": [
+     "password-and-mfa-standard#passwords",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 6.383
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1087,
+    "top3": [
+     "password-and-mfa-standard#passwords",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible"
+    ],
+    "top_score": 0.639
+   }
+  },
+  "d04-v06": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.2782,
+    "top3": [
+     "travel-policy#booking-travel",
+     "password-and-mfa-standard#passwords",
+     "it-software-requests#approval-times"
+    ],
+    "top_score": 4.211
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0021,
+    "top3": [
+     "remote-work-policy#eligibility",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 0.594
+   }
+  },
+  "d04-v07": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.253,
+    "top3": [
+     "password-and-mfa-standard#account-lockout",
+     "remote-work-policy#core-hours"
+    ],
+    "top_score": 6.283
+   },
+   "dense": {
+    "first_relevant": 19,
+    "margin": 0.0023,
+    "top3": [
+     "parental-leave-policy#how-to-request-leave",
+     "remote-work-policy#equipment-and-home-office",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 0.557
+   }
+  },
+  "d04-v08": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 4.9724,
+    "top3": [
+     "remote-work-policy#core-hours",
+     "password-and-mfa-standard#account-lockout"
+    ],
+    "top_score": 7.859
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0572,
+    "top3": [
+     "remote-work-policy#core-hours",
+     "parental-leave-policy#how-to-request-leave",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 0.6
+   }
+  },
+  "d04-v09": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.3126,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "new-starter-it-checklist#training",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 6.148
+   },
+   "dense": {
+    "first_relevant": 2,
+    "margin": 0.0209,
+    "top3": [
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "top_score": 0.614
+   }
+  },
+  "d04-v10": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.4417,
+    "top3": [
+     "it-software-requests#approval-times",
+     "it-software-requests#how-to-request-software",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 7.974
+   },
+   "dense": {
+    "first_relevant": 7,
+    "margin": 0.0009,
+    "top3": [
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#travel"
+    ],
+    "top_score": 0.654
+   }
+  },
+  "d04-v11": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.7276,
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "it-software-requests#approval-times",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 5.346
+   },
+   "dense": {
+    "first_relevant": 6,
+    "margin": 0.0073,
+    "top3": [
+     "travel-policy#booking-travel",
+     "parental-leave-policy#returning-to-work",
+     "data-retention-policy#retention-periods"
+    ],
+    "top_score": 0.589
+   }
+  },
+  "d04-v12": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 6.0397,
+    "top3": [
+     "it-software-requests#approval-times",
+     "data-retention-policy#deletion-requests",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "top_score": 9.703
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.004,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel"
+    ],
+    "top_score": 0.649
+   }
+  },
+  "d04-v13": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.3126,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "new-starter-it-checklist#training",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 6.148
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.002,
+    "top3": [
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#returning-to-work",
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "top_score": 0.639
+   }
+  },
+  "d04-v14": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.2113,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "top_score": 3.83
+   },
+   "dense": {
+    "first_relevant": 9,
+    "margin": 0.0022,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "remote-work-policy#eligibility",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 0.635
+   }
+  },
+  "d04-v15": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.4227,
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "data-retention-policy#retention-periods",
+     "it-software-requests#approval-times"
+    ],
+    "top_score": 4.887
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0175,
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "parental-leave-policy#returning-to-work",
+     "data-retention-policy#retention-periods"
+    ],
+    "top_score": 0.601
+   }
+  },
+  "d04-v16": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 4.6843,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 8.307
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0298,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 0.602
+   }
+  },
+  "d04-v17": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.5078,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 5.954
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0165,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 0.563
+   }
+  },
+  "d04-v18": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.5078,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 5.954
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.007,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 0.576
+   }
+  },
+  "d04-v19": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.3259,
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 4.949
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.0086,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "top_score": 0.568
+   }
+  },
+  "d04-v20": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.5078,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 5.954
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0078,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.573
+   }
+  },
+  "d04-v21": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.5078,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 5.954
+   },
+   "dense": {
+    "first_relevant": 5,
+    "margin": 0.0017,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.57
+   }
+  },
+  "d04-v22": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.5078,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 5.954
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.0024,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment",
+     "travel-policy#daily-limits-by-city"
+    ],
+    "top_score": 0.591
+   }
+  },
+  "d04-v23": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.8785,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 4.502
+   },
+   "dense": {
+    "first_relevant": 3,
+    "margin": 0.0119,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.577
+   }
+  },
+  "d04-v24": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 1.52,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 5.604
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0136,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.567
+   }
+  },
+  "d04-v25": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.834,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 6.644
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.011,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#travel"
+    ],
+    "top_score": 0.588
+   }
+  },
+  "d04-i01": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": null,
+    "top3": [
+     "new-starter-it-checklist#getting-help"
+    ],
+    "top_score": 5.305
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.181,
+    "top3": [
+     "new-starter-it-checklist#getting-help",
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#accounts-and-access"
+    ],
+    "top_score": 0.755
+   }
+  },
+  "d04-i02": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 9.0415,
+    "top3": [
+     "password-and-mfa-standard#resetting-your-password",
+     "security-incident-reporting#how-to-report",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 12.642
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1155,
+    "top3": [
+     "password-and-mfa-standard#resetting-your-password",
+     "password-and-mfa-standard#passwords",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 0.752
+   }
+  },
+  "d04-i03": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 4.6252,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "remote-work-policy#eligibility",
+     "password-and-mfa-standard#resetting-your-password"
+    ],
+    "top_score": 8.697
+   },
+   "dense": {
+    "first_relevant": 2,
+    "margin": 0.0008,
+    "top3": [
+     "security-incident-reporting#how-to-report",
+     "manager-pay-review-guide#overview",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 0.663
+   }
+  },
+  "d04-i04": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.1201,
+    "top3": [
+     "data-retention-policy#deletion-requests",
+     "password-and-mfa-standard#resetting-your-password",
+     "security-incident-reporting#how-to-report"
+    ],
+    "top_score": 6.721
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0485,
+    "top3": [
+     "data-retention-policy#deletion-requests",
+     "security-incident-reporting#how-to-report",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 0.721
+   }
+  },
+  "d04-i05": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.0625,
+    "top3": [
+     "security-incident-reporting#how-to-report",
+     "password-and-mfa-standard#resetting-your-password",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 5.663
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0216,
+    "top3": [
+     "security-incident-reporting#how-to-report",
+     "security-incident-reporting#what-counts-as-an-incident",
+     "remote-work-policy#purpose"
+    ],
+    "top_score": 0.747
+   }
+  },
+  "d07-a01": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 6.0271,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "remote-work-policy#eligibility"
+    ],
+    "top_score": 8.95
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1074,
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 0.674
+   }
+  },
+  "d07-a02": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.4678,
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "expense-reimbursement-policy#approval-and-payment",
+     "travel-policy#daily-limits-by-city"
+    ],
+    "top_score": 4.398
+   },
+   "dense": {
+    "first_relevant": 2,
+    "margin": 0.0045,
+    "top3": [
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#submitting-a-claim",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 0.678
+   }
+  },
+  "d07-a03": {
+   "BM25": {
+    "first_relevant": 2,
+    "margin": 0.8758,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#eligibility",
+     "it-software-requests#approval-times"
+    ],
+    "top_score": 7.893
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0139,
+    "top3": [
+     "remote-work-policy#eligibility",
+     "parental-leave-policy#returning-to-work",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.709
+   }
+  },
+  "d07-a04": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.718,
+    "top3": [
+     "remote-work-policy#core-hours",
+     "remote-work-policy#eligibility",
+     "travel-policy#booking-travel"
+    ],
+    "top_score": 6.725
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0856,
+    "top3": [
+     "remote-work-policy#core-hours",
+     "remote-work-policy#eligibility",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.862
+   }
+  },
+  "d07-a05": {
+   "BM25": {
+    "first_relevant": 2,
+    "margin": 0.1274,
+    "top3": [
+     "data-retention-policy#purpose",
+     "data-retention-policy#retention-periods",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 5.702
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1275,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#legal-holds",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 0.792
+   }
+  },
+  "d07-a06": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 6.5769,
+    "top3": [
+     "data-retention-policy#deletion-requests",
+     "data-retention-policy#retention-periods",
+     "security-incident-reporting#what-not-to-do"
+    ],
+    "top_score": 11.618
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1042,
+    "top3": [
+     "data-retention-policy#deletion-requests",
+     "data-retention-policy#retention-periods",
+     "it-software-requests#overview"
+    ],
+    "top_score": 0.737
+   }
+  },
+  "d07-a07": {
+   "BM25": {
+    "first_relevant": 2,
+    "margin": 0.0184,
+    "top3": [
+     "expense-reimbursement-policy#travel",
+     "travel-policy#booking-travel",
+     "travel-policy#purpose"
+    ],
+    "top_score": 6.499
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1466,
+    "top3": [
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel",
+     "travel-policy#safety-while-travelling"
+    ],
+    "top_score": 0.826
+   }
+  },
+  "d07-a08": {
+   "BM25": {
+    "first_relevant": 6,
+    "margin": 0.4316,
+    "top3": [
+     "expense-reimbursement-policy#scope",
+     "travel-policy#purpose",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "top_score": 6.636
+   },
+   "dense": {
+    "first_relevant": 4,
+    "margin": 0.0071,
+    "top3": [
+     "expense-reimbursement-policy#scope",
+     "travel-policy#purpose",
+     "remote-work-policy#purpose"
+    ],
+    "top_score": 0.686
+   }
+  },
+  "d07-a09": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 4.7044,
+    "top3": [
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#approval-and-payment",
+     "it-software-requests#how-to-request-software"
+    ],
+    "top_score": 9.874
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0358,
+    "top3": [
+     "it-software-requests#approval-times",
+     "it-software-requests#free-and-open-source-software",
+     "it-software-requests#overview"
+    ],
+    "top_score": 0.731
+   }
+  },
+  "d07-a10": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 2.7952,
+    "top3": [
+     "password-and-mfa-standard#passwords",
+     "new-starter-it-checklist#your-first-day",
+     "password-and-mfa-standard#resetting-your-password"
+    ],
+    "top_score": 6.156
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.083,
+    "top3": [
+     "password-and-mfa-standard#passwords",
+     "password-and-mfa-standard#account-lockout",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 0.781
+   }
+  },
+  "d07-a11": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.3776,
+    "top3": [
+     "security-incident-reporting#what-not-to-do",
+     "new-starter-it-checklist#your-first-day",
+     "travel-policy#safety-while-travelling"
+    ],
+    "top_score": 5.574
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1132,
+    "top3": [
+     "security-incident-reporting#what-not-to-do",
+     "it-software-requests#overview",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 0.706
+   }
+  },
+  "d07-a12": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 8.8931,
+    "top3": [
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#your-first-day",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 12.254
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1855,
+    "top3": [
+     "password-and-mfa-standard#resetting-your-password",
+     "new-starter-it-checklist#your-first-day",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 0.797
+   }
+  },
+  "d07-a13": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 0.4552,
+    "top3": [
+     "vpn-access-guide#when-to-use-the-vpn",
+     "vpn-access-guide#troubleshooting",
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "top_score": 6.943
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0592,
+    "top3": [
+     "vpn-access-guide#when-to-use-the-vpn",
+     "vpn-access-guide#troubleshooting",
+     "remote-work-policy#security-while-remote"
+    ],
+    "top_score": 0.755
+   }
+  },
+  "d07-a14": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 7.0551,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#purpose",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 15.282
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.1401,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#deletion-requests",
+     "data-retention-policy#legal-holds"
+    ],
+    "top_score": 0.878
+   }
+  },
+  "d07-a15": {
+   "BM25": {
+    "first_relevant": 1,
+    "margin": 3.3555,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "parental-leave-policy#returning-to-work",
+     "expense-reimbursement-policy#scope"
+    ],
+    "top_score": 6.327
+   },
+   "dense": {
+    "first_relevant": 1,
+    "margin": 0.0869,
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#scope"
+    ],
+    "top_score": 0.765
+   }
+  },
+  "d07-u01": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#how-to-request-leave",
+     "parental-leave-policy#who-is-eligible"
+    ],
+    "top_score": 3.917
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "top_score": 0.68
+   }
+  },
+  "d07-u02": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#submitting-a-claim",
+     "data-retention-policy#deletion-requests"
+    ],
+    "top_score": 2.569
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#eligibility",
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#meals"
+    ],
+    "top_score": 0.612
+   }
+  },
+  "d07-u03": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "security-incident-reporting#what-not-to-do",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 4.461
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#legal-holds",
+     "data-retention-policy#purpose"
+    ],
+    "top_score": 0.726
+   }
+  },
+  "d07-u04": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#purpose",
+     "remote-work-policy#eligibility",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 5.248
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#eligibility",
+     "remote-work-policy#purpose"
+    ],
+    "top_score": 0.708
+   }
+  },
+  "d07-u05": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "password-and-mfa-standard#multi-factor-authentication",
+     "travel-policy#safety-while-travelling",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "top_score": 4.275
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "it-software-requests#how-to-request-software",
+     "new-starter-it-checklist#accounts-and-access",
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "top_score": 0.626
+   }
+  },
+  "d07-u06": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "it-software-requests#overview",
+     "password-and-mfa-standard#passwords"
+    ],
+    "top_score": 2.159
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "expense-reimbursement-policy#scope",
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "top_score": 0.58
+   }
+  },
+  "d07-u07": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#troubleshooting",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 5.606
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#equipment-and-home-office",
+     "vpn-access-guide#connecting"
+    ],
+    "top_score": 0.571
+   }
+  },
+  "d07-u08": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "top_score": 2.991
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 0.57
+   }
+  },
+  "d07-u09": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "top_score": 5.606
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "expense-reimbursement-policy#travel",
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#core-hours"
+    ],
+    "top_score": 0.517
+   }
+  },
+  "d07-u10": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [],
+    "top_score": null
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "top_score": 0.606
+   }
+  },
+  "d07-u11": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "expense-reimbursement-policy#scope",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "top_score": 3.312
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#scope",
+     "travel-policy#purpose"
+    ],
+    "top_score": 0.678
+   }
+  },
+  "d07-u12": {
+   "BM25": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "vpn-access-guide#troubleshooting",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#scope"
+    ],
+    "top_score": 5.904
+   },
+   "dense": {
+    "first_relevant": null,
+    "margin": null,
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#purpose",
+     "vpn-access-guide#connecting"
+    ],
+    "top_score": 0.711
+   }
+  }
+ },
+ "errors": [
+  {
+   "retriever": "BM25",
+   "id": "d01-01",
+   "first_relevant": null,
+   "category": "vocabulary",
+   "why": "no word in common with the answer: dads, time off vs caregivers, leave"
+  },
+  {
+   "retriever": "BM25",
+   "id": "d07-a08",
+   "first_relevant": 6,
+   "category": "vocabulary",
+   "why": "wine vs alcohol, pay for vs reimbursed"
+  },
+  {
+   "retriever": "dense",
+   "id": "d03-13",
+   "first_relevant": 4,
+   "category": "other section",
+   "why": "'within one hour' is under How to report, which never mentions a laptop"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v06",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v07",
+   "first_relevant": 19,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v10",
+   "first_relevant": 7,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v11",
+   "first_relevant": 6,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v12",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v14",
+   "first_relevant": 9,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v17",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v18",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v20",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v21",
+   "first_relevant": 5,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d04-v24",
+   "first_relevant": 4,
+   "category": "exact value",
+   "why": "a bare number or amount: its vector doesn't single out the chunk holding it"
+  },
+  {
+   "retriever": "dense",
+   "id": "d07-a08",
+   "first_relevant": 4,
+   "category": "broader chunk",
+   "why": "the policy's Scope (business expenses, meals) outranks the Meals rule"
+  }
+ ],
+ "thresholds": {
+  "rule": "the highest value (in steps of 0.01) that refuses no answerable dev question",
+  "day06": {
+   "min_retrieval_score": 0.5,
+   "min_sentence_score": 0.6
+  },
+  "measured": {
+   "min_retrieval_score": 0.62,
+   "min_sentence_score": 0.63
+  },
+  "outcomes": {
+   "Day 06 (0.50 / 0.60)": {
+    "dev": {
+     "answered (not answerable)": 2,
+     "correct (answerable)": 14,
+     "refused (not answerable)": 6,
+     "wrong (answerable)": 2
+    },
+    "test": {
+     "answered (not answerable)": 7,
+     "correct (answerable)": 12,
+     "refused (answerable)": 2,
+     "refused (not answerable)": 5,
+     "wrong (answerable)": 1
+    }
+   },
+   "measured (0.62 / 0.63)": {
+    "dev": {
+     "correct (answerable)": 14,
+     "refused (not answerable)": 8,
+     "wrong (answerable)": 2
+    },
+    "test": {
+     "answered (not answerable)": 5,
+     "correct (answerable)": 12,
+     "refused (answerable)": 2,
+     "refused (not answerable)": 7,
+     "wrong (answerable)": 1
+    }
+   }
+  }
+ }
+}

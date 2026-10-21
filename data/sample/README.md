@@ -45,3 +45,4 @@ A language model cannot have seen Acme's policies during training, because they 
 - **No personal data.** Email addresses and URLs use the reserved `.example` domain (RFC 2606) and cannot reach anyone.
 - **Licence:** covered by the repository licence (see the root `README.md`).
 - **Changing the corpus changes results.** The notebooks contain sanity checks that expect these exact files. If you edit them, rerun the notebooks and update the checks and slides together.
+- **It also changes the ground truth.** The labelled questions in [`evals/`](../../evals/) (Day 07) belong to a recorded snapshot of these files and their permissions. After an edit, `tests/test_evals.py` fails and the Day 07 notebook lists which labels to review; see `evals/README.md`.

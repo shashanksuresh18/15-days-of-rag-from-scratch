@@ -11,6 +11,7 @@
    reader, and the citation checker on unusual answer formats.
 """
 
+import gc
 import json
 import sys
 import threading
@@ -74,7 +75,7 @@ def test_committed_outputs_are_clean() -> None:
 
 # ----------------------------------------------------------------------------- the notebook's code, tested directly
 @pytest.fixture(scope="module")
-def day06() -> dict:
+def day06():
     nb = json.loads(NOTEBOOK.read_text(encoding="utf-8"))
     source = "\n\n".join("".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code")
     module = types.ModuleType("day_06_grounded_rag")
@@ -83,7 +84,9 @@ def day06() -> dict:
         mp.delenv("DAY06_LIVE_MODEL", raising=False)
         mp.setitem(sys.modules, module.__name__, module)   # dataclasses look up their module
         exec(compile(source, NOTEBOOK.name, "exec"), module.__dict__)
-    return module.__dict__
+    yield module.__dict__
+    module.__dict__.clear()     # free the notebook's model and indexes before the next test file starts
+    gc.collect()
 
 
 class FakeServer:
