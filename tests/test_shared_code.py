@@ -8,6 +8,7 @@ Memory: the tests are grouped in one class per day, and each class creates its o
 namespace and embedding model (class-scoped fixtures). When a day's tests finish, its namespace is
 cleared and garbage-collected, so only one day's notebook and model are in memory at a time
 (Day 07 measured this file's peak memory before and after; docs/day-07/LEARN.md, section 14).
+Day 08 added the Day 07 class (the evaluation harness in evaluation.py).
 """
 
 import dataclasses
@@ -21,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from rag_from_scratch import answering, chunking, corpus, embeddings, index
+from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, index
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -638,3 +639,145 @@ class TestDay06Answering:
             module_answer = answering.RagAnswer("alice", "q", status, text, "why")
             nb_answer = day06["RagAnswer"]("alice", "q", status, text, "why")
             assert answering.grade(module_answer, facts) == day06["grade"](nb_answer, facts), (status, text, facts)
+
+
+# ----------------------------------------------------------------------------- Day 07: the evaluation harness
+@pytest.fixture(scope="class")
+def day07():
+    # Runs the whole Day 07 notebook (labels, both retrievers, thresholds, the baseline comparison). The module's
+    # functions are then compared with the notebook's own on the notebook's own rankings and labels.
+    ns = run_notebook_code("day_07_evaluation_baseline.ipynb")
+    yield ns
+    release(ns)
+
+
+class TestDay07Evaluation:
+    EVIDENCE_CASES = [  # (evidence, text): whole words and numbers only, never part of a longer number
+        (("USD 25",), "up to USD 250 per night"), (("USD 25",), "up to USD 25 per night"),
+        (("USD 25",), "USD 25,000 a year"), (("USD 25",), "USD 25.50"), (("USD 25",), "USD 25."),
+        (("14 days",), "within 14 days."), (("1 April",), "from 1 April 2027"), (("a", "b"), "a b"),
+        (("a", "b"), "a c"), ((), "anything"), (("x",), ""), (("C++",), "C++ code"), (("Wi-Fi",), "the Wi-Fi."),
+        (("14 days",), "within 114 days"), (("USD 25",), "XUSD 25"), (("Wi-Fi",), "noWi-Fi here")]
+
+    def test_evaluation_settings_match_day_07_notebook(self, day07: dict) -> None:
+        for name in ("TOP_K", "MAX_K", "K_VALUES", "TIE"):
+            assert getattr(evaluation, name) == day07[name], name
+        assert [f.name for f in dataclasses.fields(evaluation.Query)] == \
+               [f.name for f in dataclasses.fields(day07["Query"])]
+
+    def test_labels_and_validation_match_day_07_notebook(self, day07: dict, tmp_path: Path) -> None:
+        queries = evaluation.load_queries(day07["QUESTIONS_FILE"])
+        assert [asdict(q) for q in queries] == [asdict(q) for q in day07["queries"]] and len(queries) == 81
+        assert [q.answerable for q in queries] == [q.answerable for q in day07["queries"]]
+        # A file with a blank line and a trailing newline: both loaders skip it the same way
+        rows = day07["QUESTIONS_FILE"].read_text(encoding="utf-8").splitlines()
+        odd = tmp_path / "odd.jsonl"
+        odd.write_text(rows[0] + "\n\n" + rows[1] + "\n", encoding="utf-8")
+        assert [asdict(q) for q in evaluation.load_queries(odd)] == [asdict(q) for q in day07["load_queries"](odd)]
+        # The evidence rule, on every query and chunk and on made-up edge cases
+        chunks = day07["chunks"]
+        for q in day07["queries"]:
+            for c in chunks:
+                assert evaluation.holds(q.evidence, c.text) == day07["holds"](q.evidence, c.text), (q.id, c.chunk_id)
+        for evidence, text in self.EVIDENCE_CASES:
+            assert evaluation.holds(evidence, text) == day07["holds"](evidence, text), (evidence, text)
+        snap = evaluation.snapshot(chunks)
+        assert snap == day07["snapshot"](chunks) and evaluation.fingerprint(snap) == day07["fingerprint"](snap)
+        # validate(): the real labels, the two-edit demo, broken queries, another directory
+        manifest, nb_queries = day07["manifest"], day07["queries"]
+        assert evaluation.validate(queries, chunks, manifest) == day07["validate"](nb_queries, chunks, manifest) == []
+        stale = corpus.corpus_after(REPO_ROOT, day07["update_documents"])
+        assert evaluation.validate(queries, stale, manifest) == day07["stale"] and len(day07["stale"]) == 17
+        first = nb_queries[0]
+        broken = [dataclasses.replace(first, user="mallory"), dataclasses.replace(first, kind="essay"),
+                  dataclasses.replace(first, answer_chunks=()), dataclasses.replace(first, facts=()),
+                  dataclasses.replace(first, evidence=("no such words anywhere",)),
+                  dataclasses.replace(nb_queries[1], id=first.id), dataclasses.replace(first, restricted_chunks=("x",))]
+        for q in broken:
+            module_q = evaluation.Query(**asdict(q))
+            assert evaluation.validate([module_q] + queries[1:], chunks, manifest) == \
+                   day07["validate"]([q] + nb_queries[1:], chunks, manifest), q
+        other = {"alice": {"all-employees", "managers"}, "maria": {"all-employees"}}
+        assert evaluation.validate(queries, chunks, manifest, other) == \
+               day07["validate"](nb_queries, chunks, manifest, other)
+        assert evaluation.validate(queries, chunks[:-1], manifest) == day07["validate"](nb_queries, chunks[:-1], manifest)
+
+    def test_metrics_match_day_07_notebook(self, day07: dict) -> None:
+        rankings, queries = day07["rankings"], day07["queries"]
+        for name in day07["RETRIEVERS"]:
+            for q in queries:
+                ranked = rankings[name][q.id]
+                for relevant in (q.answer_chunks, q.restricted_chunks, (ranked[0][0],) if ranked else ()):
+                    assert evaluation.first_relevant(ranked, relevant) == day07["first_relevant"](ranked, relevant)
+                    for k in range(0, 13):
+                        assert evaluation.hit(ranked, relevant, k) == day07["hit"](ranked, relevant, k)
+                        assert evaluation.reciprocal_rank(ranked, relevant, k) == \
+                               day07["reciprocal_rank"](ranked, relevant, k)
+                        if relevant:
+                            assert evaluation.recall(ranked, relevant, k) == day07["recall"](ranked, relevant, k)
+                    assert evaluation.reciprocal_rank(ranked, relevant) == day07["reciprocal_rank"](ranked, relevant)
+            # measure(): the module takes the ranking, the notebook reads its global by name
+            selections = list(day07["SELECTIONS"].values()) + [
+                [q for q in day07["SELECTIONS"]["questions"] if q.split == split] for split in ("dev", "test")]
+            for selection in selections:
+                assert evaluation.measure(rankings[name], selection) == day07["measure"](name, selection)
+        for n in range(1, 40):
+            for s in range(0, n + 1):
+                assert evaluation.wilson(s, n) == day07["wilson"](s, n), (s, n)
+        assert evaluation.wilson(29, 31, z=2.58) == day07["wilson"](29, 31, z=2.58)
+        for a in range(0, 16):
+            for b in range(0, 16):
+                assert evaluation.sign_test(a, b) == day07["sign_test"](a, b), (a, b)
+
+    def test_comparison_matches_day_07_notebook(self, day07: dict) -> None:
+        rankings, queries = day07["rankings"], day07["queries"]
+        for name in day07["RETRIEVERS"]:
+            for q in queries:
+                ranked = rankings[name][q.id]
+                assert evaluation.top_score(ranked) == day07["top_score"](name, q.id)
+                if q.answerable:
+                    assert evaluation.tie_margin(ranked, q.answer_chunks) == day07["tie_margin"](name, q)
+        assert evaluation.top_score([]) is None and evaluation.tie_margin([], ("x",)) is None
+        assert evaluation.tie_margin([("a", 0.5)], ("a",)) is None     # one result: no neighbour
+        accepted = json.loads(day07["BASELINE_FILE"].read_text(encoding="utf-8"))
+        run = day07["baseline"]
+
+        def edited(change) -> dict:
+            copy = json.loads(json.dumps(run))
+            change(copy)
+            return copy
+
+        def move(qid, name, rank):
+            return lambda b: b["queries"][qid][name].update(first_relevant=rank)
+
+        def score(qid, name, delta):
+            return lambda b: b["queries"][qid][name].update(top_score=round(b["queries"][qid][name]["top_score"] + delta, 3))
+
+        variants = [run, accepted,
+                    edited(move("d03-13", "dense", 5)),                     # a near tie in the baseline: listed apart
+                    edited(move("d03-04", "BM25", 1)),                      # a real change
+                    edited(lambda b: [move("d03-13", "dense", 5)(b), b["metrics"]["questions, dense"].update(n=0)]),
+                    edited(score("d03-01", "dense", 0.004)), edited(score("d03-01", "dense", 0.006)),
+                    edited(lambda b: b["queries"]["d03-01"]["BM25"].update(top_score=None)),
+                    edited(lambda b: b["queries"]["d03-01"].update(hybrid=b["queries"]["d03-01"]["BM25"])),
+                    edited(lambda b: b["retrievers"]["BM25"].update(k1=1.5)),
+                    edited(lambda b: b["dataset"].update(version=2)),
+                    edited(lambda b: b["thresholds"]["measured"].update(min_retrieval_score=0.6)),
+                    edited(lambda b: b["metrics"].update({"questions, BM25": {}}))]
+        for new in variants:
+            for old in (accepted, run, variants[3]):
+                for tolerance in (0.005, 0.0001):
+                    assert evaluation.compare(new, old, tolerance) == day07["compare"](new, old, tolerance)
+        # On the boundaries: a score change exactly equal to the tolerance, a near tie exactly at TIE, a margin above it
+        changed = edited(score("d03-01", "dense", 0.004))
+        diff = abs(changed["queries"]["d03-01"]["dense"]["top_score"] - run["queries"]["d03-01"]["dense"]["top_score"])
+        for tolerance in (diff, diff * 0.999, diff * 1.001):
+            assert evaluation.compare(changed, run, tolerance) == day07["compare"](changed, run, tolerance)
+        assert evaluation.compare(changed, run, diff) == ([], [])
+        moved = edited(move("d01-01", "dense", 2))                  # its recorded margin is 0.0073: a real change
+        for old in (run, edited(lambda b: b["queries"]["d01-01"]["dense"].update(margin=evaluation.TIE)),
+                    edited(lambda b: b["queries"]["d01-01"]["dense"].update(margin=evaluation.TIE / 2))):
+            assert evaluation.compare(moved, old) == day07["compare"](moved, old)
+        assert evaluation.compare(moved, run)[0] and not evaluation.compare(moved, run)[1]
+        assert evaluation.compare(run, accepted) == ([], [])
+        assert evaluation.compare(variants[2], accepted)[1] and not evaluation.compare(variants[2], accepted)[0]

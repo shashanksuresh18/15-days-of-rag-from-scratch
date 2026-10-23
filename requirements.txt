@@ -6,6 +6,8 @@
 # Day 06 adds nothing either: its optional language model is called with Python's own urllib (checked on
 # 2026-10-20 with Python 3.11, 3.12, 3.13 and 3.14 on Linux). Day 07 adds nothing (checked on 2026-10-22 with
 # Python 3.11, 3.12, 3.13 and 3.14 on Linux): its metrics and intervals are a few lines of standard-library Python.
+# Day 08 adds nothing (checked on 2026-10-23 with Python 3.11, 3.12, 3.13 and 3.14 on Linux): rank fusion and score
+# normalisation are a few lines of standard-library Python.
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux

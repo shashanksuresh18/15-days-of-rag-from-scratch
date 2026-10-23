@@ -12,6 +12,8 @@ it again, a copy moves here so the new notebook can import it instead of repeati
 - corpus.py:  Day 05's corpus_after(): chunks of a temporarily changed copy of the sample data
 - answering.py: Day 06's grounded pipeline (Pipeline.retrieve/answer, assemble, ExtractiveReader,
                 check_citations), its thresholds as arguments
+- evaluation.py: Day 07's evaluation harness (labelled queries, validate(), hit@k, recall@k, MRR, the Wilson
+                 interval, the sign test, compare() against an accepted baseline)
 
 tests/test_shared_code.py checks each module against the notebook it came from.
 """

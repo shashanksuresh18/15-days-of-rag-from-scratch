@@ -372,7 +372,7 @@ def slide_thresholds(points: list[tuple[str, bool, float]]) -> Slide:
         s.text(x + 64, zy + 50, title, 21, 800, tcolor(color), max_width=cw - 84)
         s.text(x + 26, zy + 98, big, 27, 800, INK, max_width=cw - 52)
         s.text(x + 26, zy + 136, small, 19, 700, TEXT["muted"], max_width=cw - 52)
-    s.text(M, zy + 194, "rule, written first: highest gate that loses no answerable dev question", 19, 700,
+    s.text(M, zy + 194, "rule, dev only (not pre-registered): highest gate losing no answerable dev question", 19, 700,
            TEXT["muted"], max_width=W - 2 * M)
 
     # the names rule

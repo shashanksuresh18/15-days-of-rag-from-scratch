@@ -35,6 +35,8 @@ Day 7: an evaluation baseline, so "better" can be measured.
 
 #RAG #LLM #Python #AIEngineering
 
+**Update after publication (added 2026-10-23):** the post text above is the version committed with Day 06; the live post (published 2026-10-21) may differ slightly in wording. Its sentence "no real model output is recorded yet" was true when it was written. Since then, one real run with `gpt-6-luna` has been recorded (2026-10-20, 8 questions, 3,658 input and 215 output tokens, about USD 0.0005): it declined alice's pay question and the meeting-room question, two that the API-free reader answers wrongly. Details in [`docs/day-06/LEARN.md`](../docs/day-06/LEARN.md), section 14.
+
 ---
 
 ## Images — posting order, alt text and purpose

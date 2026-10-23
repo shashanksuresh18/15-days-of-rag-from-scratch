@@ -4,9 +4,10 @@
 2. The documents still match the snapshot the labels were written against, and every label can be
    derived again from its evidence. The rule is written out separately from the Day 07 notebook's
    validate(), so the two check each other.
-3. The committed baseline belongs to this dataset and is consistent with itself: its metrics follow
-   from its per-query ranks, its error list is exactly the queries missed in the top 3, and no
-   restricted chunk appears in anyone's top 3.
+3. Each committed baseline (Day 07's and Day 08's) belongs to this dataset and is consistent with
+   itself: its metrics follow from its per-query ranks, its error list is exactly the queries missed
+   in the top 3, and no restricted chunk appears in anyone's top 3. Day 08's BM25 and dense entries
+   are Day 07's, unchanged (Day 08 changed only how the two are combined).
 
 If test 2 fails after you edited data/sample/, that is the point: run the Day 07 notebook, read the
 label problems it lists, review those labels, and record a new version (docs/day-07/LEARN.md, section 8).
@@ -94,8 +95,9 @@ def test_labels_match_the_documents(manifest: dict, rows: list[dict], chunks: li
             r["id"]
 
 
-def test_baseline_belongs_to_this_dataset_and_adds_up(manifest: dict, rows: list[dict]) -> None:
-    baseline = json.loads((EVALS / "baselines" / "day-07-retrieval.json").read_text(encoding="utf-8"))
+@pytest.mark.parametrize("name", ["day-07-retrieval.json", "day-08-retrieval.json"])
+def test_baseline_belongs_to_this_dataset_and_adds_up(name: str, manifest: dict, rows: list[dict]) -> None:
+    baseline = json.loads((EVALS / "baselines" / name).read_text(encoding="utf-8"))
     assert baseline["dataset"] == {"questions": f"evals/{manifest['questions_file']}", "version": manifest["version"],
                                    "sha256": manifest["questions_sha256"],
                                    "snapshot": manifest["snapshot"]["fingerprint"]}
@@ -104,29 +106,41 @@ def test_baseline_belongs_to_this_dataset_and_adds_up(manifest: dict, rows: list
     # The metrics follow from the per-query ranks
     for kind in ("questions", "lookups"):
         selection = [r for r in rows if r["answer_chunks"] and (r["kind"] == "question") == (kind == "questions")]
-        for name in ("BM25", "dense"):
-            m, entries = baseline["metrics"][f"{kind}, {name}"], [baseline["queries"][r["id"]][name] for r in selection]
+        for retriever in baseline["retrievers"]:
+            m, entries = baseline["metrics"][f"{kind}, {retriever}"], [baseline["queries"][r["id"]][retriever]
+                                                                       for r in selection]
             ranks = [e["first_relevant"] for e in entries]
             assert m["n"] == len(selection)
             for k in (1, 3, 5, 10):
-                assert m[f"hit@{k}"] == sum(rank is not None and rank <= k for rank in ranks), (kind, name, k)
+                assert m[f"hit@{k}"] == sum(rank is not None and rank <= k for rank in ranks), (kind, retriever, k)
             mrr = sum(1 / rank for rank in ranks if rank is not None and rank <= 10) / len(ranks)
             recall = sum(len(set(r["answer_chunks"]) & set(e["top3"])) / len(r["answer_chunks"])
                          for r, e in zip(selection, entries)) / len(selection)
-            assert m["MRR@10"] == round(mrr, 4) and m["recall@3"] == round(recall, 4), (kind, name)
+            assert m["MRR@10"] == round(mrr, 4) and m["recall@3"] == round(recall, 4), (kind, retriever)
     # Each query's top 3 agrees with its recorded rank, and holds nothing the asker may not read
     for qid, per_retriever in baseline["queries"].items():
         r = by_id[qid]
-        for name, e in per_retriever.items():
+        assert list(per_retriever) == list(baseline["retrievers"]), qid
+        for retriever, e in per_retriever.items():
             in_top = next((i for i, cid in enumerate(e["top3"], start=1) if cid in r["answer_chunks"]), None)
             if not r["answer_chunks"]:
-                assert e["first_relevant"] is None and e["margin"] is None, (qid, name)
+                assert e["first_relevant"] is None and e["margin"] is None, (qid, retriever)
             assert in_top == (e["first_relevant"] if e["first_relevant"] and e["first_relevant"] <= top_k else None)
-            assert not set(r["restricted_chunks"]) & set(e["top3"]), f"{qid} {name}: a restricted chunk was retrieved"
+            assert not set(r["restricted_chunks"]) & set(e["top3"]), f"{qid} {retriever}: a restricted chunk was retrieved"
     # The error list is exactly the answerable queries missed in the top 3, each with a diagnosis
-    missed = {(name, qid) for qid, per_retriever in baseline["queries"].items() for name, e in per_retriever.items()
+    missed = {(retriever, qid) for qid, per_retriever in baseline["queries"].items()
+              for retriever, e in per_retriever.items()
               if by_id[qid]["answer_chunks"] and (e["first_relevant"] is None or e["first_relevant"] > top_k)}
     assert {(e["retriever"], e["id"]) for e in baseline["errors"]} == missed
     assert all(e["category"] and e["why"] for e in baseline["errors"])
-    assert baseline["thresholds"]["day06"] == {"min_retrieval_score": answering.MIN_RETRIEVAL_SCORE,
-                                               "min_sentence_score": answering.MIN_SENTENCE_SCORE}
+    day07 = json.loads((EVALS / "baselines" / "day-07-retrieval.json").read_text(encoding="utf-8"))
+    if name == "day-07-retrieval.json":
+        assert baseline["thresholds"]["day06"] == {"min_retrieval_score": answering.MIN_RETRIEVAL_SCORE,
+                                                   "min_sentence_score": answering.MIN_SENTENCE_SCORE}
+    else:   # Day 08 combined Day 07's two retrievers without changing them: their entries and errors are Day 07's
+        for retriever in ("BM25", "dense"):
+            assert baseline["retrievers"][retriever] == day07["retrievers"][retriever]
+            assert {qid: per[retriever] for qid, per in baseline["queries"].items()} == \
+                   {qid: per[retriever] for qid, per in day07["queries"].items()}
+            assert baseline["metrics"][f"questions, {retriever}"] == day07["metrics"][f"questions, {retriever}"]
+        assert [e for e in baseline["errors"] if e["retriever"] in ("BM25", "dense")] == day07["errors"]

@@ -7,6 +7,7 @@ Started on Day 07 ([lesson](../docs/day-07/LEARN.md), [notebook](../notebooks/da
 | [`questions-v1.jsonl`](questions-v1.jsonl) | 81 labelled queries, one JSON object per line |
 | [`manifest.json`](manifest.json) | version, file hash, counts, the split rules, the user directory, and the **snapshot** the labels belong to (every chunk's text hash and allowed groups) |
 | [`baselines/day-07-retrieval.json`](baselines/day-07-retrieval.json) | the accepted Day 07 run: BM25 and dense retrieval, every query's rank, every error with its diagnosis, and Day 06's thresholds as measured |
+| [`baselines/day-08-retrieval.json`](baselines/day-08-retrieval.json) | the accepted Day 08 run ([lesson](../docs/day-08/LEARN.md)): Day 07's BM25 and dense entries unchanged, plus RRF and the weighted fusion, every query's rank, every error with its diagnosis. Thresholds weren't re-measured |
 
 ## One labelled query
 
@@ -38,6 +39,7 @@ Started on Day 07 ([lesson](../docs/day-07/LEARN.md), [notebook](../notebooks/da
 3. **Any change to the questions is a new version.** Write `questions-v2.jsonl`, keep `v1` (old baselines refer to it), and update the manifest's version, file name, hash, counts and, if the documents changed, the snapshot. The notebook refuses to compare runs across versions.
 4. **Test questions are spent once.** A test question that influenced a decision becomes a dev question; write new test questions.
 5. **A baseline changes only by a reviewed commit.** Notebooks write their runs to `outputs/` (git-ignored) and compare them with the file here. To accept a new baseline, read the listed changes, copy the run file over the accepted one, and commit it with the reason. Rank changes where the baseline recorded a near tie (a gap under 0.001) are reported separately, as CPU rounding.
-6. **No personal data.** These questions are synthetic. A real evaluation set built from user questions needs the same access control and retention as the documents, and doesn't belong in a public repository.
+6. **Commit the rule before scoring the test split.** Write the selection rule (or the value itself) into the repository before any run, exploratory ones included, prints test-split results. If test results were seen first, say so: Days 07 and 08 had to (Day 07 LEARN.md, section 9.2; Day 08 LEARN.md, section 7).
+7. **No personal data.** These questions are synthetic. A real evaluation set built from user questions needs the same access control and retention as the documents, and doesn't belong in a public repository.
 
-Checked by [`tests/test_evals.py`](../tests/test_evals.py) (no model, a few seconds) and by the Day 07 notebook's sanity checks.
+Checked by [`tests/test_evals.py`](../tests/test_evals.py) (no model, a few seconds; both baselines) and by the Day 07 and Day 08 notebooks' sanity checks. A margin under 0.001 marks a near tie; for RRF, whose scores are made of ranks, it is the smallest score gap in an *input* ranking whose swap would move the labelled chunk.

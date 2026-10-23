@@ -11,7 +11,8 @@
 | **Code** | [`notebooks/day_07_evaluation_baseline.ipynb`](../../notebooks/day_07_evaluation_baseline.ipynb) — Python's standard library plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 06's answering pipeline today |
 | **Data** | [`evals/`](../../evals/): 81 labelled queries, the snapshot they belong to, and the accepted baseline |
 | **Visuals** | [`assets/day-07/`](../../assets/day-07/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-22 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push (section 14). |
+| **Verified** | Notebook executed top to bottom on 2026-10-22 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. Since verified on Windows 11 and in CI on Linux, Windows and macOS (section 14). |
+| **Corrected** | 2026-10-23: section 9.2 overstated when the threshold rule was written down. No number changed. |
 
 ---
 
@@ -299,7 +300,7 @@ score        dev: 16 ● and 8 ○         test: 15 ● and 12 ○
 
 ### 9.2 Choosing the gate with a rule
 
-The rule, written down before looking at the test split: **the highest value, in steps of 0.01, that refuses no answerable dev question.** Refusing an answerable question is the mistake we least want for a policy assistant; another product might weigh the two mistakes differently, and should write its rule down too.
+The rule uses only the dev split: **the highest value, in steps of 0.01, that refuses no answerable dev question.** Refusing an answerable question is the mistake we least want for a policy assistant; another product might weigh the two mistakes differently, and should write its rule down too.
 
 ```text
 gate    dev: answerable kept  not answerable refused   test: answerable kept  not answerable refused
@@ -312,7 +313,11 @@ gate    dev: answerable kept  not answerable refused   test: answerable kept  no
 0.75                 6 of 16                  8 of 8                 8 of 15                12 of 12
 ```
 
-**Day 06's gate at 0.50 was safe and nearly useless**: it refused 1 of 20 unanswerable questions. The measured gate, **0.62**, keeps every answerable question in both splits and refuses **6 of 12 unanswerable test questions**, a split it wasn't chosen on. It is set by a single question, the weakest answerable one ("What training must new starters complete?", at 0.626); one new question below it would move the gate. That is how it should be, and why the set has to keep growing.
+**Day 06's gate at 0.50 was safe and nearly useless**: it refused 1 of 20 unanswerable questions. The measured gate, **0.62**, keeps every answerable question in both splits and refuses **6 of 12 unanswerable test questions**, a split it wasn't chosen on (though not an untouched one: see the correction below). It is set by a single question, the weakest answerable one ("What training must new starters complete?", at 0.626); one new question below it would move the gate. That is how it should be, and why the set has to keep growing.
+
+**Correction (2026-10-23).** This section first said the rule was "written down before looking at the test split". That overstated it. The rule uses only dev questions and no other rule was tried, but while this lesson was being built, an exploratory run had already printed every question's top score, test split included, before the rule was written into the notebook. So the rule wasn't pre-registered, and the test-split figures above (15 of 15 kept, 6 of 12 refused) are a check made after seeing those scores, not a clean held-out result. The 27 test questions themselves, with their evidence and facts, were written before any retriever ran on them; that part stands. A reader's question on the Day 7 LinkedIn post caught this. The notebook's wording was corrected the same day; re-running it gave the same outputs apart from the Python patch version and one timing, so the saved outputs from 2026-10-22 were kept.
+
+**How to do it properly:** commit the rule (or the threshold itself) before the first run that scores the held-out questions, and keep exploratory runs on the dev split until then. If held-out scores have already been seen, say so, and keep the claim for the next fresh questions.
 
 ### 9.3 The names rule: perfect on dev, wrong on test
 
@@ -445,6 +450,8 @@ def gate_counts(threshold: float, split: str) -> tuple[int, int, int, int]:
 
 **In the test environment** Hugging Face wasn't reachable, so the model files came from a copy whose SHA-256 values match the published ones; the download itself is Day 04's code path, verified on Windows 11 and in CI. CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push.
 
+**Verified after publication (2026-10-22; recorded on 2026-10-23):** on Windows 11 with Python 3.11.9, every test file passed when run one file per `pytest` process: 56 passed, 1 skipped (the slide test, without Pillow; run on its own, `tests/test_slides.py` then reports "no tests collected", which is expected). The peak working set of the process running `tests/test_shared_code.py` was 678 MB (measured with the Windows API, `K32GetProcessMemoryInfo`); there is no Windows measurement from before the per-day release, so this is a figure, not a before-and-after comparison. With the network pointed at a dead address (`HF_ENDPOINT=http://127.0.0.1:9`), `tests/test_day_07_notebook.py`, `tests/test_evals.py` and `tests/test_shared_code.py` passed too (32 passed). They took longer than online on that machine (about 15 minutes for the shared-code tests instead of 1.5 to 2.5); the same tests made no network connection attempts when checked on Linux, so the slowdown was most likely the machine itself, and it wasn't investigated further. In GitHub Actions on Linux, Windows and macOS with Python 3.11 and 3.14: run [39748398969](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39748398969) on the `day-07` branch and run [39834132268](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/39834132268) on `main` both succeeded (6 of 6 jobs each).
+
 **Expected differences on your machine:** timings, and scores in the last decimal places. If a rank moves where the gap was under 0.001, section 6 lists it as a near tie, not a change. If a sanity check fails, please open an issue with your OS, CPU and Python version.
 
 ## 15. Common errors and mistakes
@@ -464,6 +471,7 @@ def gate_counts(threshold: float, split: str) -> tuple[int, int, int, int]:
 
 - **Labelling by looking at the retriever's output.** The label then agrees with the system you are testing. Write evidence from the documents, derive the ids.
 - **Tuning on the test split.** Every number you report becomes optimistic. Tune on dev, report on test, replace test questions once used.
+- **Peeking at the test split while exploring.** Even without tuning on it, seeing its scores before the rule is fixed turns the held-out result into a check, not proof. This lesson did it once (section 9.2): commit the rule first.
 - **Ignoring who asks.** Without the user, permission-dependent questions get the wrong ground truth, and a leak looks like a hit.
 - **Reading a similarity score as a quality score.** An unanswerable question scored higher than 12 of 31 answerable ones.
 - **Celebrating a 3-point gain on 31 questions.** Ask which question moved, and why.
@@ -481,7 +489,7 @@ def gate_counts(threshold: float, split: str) -> tuple[int, int, int, int]:
 
 1. **Measure before you improve.** 81 labelled queries, each with who asks and the evidence that answers it, tied to a snapshot of the documents and their permissions. Both retrievers find the answer in the top 3 for 29 of 31 questions; on lookups BM25 finds 30 of 30 and dense 19.
 2. **Every miss gets a reason.** Fifteen errors, four categories, each pointing at a technique a later day will test: exact values and vocabulary (hybrid search), a broader chunk (reranking), an answer in the next section (wider retrieval).
-3. **Choose thresholds with a rule, report them on questions you didn't tune on.** The measured gate refuses 6 of 12 unanswerable test questions instead of none; the names rule, perfect on dev, wrongly refused 2 of 15 answerable test questions.
+3. **Choose thresholds with a rule, commit it before scoring held-out questions, and report on questions you didn't tune on.** The measured gate refuses 6 of 12 unanswerable test questions instead of none; the names rule, perfect on dev, wrongly refused 2 of 15 answerable test questions.
 
 ## 18. Exercise
 
