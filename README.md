@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–08 are available. Days 09–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–09 are available. Days 10–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -20,7 +20,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 06 | First end-to-end grounded RAG | [LEARN.md](docs/day-06/LEARN.md) | [notebook](notebooks/day_06_grounded_rag.ipynb) | [slides](assets/day-06/) | [post](linkedin/day-06.md) | ✅ Tested 2026-10-20 |
 | 07 | Evaluation baseline | [LEARN.md](docs/day-07/LEARN.md) | [notebook](notebooks/day_07_evaluation_baseline.ipynb) · [evals/](evals/) | [slides](assets/day-07/) | [post](linkedin/day-07.md) | ✅ Tested 2026-10-22 |
 | 08 | Hybrid search and rank fusion | [LEARN.md](docs/day-08/LEARN.md) | [notebook](notebooks/day_08_hybrid_search_and_fusion.ipynb) · [baseline](evals/baselines/day-08-retrieval.json) | [slides](assets/day-08/) | [post](linkedin/day-08.md) | ✅ Tested 2026-10-23 |
-| 09 | Reranking and context selection | — | — | — | — | Planned |
+| 09 | Reranking and context selection | [LEARN.md](docs/day-09/LEARN.md) | [notebook](notebooks/day_09_reranking_and_context_selection.ipynb) · [rules](evals/preregistration/day-09.md) · [baseline](evals/baselines/day-09-retrieval.json) | [slides](assets/day-09/) | [post](linkedin/day-09.md) | ✅ Tested 2026-10-28 |
 | 10 | Query understanding and transformations | — | — | — | — | Planned |
 | 11 | Advanced retrieval for harder questions | — | — | — | — | Planned |
 | 12 | Answer evaluation and regression tests | — | — | — | — | Planned |
@@ -30,7 +30,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 ## Quick start
 
-**You need:** Python **3.11 or newer**, Git, and about 600 MB of disk space (from Day 04: a 133 MB embedding model and its runtime). No API keys: Day 06 can optionally call a language model you configure, local or hosted, but runs without one. Day 04 downloads its model from Hugging Face on first run; every other day runs offline.
+**You need:** Python **3.11 or newer**, Git, and about 700 MB of disk space (from Day 04: a 133 MB embedding model and its runtime; from Day 09: a 91 MB reranker). No API keys: Day 06 can optionally call a language model you configure, local or hosted, but runs without one. Days 04 and 09 download their model from Hugging Face on first run; every other day runs offline.
 
 ```bash
 git clone https://github.com/shashanksuresh18/15-days-of-rag-from-scratch.git
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 to 08 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 to 09 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -130,9 +130,19 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_08_hybrid_search_and_fusion.ipynb` (about 15 seconds). Uses Day 04's model (downloaded once if it isn't in `models/` yet) |
 | **What you build** | Hybrid search from scratch on Day 07's 81 labelled queries and snapshot: a check that BM25 and dense still reproduce Day 07's baseline → why raw scores can't be added (the raw sum was BM25's top 3 for 62 of 71 queries) → Reciprocal Rank Fusion with a deterministic tie-break, and its k and window measured → lexical, dense and hybrid compared query by query with the sign test → RRF's two losses explained (a chunk only one retriever finds; a confident first place) → a weighted fusion with min-max scores, its weight chosen by a rule on the dev split and checked on the test split → every remaining miss diagnosed → one text or one per retriever, measured → permissions through fusion → a committed baseline with four retrievers for Days 09–11 |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-23, from both the repo root and `notebooks/`. Day 07's evaluation harness was copied to `src/rag_from_scratch/evaluation.py` with a test that it matches the Day 07 notebook; deliberate bugs in the copy and in the notebook were each caught. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-23, from both the repo root and `notebooks/`. Day 07's evaluation harness was copied to `src/rag_from_scratch/evaluation.py` with a test that it matches the Day 07 notebook; deliberate bugs in the copy and in the notebook were each caught. Verified after publication on Windows 11 (Python 3.11.9: 64 passed, 1 skipped, one test file per process; peak working set of the shared-code tests 678 MB; offline, the notebook test failed once while the PC was in standby and passed when run again) and in GitHub Actions on Linux, Windows and macOS (runs 40197282045 and 40205959450). CI runs the same tests on every push |
 | **Known limitations** | 81 queries written by one author; the fusion weight (0.7) was chosen on the dev split by a rule that wasn't pre-registered (exploratory runs had already shown test-split results), and the 15 test questions can't tell the weighted fusion and RRF apart (15 of 15 each); min-max normalisation depends on how many results each retriever returns; full rankings fused on 44 chunks (a large index fuses each retriever's top N); Day 06's pipeline still retrieves with dense alone until a later day switches it, measured |
 | **Cost** | Free. No new packages, no API key, no paid services. Runs offline once Day 04's model is in `models/` |
+
+## Day 09 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_09_reranking_and_context_selection.ipynb` (about 1–2 minutes). The first run downloads the reranker (91 MB) into `models/`, and Day 04's model if it isn't there yet |
+| **What you build** | A second stage for Day 08's hybrid, with every rule committed before the test split was scored ([`evals/preregistration/day-09.md`](evals/preregistration/day-09.md)): a check that Day 08's four retrievers reproduce its baseline → a small cross-encoder (`cross-encoder/ms-marco-MiniLM-L6-v2`, Apache-2.0) run from its ONNX file, checked against its model card → the weighted fusion and RRF reranked at a depth chosen by a dev rule (3 and 20), compared query by query with Day 08's accepted baseline → every move explained (it reads question and chunk together; it scores each chunk alone; it doesn't reason) → latency per depth → a gate on the reranker's score against the five "similar but wrong" questions → context selection with deduplication, a per-document cap and a token budget, and a stale copy that no deduplication fixes → a reranker promoting a permission leak from rank 4 to rank 1 → two pre-registered decisions → a committed baseline with six retrievers |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-28, from both the repo root and `notebooks/`. Day 08's fusion was copied to `src/rag_from_scratch/fusion.py` with a test that it matches the Day 08 notebook; deliberate bugs in the copy and in the notebook were each caught. The reranker's first download could not be run in the test environment (the files came from a copy matching the published SHA-256 values and sizes). GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **Known limitations** | The pre-registered decisions both came out "not adopted", each decided by one test question, so the evidence is thin either way; the v1 test split has now been used to decide and can't give clean held-out evidence again; one small reranker trained on web search (MS MARCO, non-commercial research terms) and compared with others on paper only; it scores each chunk alone and doesn't reason about amounts; no GPU or quantized timings; the gate and selection settings are recorded, not wired into Day 06's pipeline |
+| **Cost** | Free. No new packages, no API key, no paid services. Runs offline once both models are in `models/`. Reranking costs latency: 30 to 40 ms per query for 3 candidates and about a quarter of a second for 20, against about 10 ms to embed the question (2-vCPU machine) |
 
 ## Repository layout
 
@@ -150,19 +160,19 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index, answering, evaluation), see below
-├── evals/                        labelled questions, the document snapshot they belong to, accepted baselines (Days 07 and 08)
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index, answering, evaluation, fusion), see below
+├── evals/                        labelled questions, the document snapshot they belong to, accepted baselines (Days 07–09), rules committed before scoring (Day 09)
 ├── tests/                        smoke tests that execute the notebooks, shared-code, sample-data and label checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
 ├── scripts/slides/               reproducible slide build (SVG -> PNG)
 ├── scripts/data/                 generator for the synthetic sample PDFs (standard library only)
 ├── outputs/                      created when you run a notebook; ignored by Git
-├── models/                       the embedding model downloaded by Day 04 (and later days); ignored by Git
+├── models/                       the models downloaded by Day 04 (embeddings) and Day 09 (reranker); ignored by Git
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync; Day 07 also imports Day 06's answering pipeline; Day 08 also imports Day 07's evaluation harness). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync; Day 07 also imports Day 06's answering pipeline; Day 08 also imports Day 07's evaluation harness; Day 09 also imports Day 08's fusion). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 
@@ -175,7 +185,7 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 ## Data and licence
 
 - The sample corpus is **synthetic** and written for this repository; Acme Corp is fictional. The two sample PDFs are generated by [`scripts/data/make_sample_pdfs.py`](scripts/data/make_sample_pdfs.py). Details in [`data/sample/README.md`](data/sample/README.md).
-- **Downloaded model (Day 04):** [`BAAI/bge-small-en-v1.5`](https://huggingface.co/BAAI/bge-small-en-v1.5), MIT licence, is downloaded by the notebook at run time into `models/` and is not redistributed in this repository.
+- **Downloaded models:** [`BAAI/bge-small-en-v1.5`](https://huggingface.co/BAAI/bge-small-en-v1.5) (Day 04, MIT licence) and an ONNX export ([`Xenova/ms-marco-MiniLM-L-6-v2`](https://huggingface.co/Xenova/ms-marco-MiniLM-L-6-v2)) of [`cross-encoder/ms-marco-MiniLM-L6-v2`](https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2) (Day 09, Apache-2.0; trained on MS MARCO, whose terms say non-commercial research: see Day 09 LEARN.md, section 4) are downloaded by the notebooks at run time into `models/` and are not redistributed in this repository.
 - **Third-party assets:** the slide tooling bundles two fonts (SIL Open Font License) and a subset of Lucide icons (ISC licence). Details and licence files are in [`scripts/slides/README.md`](scripts/slides/README.md).
 - **Licence:** [MIT](LICENSE) for the code, lessons, slides and posts. The bundled fonts (SIL Open Font License) and icons (ISC) keep their own licences, listed above.
 

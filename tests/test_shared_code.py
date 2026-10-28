@@ -8,7 +8,8 @@ Memory: the tests are grouped in one class per day, and each class creates its o
 namespace and embedding model (class-scoped fixtures). When a day's tests finish, its namespace is
 cleared and garbage-collected, so only one day's notebook and model are in memory at a time
 (Day 07 measured this file's peak memory before and after; docs/day-07/LEARN.md, section 14).
-Day 08 added the Day 07 class (the evaluation harness in evaluation.py).
+Day 08 added the Day 07 class (the evaluation harness in evaluation.py); Day 09 the Day 08 class (rank fusion in
+fusion.py).
 """
 
 import dataclasses
@@ -22,7 +23,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, index
+from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -781,3 +782,73 @@ class TestDay07Evaluation:
         assert evaluation.compare(moved, run)[0] and not evaluation.compare(moved, run)[1]
         assert evaluation.compare(run, accepted) == ([], [])
         assert evaluation.compare(variants[2], accepted)[1] and not evaluation.compare(variants[2], accepted)[0]
+
+
+# ----------------------------------------------------------------------------- Day 08: rank fusion
+@pytest.fixture(scope="class")
+def day08():
+    # Runs the whole Day 08 notebook (both retrievers, both fusions, the baseline comparison). The module's functions
+    # are then compared with the notebook's own on the notebook's own rankings, and on made-up edge cases.
+    ns = run_notebook_code("day_08_hybrid_search_and_fusion.ipynb")
+    yield ns
+    release(ns)
+
+
+class TestDay08Fusion:
+    EDGE_LISTS = [  # rankings no real query produces: empty, one item, equal scores, negative scores, a repeated id
+        [], [("a", 1.0)], [("a", 2.0), ("b", 2.0), ("c", 2.0)], [("a", -1.0), ("b", -3.5)],
+        [("a", 3.0), ("b", 1.0), ("a", 0.5)], [("b", 0.9), ("a", 0.9), ("c", 0.1)]]
+
+    def test_fusion_settings_match_day_08_notebook(self, day08: dict) -> None:
+        assert fusion.RRF_K == day08["RRF_K"] == 60 and fusion.ALPHA == day08["ALPHA"] == 0.7
+
+    def test_rrf_matches_day_08_notebook(self, day08: dict) -> None:
+        rankings = day08["rankings"]
+        for q in day08["queries"]:
+            lists = [rankings["BM25"][q.id], rankings["dense"][q.id]]
+            assert fusion.rrf(lists) == day08["rrf"](lists) == rankings["RRF"][q.id], q.id
+            for k in (1, 5, 20, 100, 1000):
+                assert fusion.rrf(lists, k) == day08["rrf"](lists, k), (q.id, k)
+            for window in (1, 5, 10):
+                cut = [ranked[:window] for ranked in lists]
+                assert fusion.rrf(cut) == day08["rrf"](cut), (q.id, window)
+            assert fusion.rrf(lists[::-1]) == day08["rrf"](lists[::-1]) and fusion.rrf(lists[:1]) == day08["rrf"](lists[:1])
+        for a in self.EDGE_LISTS:
+            for b in self.EDGE_LISTS:
+                assert fusion.rrf([a, b]) == day08["rrf"]([a, b]), (a, b)
+        assert fusion.rrf([]) == day08["rrf"]([]) == []
+
+    def test_min_max_and_weighted_match_day_08_notebook(self, day08: dict) -> None:
+        rankings = day08["rankings"]
+        for q in day08["queries"]:
+            lexical, dense = rankings["BM25"][q.id], rankings["dense"][q.id]
+            assert fusion.min_max(lexical) == day08["min_max"](lexical), q.id
+            assert fusion.min_max(dense) == day08["min_max"](dense), q.id
+            assert fusion.weighted(lexical, dense, fusion.ALPHA) == rankings["weighted"][q.id], q.id
+            for alpha in [i / 10 for i in range(11)] + [0.25, 0.75]:
+                assert fusion.weighted(lexical, dense, alpha) == day08["weighted"](lexical, dense, alpha), (q.id, alpha)
+            assert fusion.weighted(dense, lexical, 0.3) == day08["weighted"](dense, lexical, 0.3), q.id
+            assert fusion.weighted([], dense, 0.7) == day08["weighted"]([], dense, 0.7), q.id
+        for a in self.EDGE_LISTS:
+            assert fusion.min_max(a) == day08["min_max"](a), a
+            for b in self.EDGE_LISTS:
+                for alpha in (0.0, 0.7, 1.0):
+                    assert fusion.weighted(a, b, alpha) == day08["weighted"](a, b, alpha), (a, b, alpha)
+
+    def test_rrf_margin_matches_day_08_notebook(self, day08: dict) -> None:
+        rankings = day08["rankings"]
+        for q in day08["queries"]:
+            lists = [rankings["BM25"][q.id], rankings["dense"][q.id]]
+            assert fusion.rrf_margin(lists, q.answer_chunks) == day08["rrf_margin"](q), q.id
+        # The notebook's recorded margins, as accepted in its baseline file
+        accepted = json.loads((REPO_ROOT / "evals" / "baselines" / "day-08-retrieval.json").read_text(encoding="utf-8"))
+        for q in day08["queries"]:
+            lists = [rankings["BM25"][q.id], rankings["dense"][q.id]]
+            assert fusion.rrf_margin(lists, q.answer_chunks) == accepted["queries"][q.id]["RRF"]["margin"], q.id
+        # Labels the notebook never had: another chunk, two chunks, a chunk no retriever returns, and no label at all
+        q = day08["by_qid"]["d03-13"]
+        lists = [rankings["BM25"][q.id], rankings["dense"][q.id]]
+        for relevant in (("travel-policy#safety-while-travelling",), (lists[1][5][0], lists[1][9][0]), ("no-such#chunk",)):
+            fake = dataclasses.replace(q, answer_chunks=relevant)
+            assert fusion.rrf_margin(lists, relevant) == day08["rrf_margin"](fake), relevant
+        assert fusion.rrf_margin(lists, ()) is None

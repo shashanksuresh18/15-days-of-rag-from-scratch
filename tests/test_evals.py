@@ -4,10 +4,12 @@
 2. The documents still match the snapshot the labels were written against, and every label can be
    derived again from its evidence. The rule is written out separately from the Day 07 notebook's
    validate(), so the two check each other.
-3. Each committed baseline (Day 07's and Day 08's) belongs to this dataset and is consistent with
-   itself: its metrics follow from its per-query ranks, its error list is exactly the queries missed
-   in the top 3, and no restricted chunk appears in anyone's top 3. Day 08's BM25 and dense entries
-   are Day 07's, unchanged (Day 08 changed only how the two are combined).
+3. Each committed baseline (Day 07's, Day 08's and Day 09's) belongs to this dataset and is consistent
+   with itself: its metrics follow from its per-query ranks, its error list is exactly the queries missed
+   in the top 3, and no restricted chunk appears in anyone's top 3. A later baseline keeps every entry it
+   inherits unchanged: Day 08's BM25 and dense entries are Day 07's (Day 08 changed only how the two are
+   combined), and Day 09's four Day 08 retrievers are Day 08's (Day 09 adds reranked versions). Day 09's
+   settings are the ones committed in evals/preregistration/day-09.md before its test split was scored.
 
 If test 2 fails after you edited data/sample/, that is the point: run the Day 07 notebook, read the
 label problems it lists, review those labels, and record a new version (docs/day-07/LEARN.md, section 8).
@@ -95,7 +97,7 @@ def test_labels_match_the_documents(manifest: dict, rows: list[dict], chunks: li
             r["id"]
 
 
-@pytest.mark.parametrize("name", ["day-07-retrieval.json", "day-08-retrieval.json"])
+@pytest.mark.parametrize("name", ["day-07-retrieval.json", "day-08-retrieval.json", "day-09-retrieval.json"])
 def test_baseline_belongs_to_this_dataset_and_adds_up(name: str, manifest: dict, rows: list[dict]) -> None:
     baseline = json.loads((EVALS / "baselines" / name).read_text(encoding="utf-8"))
     assert baseline["dataset"] == {"questions": f"evals/{manifest['questions_file']}", "version": manifest["version"],
@@ -137,10 +139,21 @@ def test_baseline_belongs_to_this_dataset_and_adds_up(name: str, manifest: dict,
     if name == "day-07-retrieval.json":
         assert baseline["thresholds"]["day06"] == {"min_retrieval_score": answering.MIN_RETRIEVAL_SCORE,
                                                    "min_sentence_score": answering.MIN_SENTENCE_SCORE}
-    else:   # Day 08 combined Day 07's two retrievers without changing them: their entries and errors are Day 07's
-        for retriever in ("BM25", "dense"):
-            assert baseline["retrievers"][retriever] == day07["retrievers"][retriever]
+    else:   # a later day adds retrievers without changing the ones it inherits: their entries and errors are unchanged
+        earlier_name, inherited = {"day-08-retrieval.json": ("day-07-retrieval.json", ("BM25", "dense")),
+                                   "day-09-retrieval.json": ("day-08-retrieval.json", ("BM25", "dense", "RRF", "weighted"))}[name]
+        earlier = json.loads((EVALS / "baselines" / earlier_name).read_text(encoding="utf-8"))
+        for retriever in inherited:
+            assert baseline["retrievers"][retriever] == earlier["retrievers"][retriever]
             assert {qid: per[retriever] for qid, per in baseline["queries"].items()} == \
-                   {qid: per[retriever] for qid, per in day07["queries"].items()}
-            assert baseline["metrics"][f"questions, {retriever}"] == day07["metrics"][f"questions, {retriever}"]
-        assert [e for e in baseline["errors"] if e["retriever"] in ("BM25", "dense")] == day07["errors"]
+                   {qid: per[retriever] for qid, per in earlier["queries"].items()}
+            for kind in ("questions", "lookups"):
+                assert baseline["metrics"][f"{kind}, {retriever}"] == earlier["metrics"][f"{kind}, {retriever}"]
+        assert [e for e in baseline["errors"] if e["retriever"] in inherited] == earlier["errors"]
+    if name == "day-09-retrieval.json":   # the settings the pre-registration committed to, before the test split was scored
+        thresholds = baseline["thresholds"]
+        prereg = (REPO_ROOT / thresholds["preregistration"]).read_text(encoding="utf-8")
+        depths = {r["reranks"]: r["depth"] for r in baseline["retrievers"].values() if "reranks" in r}
+        assert depths == {"weighted": 3, "RRF": 20} and "**N = 3**" in prereg and "**N = 20**" in prereg
+        assert thresholds["reranker_gate"]["value"] == -3.6 and "**the gate is −3.6**" in prereg
+        assert set(thresholds["decisions"].values()) == {"not adopted"}

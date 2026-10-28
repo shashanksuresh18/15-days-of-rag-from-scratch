@@ -11,7 +11,7 @@
 | **Code** | [`notebooks/day_08_hybrid_search_and_fusion.ipynb`](../../notebooks/day_08_hybrid_search_and_fusion.ipynb) — Python's standard library plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 07's evaluation harness today |
 | **Data** | [`evals/`](../../evals/): Day 07's 81 labelled queries and snapshot, unchanged, and today's accepted baseline, [`evals/baselines/day-08-retrieval.json`](../../evals/baselines/day-08-retrieval.json) |
 | **Visuals** | [`assets/day-08/`](../../assets/day-08/) |
-| **Verified** | Notebook executed top to bottom on 2026-10-23 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push (section 16). |
+| **Verified** | Notebook executed top to bottom on 2026-10-23 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. Since verified on Windows 11 and in CI on Linux, Windows and macOS (section 16). |
 
 ---
 
@@ -454,6 +454,8 @@ No environment variables, no API keys. The notebook runs offline once the model 
 - How close the results are to a tie: the smallest gaps are Day 07's (dense, lost laptop, 0.0001) and carry into RRF (its rank 2 or 3; the check accepts either); the weighted fusion's closest call is 0.0016.
 
 **In the test environment** Hugging Face wasn't reachable, so the model files came from a copy whose SHA-256 values match the published ones; the download itself is Day 04's code path, verified on Windows 11 and in CI. CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push.
+
+**Verified after publication (2026-10-25; recorded on 2026-10-28):** on Windows 11 with Python 3.11.9, every test file passed when run one file per `pytest` process: 64 passed, 1 skipped (the slide test, without Pillow). The peak working set of the process running `tests/test_shared_code.py` was 678 MB, the same as Day 07's although the file has one more class. With the network pointed at a dead address (`HF_ENDPOINT=http://127.0.0.1:9`), `tests/test_evals.py` (4) and `tests/test_shared_code.py` (30) passed. `tests/test_day_08_notebook.py` failed once (1 failed, 2 passed, after 25 minutes): the Windows System event log showed the PC going into standby during that run, which most likely pushed a cell past the notebook test's 15-minute per-cell timeout. Run again, it passed (3 passed). The offline notebook test took longer than online on that machine (221 s against 31 s); on Linux it doesn't (and makes no connection attempts), and this wasn't investigated further. In GitHub Actions on Linux, Windows and macOS with Python 3.11 and 3.14: run [40197282045](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/40197282045) on the `day-08` branch and run [40205959450](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/40205959450) on `main` both succeeded (6 of 6 jobs each).
 
 **Expected differences on your machine:** timings, and scores in the last decimal places. If a rank moves where the baseline recorded a near tie, section 10 lists it as a near tie, not a change. If a sanity check fails, please open an issue with your OS, CPU and Python version.
 
