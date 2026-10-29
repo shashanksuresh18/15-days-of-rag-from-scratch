@@ -1,0 +1,308 @@
+{
+  "name": "acme-handbook-eval",
+  "version": 2,
+  "created": "2026-10-29",
+  "questions_file": "questions-v2.jsonl",
+  "questions_sha256": "b3d72a948b6d5573e8da88a1a2dc66bfac37a01b0b2abb376462723394db63c5",
+  "counts": {
+    "queries": 122,
+    "questions": 92,
+    "answerable_questions": 60,
+    "unanswerable_questions": 32,
+    "lookups": 30,
+    "dev": 81,
+    "test": 41
+  },
+  "splits": {
+    "dev": "The 81 queries of version 1, text and labels unchanged. Its 27 test questions are dev from now on (evals/README.md, rule 4): Day 09 used them to decide, and Days 07 and 08 had seen their results.",
+    "test": "Written on 2026-10-29, before any system was run on them, and committed with Day 10's pre-registration (evals/preregistration/day-10.md). Report on these; never tune on them."
+  },
+  "previous": {
+    "version": 1,
+    "questions_file": "questions-v1.jsonl",
+    "manifest": "manifest.json",
+    "changes": "the 27 v1 test questions moved to dev (their notes say so); new test questions added"
+  },
+  "labels": "answer_chunks: the chunks the asking user may read that contain every evidence string (as whole words). restricted_chunks: chunks that contain the evidence but the user may not read. Both were derived from the evidence on the snapshot below, then frozen. facts: strings a correct answer contains (for answer checks; Day 12).",
+  "directory": {
+    "alice": [
+      "all-employees"
+    ],
+    "maria": [
+      "all-employees",
+      "managers"
+    ]
+  },
+  "snapshot": {
+    "corpus": "data/sample: Day 02's ingest, then Day 03's section_chunks (max_words 80, Title > Section header)",
+    "chunks_count": 44,
+    "fingerprint": "3f8344d00b8b4878291cd7c156631ce8bc21345219083f8444afb4054fc89342",
+    "chunks": {
+      "data-retention-policy#purpose": {
+        "hash": "f560f5172bd217137a07e97fc785a80f81ca84784570bee0b0f40922f7e61653",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "data-retention-policy#retention-periods": {
+        "hash": "58408af2c8c475bb29a7d8ea91321b08cd3e3d9caa074681c72bc5586c8e190c",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "data-retention-policy#deletion-requests": {
+        "hash": "a9be48db6a42118d5ac36097aa84f20133c40c065d96de99833e365ad0baeba7",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "data-retention-policy#legal-holds": {
+        "hash": "eb17c496203fb50b75a0b205206fe6c7e6bcb60c995b93da30b5f9e7d41e02e0",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "expense-reimbursement-policy#scope": {
+        "hash": "f74991acb308013a163f84e42466eb7869a91c8b60947e383253c537b7c10272",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "expense-reimbursement-policy#submitting-a-claim": {
+        "hash": "2fe898ead67ea9e5cd5080693b7850243d3e94d12646e981ee15b21d06d98379",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "expense-reimbursement-policy#approval-and-payment": {
+        "hash": "64962d4e296e68e2edd5857ee09f61dea88b95964ff0077bd6c7e5c9658e8dc9",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "expense-reimbursement-policy#travel": {
+        "hash": "89c5cb97e40203b792c0e22e97d050079c062f1d21909d424bf14e7e74647247",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "expense-reimbursement-policy#meals": {
+        "hash": "acbbb8bdbda90da3a049136f7533795d4727350ad2ab532a87445286923c7306",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "it-software-requests#overview": {
+        "hash": "774a933256f6e3c6848f96dca55374a99993337c01f09d760d17838d4ed25c06",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "it-software-requests#how-to-request-software": {
+        "hash": "7f6983e109d79e7fe283555ef6dcca15a24d4799dafe931c19cb55feca1e5b8f",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "it-software-requests#approval-times": {
+        "hash": "ca190d3c9cd00c5bb8903e54ca73242d4ddf7bb40ee8b6ce1f6ca0e60f09035f",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "it-software-requests#free-and-open-source-software": {
+        "hash": "988d36909abf11e3b5001130e0d251a1a70ac956fcbe795f332fd229a13e28a7",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "manager-pay-review-guide#overview": {
+        "hash": "146c27100b941450147d10e4785929b9241aaa715ce9d3973a017dc7922ebaed",
+        "groups": [
+          "managers",
+          "people-team"
+        ]
+      },
+      "new-starter-it-checklist#your-first-day": {
+        "hash": "4d0846b3acb6a8b462d09d07f714c883be6e3f50951e8fbda226bcfa57461119",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "new-starter-it-checklist#accounts-and-access": {
+        "hash": "2db864ac70476e1b8c5b5040387a69efb6cc8e96d96226efc9cd620eb8b6d8ae",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "new-starter-it-checklist#training": {
+        "hash": "3df24706909db9bbdbd81e0a28138eea2523891ff6d08b15275b3a7cb9d1b320",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "new-starter-it-checklist#getting-help": {
+        "hash": "4d6ee039d9873bc17b434db0bf6804a4c6b79cf486a4fe6d583d3253bda98637",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "parental-leave-policy#who-is-eligible": {
+        "hash": "7e2d48ea7e96fa30d0ca1a0aee3b6de1c3fd85cca406154af523750898445164",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "parental-leave-policy#leave-entitlement": {
+        "hash": "a4fd747eb6d9c6f608864ee29d5421b343d01418bda60fa2ed19ff8b47a22333",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "parental-leave-policy#how-to-request-leave": {
+        "hash": "c51f8522160bf955bd6de767e6c51f2240020668f829633071c765b77d0090ff",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "parental-leave-policy#returning-to-work": {
+        "hash": "0b31aaf55f9ee9e815e47d67e6c390b5e449746af213c9e4a1508fa64accb93e",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "password-and-mfa-standard#passwords": {
+        "hash": "fe2b1c897c66ceb0599030bf44865d8960f897fd76d10c0f90c494b2b6416c54",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "password-and-mfa-standard#multi-factor-authentication": {
+        "hash": "10887c9472c7461a3e22b6a86299400754ce891a60020268641e207ca69b520a",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "password-and-mfa-standard#resetting-your-password": {
+        "hash": "2787aeac141e14ef2564b52317bfdbc0e6225405d21faf280518039cb71504dc",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "password-and-mfa-standard#account-lockout": {
+        "hash": "bea724a1a4721cc5f1c64808aabd99a2f927d2a57c9494056a8d2f507b7d9928",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "remote-work-policy#purpose": {
+        "hash": "ecf13bf8d39e79d918c2e347e70408b3c9061c4d2244bbafad96fe407899f364",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "remote-work-policy#eligibility": {
+        "hash": "4bd5c8127bab5907da1308f863259b4746efd41204a1f88229b8d329112b468d",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "remote-work-policy#core-hours": {
+        "hash": "a960d9366d8bc3bbb757cd452f21a6ca807f8ced85f67f44887e0dde7ad54062",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "remote-work-policy#equipment-and-home-office": {
+        "hash": "1a4011e70d251ba9cfa3223307c113be7675dfc418aeb614c708f7e9e61ff9ab",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "remote-work-policy#security-while-remote": {
+        "hash": "ea9764804d5466c11b46175c4a49f497a5fc94e5eeb868f529261bcf3db5f109",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "security-incident-reporting#what-counts-as-an-incident": {
+        "hash": "0023c1582cdb48fd994af15961a7f7712e895e26b67140f91ee07fc7f47b2a7d",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "security-incident-reporting#how-to-report": {
+        "hash": "ca9a0a4d2de704b81840abaa62e3fc2d87d5d79ec0f5ea3f59e2b897cdff830e",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "security-incident-reporting#what-not-to-do": {
+        "hash": "5a8a56d3cd02b389679e6ccdc71e39b83ceb41599fb377ac1e10a99ec8341418",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "security-incident-reporting#after-you-report": {
+        "hash": "ec5fcb78fd51079c883d9eb098ec6d53f68ed374e0391dafb1b6aa1c4dd42ec4",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "travel-policy#purpose": {
+        "hash": "8796f3c2905295f77e9fd791467dfa3bd392918380143678ff2399063600f771",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "travel-policy#booking-travel": {
+        "hash": "92eb4578bf7b70bc7beae6a50f24973909a2d3a3c0caf6f11e95cd527d66363f",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "travel-policy#daily-limits-by-city": {
+        "hash": "e13a0fb0b50f3a0e13d6b7d61e6813fd6159faf7dd67958b6fccee0450a9e086",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "travel-policy#claiming-travel-costs": {
+        "hash": "815a303754d15cef49f0b751aac3c70497746862f32db4c91f08646dc526fd6d",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "travel-policy#safety-while-travelling": {
+        "hash": "ca109e9c10c4e79c2ac0bb86f114db5f01b8f277edb58d95388718ca11c52bf5",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "vpn-access-guide#when-to-use-the-vpn": {
+        "hash": "a1fb60e3e036332c5736154a186b0d11daf431ee6022cb969e9c98dd9818173c",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "vpn-access-guide#installing-the-client": {
+        "hash": "fdf699bc702dd4ba4f200f8df9dd55b32b986e715bf7c752ea9dfe3955d92bee",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "vpn-access-guide#connecting": {
+        "hash": "c11765eb3f3d15237127a098f7c50a92d87a1cafb1288d3c66bc5065fb0beb8d",
+        "groups": [
+          "all-employees"
+        ]
+      },
+      "vpn-access-guide#troubleshooting": {
+        "hash": "372dd1c4062c91d0ff6fb485c640632cb22813e60fbb0ab07bef8d20ec8b0ad7",
+        "groups": [
+          "all-employees"
+        ]
+      }
+    }
+  }
+}
