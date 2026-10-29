@@ -1,9 +1,10 @@
 """Day 07's evaluation harness, packaged for reuse by later days.
 
-The code is the one taught in notebooks/day_07_evaluation_baseline.ipynb (sections 1, 1.1, 3 and 6):
+The code is the one taught in notebooks/day_07_evaluation_baseline.ipynb (sections 1, 1.1, 3, 5 and 6):
 the labelled query and its loader, the whole-word evidence rule, the snapshot the labels belong to
 and validate(), the metrics (hit@k, recall@k, reciprocal rank, MRR), the Wilson interval, the sign
-test, the near-tie margin and compare(), which lists what changed since an accepted baseline.
+test, outcome() (what a user experiences end to end; added on Day 10, which reuses it), the near-tie
+margin and compare(), which lists what changed since an accepted baseline.
 
 One change in shape: the notebook's measure(), tie_margin() and top_score() read a global
 `rankings` dictionary by retriever name. Here they take the ranking itself, so a later day can
@@ -18,7 +19,7 @@ measure any retriever without defining globals:
 A ranking is a list of (chunk_id, score) pairs, best first.
 
 tests/test_shared_code.py runs the Day 07 notebook's own code and checks that this module returns
-identical queries, problems, metrics, intervals, p-values, margins and comparisons.
+identical queries, problems, metrics, intervals, p-values, outcomes, margins and comparisons.
 
 Standard library only.
 """
@@ -158,6 +159,16 @@ def sign_test(only_a: int, only_b: int) -> float:
     if n == 0:
         return 1.0
     return min(1.0, 2 * sum(math.comb(n, i) for i in range(min(only_a, only_b) + 1)) / 2 ** n)
+
+
+# ----------------------------------------------------------------------------- end to end (section 5)
+def outcome(a, q: Query) -> str:
+    # What the user experiences. "refused": no answer shown (abstained, or blocked by the citation check)
+    if a.status != "answered":
+        return "refused"
+    if not q.answerable:
+        return "answered"            # an answer to a question the documents don't answer for this user
+    return "correct" if all(f.lower() in a.text.lower() for f in q.facts) else "wrong"
 
 
 # ----------------------------------------------------------------------------- the baseline (section 6)

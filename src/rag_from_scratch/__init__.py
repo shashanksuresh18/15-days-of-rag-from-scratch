@@ -15,6 +15,7 @@ it again, a copy moves here so the new notebook can import it instead of repeati
 - evaluation.py: Day 07's evaluation harness (labelled queries, validate(), hit@k, recall@k, MRR, the Wilson
                  interval, the sign test, compare() against an accepted baseline)
 - fusion.py:  Day 08's rank fusion (rrf(), min_max(), weighted() and RRF's near-tie margin)
+- reranking.py: Day 09's cross-encoder reranker (Reranker: (question, text) pairs -> logits; rerank(), rerank_margin())
 
 tests/test_shared_code.py checks each module against the notebook it came from.
 """

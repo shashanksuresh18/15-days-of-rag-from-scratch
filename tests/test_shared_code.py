@@ -9,7 +9,8 @@ namespace and embedding model (class-scoped fixtures). When a day's tests finish
 cleared and garbage-collected, so only one day's notebook and model are in memory at a time
 (Day 07 measured this file's peak memory before and after; docs/day-07/LEARN.md, section 14).
 Day 08 added the Day 07 class (the evaluation harness in evaluation.py); Day 09 the Day 08 class (rank fusion in
-fusion.py).
+fusion.py); Day 10 the Day 09 class (the cross-encoder reranker in reranking.py) and a test of outcome(), which Day 10
+copied from the Day 07 notebook into evaluation.py.
 """
 
 import dataclasses
@@ -23,7 +24,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index
+from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index, reranking
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -730,6 +731,23 @@ class TestDay07Evaluation:
             for b in range(0, 16):
                 assert evaluation.sign_test(a, b) == day07["sign_test"](a, b), (a, b)
 
+    def test_outcome_matches_day_07_notebook(self, day07: dict) -> None:
+        # Every graded answer of the notebook's end-to-end table, under both settings
+        for label, answers in day07["answers"].items():
+            for q in day07["natural"]:
+                assert evaluation.outcome(answers[q.id], q) == day07["outcome"](answers[q.id], q) == \
+                       day07["outcomes"][label][q.id], (label, q.id)
+        # Made-up answers: every status, an answerable and an unanswerable query, facts in another case or missing
+        answerable = next(q for q in day07["natural"] if q.answerable and len(q.facts) == 1    # a fact with letters,
+                          and q.facts[0].lower() != q.facts[0].upper())                     # so its case can differ
+        unanswerable = next(q for q in day07["natural"] if not q.answerable)
+        fact = answerable.facts[0]
+        for status in ("answered", "abstained", "blocked", "unavailable"):
+            for text in (fact, fact.upper(), f"It is {fact.lower()}.", "something else", ""):
+                a = answering.RagAnswer("alice", "q", status, text, "why")
+                for q in (answerable, unanswerable, dataclasses.replace(answerable, facts=(fact, "a second fact"))):
+                    assert evaluation.outcome(a, q) == day07["outcome"](a, q), (status, text, q.id)
+
     def test_comparison_matches_day_07_notebook(self, day07: dict) -> None:
         rankings, queries = day07["rankings"], day07["queries"]
         for name in day07["RETRIEVERS"]:
@@ -852,3 +870,122 @@ class TestDay08Fusion:
             fake = dataclasses.replace(q, answer_chunks=relevant)
             assert fusion.rrf_margin(lists, relevant) == day08["rrf_margin"](fake), relevant
         assert fusion.rrf_margin(lists, ()) is None
+
+
+# ----------------------------------------------------------------------------- Day 09: the cross-encoder reranker
+@pytest.fixture(scope="class")
+def day09():
+    # Runs the whole Day 09 notebook (both models, six retrievers, every depth, the gate). Its pair_scores then hold the
+    # reranker's score for every query and each hybrid's top 44, so the module's rerank() can be compared without
+    # calling the model again.
+    ns = run_notebook_code("day_09_reranking_and_context_selection.ipynb")
+    yield ns
+    release(ns)
+
+
+@pytest.fixture(scope="class")
+def module_reranker():
+    model = reranking.Reranker(REPO_ROOT)     # one per class that asks for it, released with the class
+    yield model
+    del model
+    gc.collect()
+
+
+class TestDay09Reranking:
+    def test_reranker_settings_match_day_09_notebook(self, day09: dict) -> None:
+        assert reranking.RERANKER == day09["RERANKER"] and reranking.MAX_TOKENS == day09["MAX_TOKENS"] == 512
+        assert reranking.default_model_dir(REPO_ROOT) == day09["RERANKER_DIR"]
+
+    def test_scores_match_day_09_notebook(self, day09: dict, module_reranker: reranking.Reranker) -> None:
+        # The model card's example, and every query's top 5 from both hybrids, in batches of 16 (one batch), 5 and 1
+        scores, by_cid, rankings = day09["rerank_scores"], day09["by_cid"], day09["rankings"]
+        assert module_reranker.scores(day09["CARD_QUESTION"], day09["CARD_PASSAGES"]) == \
+               scores(day09["CARD_QUESTION"], day09["CARD_PASSAGES"]) == list(day09["card"])
+        for q in day09["queries"]:
+            for base, batch_sizes in (("weighted", (16, 1)), ("RRF", (5,))):
+                texts = [by_cid[cid].text for cid, _ in rankings[base][q.id][:5]]
+                for batch_size in batch_sizes:
+                    assert module_reranker.scores(q.question, texts, batch_size) == scores(q.question, texts, batch_size), \
+                        (q.id, base, batch_size)
+        # The default batch size, on more texts than fit in one batch (every 10th query's top 20)
+        for q in day09["queries"][::10]:
+            texts = [by_cid[cid].text for cid, _ in rankings["weighted"][q.id][:20]]
+            assert module_reranker.scores(q.question, texts) == scores(q.question, texts), q.id
+        # Edge texts: empty, unicode, over 512 tokens together with the question, and no texts at all
+        long_text = " ".join(c.text for c in day09["chunks"][:12])
+        for texts in ([""], ["Ünïcödé text — with dashes"], [long_text], [long_text, "short"]):
+            assert module_reranker.scores("How long?", texts) == scores("How long?", texts), texts[0][:30]
+        assert module_reranker.scores("How long?", []) == scores("How long?", []) == []
+        assert module_reranker.tokenizer.truncation["max_length"] == day09["pair_tokenizer"].truncation["max_length"]
+
+    def test_rerank_matches_day_09_notebook(self, day09: dict) -> None:
+        rankings, pair_scores = day09["rankings"], day09["pair_scores"]
+        for q in day09["queries"]:
+            for base in ("weighted", "RRF"):
+                ranked = rankings[base][q.id]
+                for n in day09["DEPTHS"]:
+                    top = {cid: pair_scores[q.id, cid] for cid, _ in ranked[:n]}
+                    assert reranking.rerank(ranked, top, n) == day09["rerank"](q, ranked, n), (q.id, base, n)
+                n = day09["DEPTH"][base]
+                assert reranking.rerank(ranked, {cid: pair_scores[q.id, cid] for cid, _ in ranked[:n]}, n) == \
+                       rankings[f"{base}+rerank"][q.id], (q.id, base)
+        # Made-up rankings: ties in the reranker's scores (chunk id decides), n = 0, n past the end, an empty ranking
+        fake = dataclasses.replace(day09["queries"][0], id="made-up")
+        made_up = {"a": 1.0, "b": 1.0, "c": 2.0, "d": -1.0}
+        for cid, score in made_up.items():
+            pair_scores["made-up", cid] = score
+        ranked = [("b", 0.9), ("a", 0.8), ("d", 0.7), ("c", 0.6)]
+        for n in (0, 1, 2, 3, 4, 10):
+            assert reranking.rerank(ranked, made_up, n) == day09["rerank"](fake, ranked, n), n
+        assert reranking.rerank([], {}, 3) == day09["rerank"](fake, [], 3) == []
+
+    def test_rerank_margin_matches_day_09_notebook(self, day09: dict) -> None:
+        rankings, depth = day09["rankings"], day09["DEPTH"]
+        accepted = json.loads((REPO_ROOT / "evals" / "baselines" / "day-09-retrieval.json").read_text(encoding="utf-8"))
+        for name, base in day09["RERANKED"].items():
+            for q in day09["queries"]:
+                if not q.answerable:
+                    continue
+                fused, ranked = rankings[base][q.id], rankings[name][q.id]
+                margin = reranking.rerank_margin(fused, ranked, q.answer_chunks, depth[base])
+                assert margin == day09["rerank_margin"](name, q) == accepted["queries"][q.id][name]["margin"], (name, q.id)
+                # Labels the notebook never had: another chunk at each of the first 25 ranks, two chunks, no such chunk
+                for relevant in [(cid,) for cid, _ in ranked[:25]] + [(ranked[1][0], ranked[30][0]), ("no-such#chunk",)]:
+                    fake = dataclasses.replace(q, answer_chunks=relevant)
+                    assert reranking.rerank_margin(fused, ranked, relevant, depth[base]) == \
+                           day09["rerank_margin"](name, fake), (name, q.id, relevant)
+        assert reranking.rerank_margin([], [], ("a",), 3) is None
+
+    def test_reranker_file_checks_match_day_09_notebook(self, day09: dict, tmp_path: Path, monkeypatch, capsys) -> None:
+        # Point both versions at a scratch model folder, so the real files are never touched.
+        model_dir = tmp_path / "models" / "ms-marco-MiniLM-L-6-v2" / reranking.RERANKER["revision"][:12]
+        model_dir.mkdir(parents=True)
+        monkeypatch.setitem(day09, "REPO_ROOT", tmp_path)
+        monkeypatch.setitem(day09, "RERANKER_DIR", model_dir)
+        real = (reranking.default_model_dir(REPO_ROOT) / "tokenizer.json").read_bytes()
+        target = model_dir / "tokenizer.json"
+
+        def both(name: str):
+            return [_outcome(lambda: day09["reranker_file"](name)),
+                    _outcome(lambda: reranking.reranker_file(name, model_dir, tmp_path))]
+
+        # 1. A good file: same path, same printed line
+        target.write_bytes(real)
+        capsys.readouterr()
+        notebook, module = both("tokenizer.json")
+        printed = capsys.readouterr().out.splitlines()
+        assert notebook == module == ("ok", target) and printed[0] == printed[1] and printed[0].endswith("verified")
+        # 2. One byte changed: both refuse to load it, with the same message
+        target.write_bytes(real[:-1] + bytes([real[-1] ^ 1]))
+        notebook, module = both("tokenizer.json")
+        assert notebook == module and notebook[0] == "ValueError" and "Never load a model file" in notebook[1]
+        # 3. Missing file and a failing download (no network needed): same helpful error
+        target.unlink()
+
+        def no_network(*args, **kwargs):
+            raise OSError("network unreachable (simulated by the test)")
+
+        monkeypatch.setitem(day09, "hf_hub_download", no_network)
+        monkeypatch.setattr(reranking, "hf_hub_download", no_network)
+        notebook, module = both("onnx/model.onnx")
+        assert notebook == module and notebook[0] == "RuntimeError" and "HF_ENDPOINT" in notebook[1]

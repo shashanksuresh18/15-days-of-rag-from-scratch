@@ -10,6 +10,8 @@
 # normalisation are a few lines of standard-library Python. Day 09 adds nothing (checked on 2026-10-28 with Python 3.11,
 # 3.12, 3.13 and 3.14 on Linux): its cross-encoder reranker runs on Day 04's onnxruntime and tokenizers, and its
 # model (an ONNX export of cross-encoder/ms-marco-MiniLM-L6-v2, Apache-2.0, 91 MB) is downloaded once by the notebook.
+# Day 10 adds nothing (checked on 2026-10-30 with Python 3.11, 3.12, 3.13 and 3.14 on Linux): its query analysis and
+# vocabulary map are a few lines of standard-library Python (re), and it reuses Day 04's and Day 09's models.
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux
