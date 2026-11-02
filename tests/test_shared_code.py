@@ -948,7 +948,14 @@ class TestDay09Reranking:
                     continue
                 fused, ranked = rankings[base][q.id], rankings[name][q.id]
                 margin = reranking.rerank_margin(fused, ranked, q.answer_chunks, depth[base])
-                assert margin == day09["rerank_margin"](name, q) == accepted["queries"][q.id][name]["margin"], (name, q.id)
+                assert margin == day09["rerank_margin"](name, q), (name, q.id)
+                # The baseline was recorded on another machine. Margins are rounded to 4 decimals and the reranker's
+                # scores can differ slightly between machines (CI on macOS gave 11.7955 for d07-a11 where Linux and
+                # Windows give 11.7956), so the baseline may differ by one in the last digit. The copy and the
+                # notebook, both computed here, must agree exactly (above).
+                then = accepted["queries"][q.id][name]["margin"]
+                assert (margin is None) == (then is None), (name, q.id)
+                assert margin is None or round(abs(margin - then), 4) <= 0.0001, (name, q.id, margin, then)
                 # Labels the notebook never had: another chunk at each of the first 25 ranks, two chunks, no such chunk
                 for relevant in [(cid,) for cid, _ in ranked[:25]] + [(ranked[1][0], ranked[30][0]), ("no-such#chunk",)]:
                     fake = dataclasses.replace(q, answer_chunks=relevant)

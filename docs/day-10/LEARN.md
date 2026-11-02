@@ -453,6 +453,11 @@ No API key and no `.env` are needed today.
 
 **In the test environment** Hugging Face wasn't reachable, so both models' files came from copies whose SHA-256 values and sizes match the pinned ones (as on Days 04–09). CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push.
 
+**Before publication (2026-11-02):**
+
+- **Windows 11** (Python 3.11, one test file per process): 85 passed and 1 skipped; offline, with `HF_ENDPOINT` pointed at a dead address, the three test files that load models passed (52 tests) and nothing was downloaded. `tests/test_shared_code.py` peaked at 671 MB, the first Windows figure measured inside the pytest process (Day 09's helper measured the venv's launcher instead).
+- **CI found a test bug on macOS.** The first CI run on today's branch (run 41036630340) passed on Linux and Windows but failed one test on both macOS jobs: the new check that `rerank_margin()` matches Day 09's committed baseline. On macOS, question d07-a11's margin for weighted+rerank comes out as 11.7955; the baseline, recorded on Linux, says 11.7956. Margins are rounded to 4 decimals, so a tiny difference in the reranker's scores between machines can flip the last digit (the cause wasn't investigated further; no lesson depends on a margin's fourth decimal). The shared copy and the notebook agreed with each other on macOS, and every notebook test passed there. The test now allows one unit in the last decimal against the baseline, and still requires the copy and the notebook, both computed on the same machine, to agree exactly. The lesson: compare a computed number with a baseline from another machine within its rounding, and two computations on the same machine exactly.
+
 **Expected differences on your machine:** timings, and scores in the last decimal places. The closest call among today's retrievers is 0.0014 (the one-time-code question), above the 0.001 that would make it a near tie. If a sanity check fails, please open an issue with your OS, CPU and Python version.
 
 ## 19. Common errors and mistakes
