@@ -12,6 +12,8 @@
 # model (an ONNX export of cross-encoder/ms-marco-MiniLM-L6-v2, Apache-2.0, 91 MB) is downloaded once by the notebook.
 # Day 10 adds nothing (checked on 2026-10-30 with Python 3.11, 3.12, 3.13 and 3.14 on Linux): its query analysis and
 # vocabulary map are a few lines of standard-library Python (re), and it reuses Day 04's and Day 09's models.
+# Day 11 adds nothing (checked on 2026-11-09 with Python 3.11, 3.12, 3.13 and 3.14 on Linux): section expansion is a
+# lookup in the documents' own structure, and it reuses Day 04's model.
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux

@@ -10,7 +10,8 @@ cleared and garbage-collected, so only one day's notebook and model are in memor
 (Day 07 measured this file's peak memory before and after; docs/day-07/LEARN.md, section 14).
 Day 08 added the Day 07 class (the evaluation harness in evaluation.py); Day 09 the Day 08 class (rank fusion in
 fusion.py); Day 10 the Day 09 class (the cross-encoder reranker in reranking.py) and a test of outcome(), which Day 10
-copied from the Day 07 notebook into evaluation.py.
+copied from the Day 07 notebook into evaluation.py; Day 11 the Day 10 class (query analysis and the map in queries.py),
+which runs only the Day 10 cells that define them, so it doesn't load a model.
 """
 
 import dataclasses
@@ -24,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index, reranking
+from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index, queries, reranking
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -996,3 +997,94 @@ class TestDay09Reranking:
         monkeypatch.setattr(reranking, "hf_hub_download", no_network)
         notebook, module = both("onnx/model.onnx")
         assert notebook == module and notebook[0] == "RuntimeError" and "HF_ENDPOINT" in notebook[1]
+
+
+# ----------------------------------------------------------------------------- Day 10: query analysis and the map
+DAY10_CELLS = ("cell-02", "cell-03", "cell-12", "cell-14")   # setup, settings, analyse() (section 3), the map (4)
+
+
+def run_notebook_cells(name: str, cell_ids, inputs: dict) -> dict:
+    """Execute some of a notebook's code cells, in order, with the variables they read from earlier cells given."""
+    nb = json.loads((NOTEBOOKS / name).read_text(encoding="utf-8"))
+    cells = {c.get("id"): "".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code"}
+    source = "\n\n".join(cells[i] for i in cell_ids)
+    module = types.ModuleType(name.removesuffix(".ipynb"))
+    module.__dict__.update(inputs)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.chdir(REPO_ROOT)
+        mp.setitem(sys.modules, module.__name__, module)
+        exec(compile(source, name, "exec"), module.__dict__)
+    return module.__dict__
+
+
+@pytest.fixture(scope="class")
+def day10():
+    # Only the cells that define what moved to queries.py, not the whole notebook (which loads both models and ranks
+    # 122 queries with eight retrievers). Those cells read the chunks and v1's queries from section 1; they are built
+    # here by the shared code that the Day 02, 03 and 07 classes check against their own notebooks.
+    documents, _ = ingest(REPO_ROOT)
+    chunks = [c for d in documents for c in chunking.section_chunks(d)]
+    queries = evaluation.load_queries(REPO_ROOT / "evals" / "questions-v1.jsonl")
+    ns = run_notebook_cells("day_10_query_understanding_and_transformations.ipynb", DAY10_CELLS,
+                            {"chunks": chunks, "queries": queries, "by_qid": {q.id: q for q in queries}})
+    yield ns
+    release(ns)
+
+
+DAY10_TEXTS = [   # made-up questions and lookups for the edges of the analysis and the map
+    "", "   ", "?", "USD 1,000", "USD 1,000.50 per night", "#it-help", "privacy@acme.example", "https://it.acme.example/reset",
+    "Email privacy@acme.example. Then call?", "Is New Delhi covered? And New York?", "Mexico City or Mexico?",
+    "What about South Korea, Seoul and Korea?", "Tokyo hotels", "In Tokyo, what is the limit?", "PARIS or Paris?",
+    "My dad works from home. Is that OK?", "How did Baghdad do?", "Can my Dad take TIME OFF?", "wfh on Fridays",
+    "Will Acme pay for wine, beer and spirits?", "Does multi-factor authentication need MFA?", "Is MFA needed?",
+    "I'm locked. Locked out. What now!", "Shut it down? Switch it off? Power off!", "My laptop has a virus, a Virus.",
+    "Working from home vs work from home", "pay forward", "time offset", "a 14-character password?",
+    "Who is the CEO? Who knows.", "Wi-Fi, VPN and IT-help", "Ünïcödé café in Zürich?", "12:30 or 10:00-15:00",
+    "the limit is USD 250", "USD 250 in London", "Reset it at https://it.acme.example/reset.", "Is it https://x.example/a?",
+]
+
+
+class TestDay10Queries:
+    def test_query_settings_match_day_10_notebook(self, day10: dict) -> None:
+        assert queries.COUNTRIES == day10["COUNTRIES"] and queries.CAPITALS == day10["CAPITALS"]
+        assert queries.PLACES == day10["PLACES"] and len(queries.PLACES) == 38
+        for pattern in ("PLACE", "VALUE", "DEFINED"):
+            assert getattr(queries, pattern).pattern == day10[pattern].pattern, pattern
+        assert queries.VOCABULARY == day10["VOCABULARY"] and len(queries.VOCABULARY) == 8
+        assert [f.name for f in dataclasses.fields(queries.QueryAnalysis)] == \
+               [f.name for f in dataclasses.fields(day10["QueryAnalysis"])]
+        assert [f.name for f in dataclasses.fields(queries.Expansion)] == [f.name for f in dataclasses.fields(day10["Expansion"])]
+
+    def test_analysis_matches_day_10_notebook(self, day10: dict) -> None:
+        # Every question of all three versions of the labelled set, and made-up edge texts
+        texts = [q.question for q in evaluation.load_queries(REPO_ROOT / "evals" / "questions-v3.jsonl")] + DAY10_TEXTS
+        for text in texts:
+            assert asdict(queries.analyse(text)) == asdict(day10["analyse"](text)), text
+            assert queries.question_names(text) == day10["question_names"](text), text
+        assert queries.analyse("Is New Delhi covered?").names == (("New Delhi", "city"),)
+        assert queries.analyse("USD 220").exact and not queries.analyse("USD 220?").exact
+
+    def test_abbreviations_and_matching_match_day_10_notebook(self, day10: dict) -> None:
+        assert queries.defined_abbreviations(day10["chunks"]) == day10["defined_abbreviations"](day10["chunks"])
+        assert queries.VOCABULARY + queries.defined_abbreviations(day10["chunks"]) == day10["ENTRIES"]
+        made_up = [types.SimpleNamespace(text=t) for t in (
+            "Single sign-on (SSO) and Multi-factor authentication (MFA).", "Two words here (TW) twice: Two words here (TW)",
+            "Lower case (lc) is not one; Data protection officer (DPO) is.", "A (B)", "Very long name of a team (VLNT)")]
+        assert queries.defined_abbreviations(made_up) == day10["defined_abbreviations"](made_up)
+        for text in DAY10_TEXTS:
+            for phrase in ("dad", "time off", "pay for", "mfa", "multi-factor authentication", "locked", "it", "usd 1,000"):
+                assert queries.contains(text, phrase) == day10["contains"](text, phrase), (text, phrase)
+
+    def test_expansion_matches_day_10_notebook(self, day10: dict) -> None:
+        # The notebook's map, the same map matched word by word, and the map plus one more entry (Day 10, section 7.1)
+        entries = day10["ENTRIES"]
+        word_entries = [(tuple(sorted({w for p in phrases for w in p.split()})), terms, why) for phrases, terms, why in entries]
+        meals_entries = entries + [(("dinner", "lunch", "breakfast"), ("meals",), "not recorded: added for this demo")]
+        texts = [q.question for q in evaluation.load_queries(REPO_ROOT / "evals" / "questions-v3.jsonl")] + DAY10_TEXTS
+        overlapping = [(("a b",), ("x", "y"), "made up"), (("c",), ("y", "z"), "made up"), (("b c",), ("x",), "made up")]
+        texts += ["a b c?", "A B and b c, then c?"]
+        for e in (entries, word_entries, meals_entries, [], queries.VOCABULARY, overlapping):
+            for text in texts:
+                assert asdict(queries.expand(text, e)) == asdict(day10["expand"](text, e)), text
+        assert [q.id for q in day10["queries"] if queries.expand(q.question, entries).matched] == \
+               ["d01-01", "d01-02", "d07-a03", "d07-a08", "d07-a11", "d07-u12"]

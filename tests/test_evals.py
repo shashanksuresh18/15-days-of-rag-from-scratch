@@ -1,8 +1,9 @@
 """The labelled set in evals/, checked without running any model (a few seconds).
 
-Every check runs for both versions of the questions: questions-v1.jsonl (manifest.json, Day 07) and
+Every check runs for all three versions of the questions: questions-v1.jsonl (manifest.json, Day 07),
 questions-v2.jsonl (manifest-v2.json, Day 10: v1's 81 queries unchanged, its used test questions moved to dev,
-and 41 new test questions).
+and 41 new test questions) and questions-v3.jsonl (manifest-v3.json, Day 11: v2's 122 queries unchanged, its used
+test questions moved to dev, and 68 new test questions).
 
 1. The question file matches its manifest (hash, counts) and every row has the expected fields.
 2. The documents still match the snapshot the labels were written against, and every label can be
@@ -15,7 +16,10 @@ and 41 new test questions).
    combined), and Day 09's four Day 08 retrievers are Day 08's (Day 09 adds reranked versions). Day 09's
    settings are the ones committed in evals/preregistration/day-09.md before its test split was scored. Day 10's v1
    file keeps Day 09's six retrievers unchanged and adds two; its v2 file agrees with it on the 81 shared queries; and
-   its map and outcomes are the ones committed in evals/preregistration/day-10.md.
+   its map and outcomes are the ones committed in evals/preregistration/day-10.md. Day 11's v3 file keeps Day 10's five
+   retrievers unchanged on v2's 122 queries, and its section-expansion contexts follow the rules committed in
+   evals/preregistration/day-11.md: the hits first, then only their neighbouring sections, within the budget, nothing
+   the asker may not read, and the rule's dev values (checked from the chunk texts, without any model).
 
 If test 2 fails after you edited data/sample/, that is the point: run the Day 07 notebook, read the
 label problems it lists, review those labels, and record a new version (docs/day-07/LEARN.md, section 8).
@@ -38,8 +42,10 @@ FIELDS = ["id", "question", "user", "kind", "split", "origin", "tags", "evidence
           "restricted_chunks", "note"]
 
 
-MANIFESTS = ["manifest.json", "manifest-v2.json"]
-NEW_TEST_ORIGIN = {1: "day07-new", 2: "day10-new"}     # each version's test split is that day's new questions, only
+MANIFESTS = ["manifest.json", "manifest-v2.json", "manifest-v3.json"]
+NEW_TEST_ORIGIN = {1: "day07-new", 2: "day10-new", 3: "day11-new"}   # each version's test split is that day's new questions
+MOVED = {2: " (v1 test split; Day 09 used it to decide, so dev from v2 on)",     # the note a used test question gets
+         3: " (v2 test split; Day 10 used it to decide, so dev from v3 on)"}     # when it moves to dev (rule 4)
 
 
 def _manifest(name: str) -> dict:
@@ -87,7 +93,10 @@ def test_question_file_matches_its_manifest(manifest: dict, rows: list[dict]) ->
         "dev": sum(r["split"] == "dev" for r in rows), "test": sum(r["split"] == "test" for r in rows)}
     for r in rows:
         assert r["kind"] in ("question", "lookup") and r["split"] in ("dev", "test"), r["id"]
-        assert r["user"] in answering.DIRECTORY and r["question"].strip() and r["note"].strip(), r["id"]
+        assert r["user"] in answering.DIRECTORY and r["question"].strip() and isinstance(r["note"], str), r["id"]
+        # A note records a labelling decision worth recording. v1 and v2 wrote one for every query; v3's new questions
+        # leave it empty when there is nothing to record (27 of 68)
+        assert r["note"].strip() or (manifest["version"] >= 3 and r["origin"] == NEW_TEST_ORIGIN[manifest["version"]]), r["id"]
         for field in ("tags", "evidence", "facts", "answer_chunks", "restricted_chunks"):
             assert isinstance(r[field], list) and all(isinstance(v, str) and v for v in r[field]), (r["id"], field)
         assert r["answer_chunks"] == sorted(r["answer_chunks"]) and r["restricted_chunks"] == sorted(r["restricted_chunks"])
@@ -98,17 +107,19 @@ def test_question_file_matches_its_manifest(manifest: dict, rows: list[dict]) ->
     assert {r["origin"] for r in rows if r["split"] == "test"} == {origin}
     assert {r["split"] for r in rows if r["origin"] == origin} == {"test"}
     assert manifest["directory"] == {user: sorted(groups) for user, groups in answering.DIRECTORY.items()}
-    if manifest["version"] == 2:   # v1's queries, unchanged except the used test questions, which moved to dev (rule 4)
-        v1 = _manifest(manifest["previous"]["manifest"])
-        assert manifest["previous"]["questions_file"] == v1["questions_file"] and manifest["snapshot"] == v1["snapshot"]
-        old = _rows(v1)
+    if manifest["version"] > 1:   # the previous version's queries, unchanged except the used test questions (rule 4)
+        previous = _manifest(manifest["previous"]["manifest"])
+        assert previous["version"] == manifest["previous"]["version"] == manifest["version"] - 1
+        assert manifest["previous"]["questions_file"] == previous["questions_file"]
+        assert manifest["snapshot"] == previous["snapshot"]
+        old = _rows(previous)
         assert [r["id"] for r in rows[:len(old)]] == [r["id"] for r in old]
         for new, before in zip(rows, old):
             moved = before["split"] == "test"
             assert {k: v for k, v in new.items() if k not in ("split", "note")} == \
                    {k: v for k, v in before.items() if k not in ("split", "note")}, new["id"]
-            assert new["split"] == "dev" and new["note"] == before["note"] + (
-                " (v1 test split; Day 09 used it to decide, so dev from v2 on)" if moved else ""), new["id"]
+            assert new["split"] == "dev" and new["note"] == before["note"] + (MOVED[manifest["version"]] if moved else ""), \
+                new["id"]
 
 
 def test_labels_match_the_documents(manifest: dict, rows: list[dict], chunks: list) -> None:
@@ -129,7 +140,8 @@ def test_labels_match_the_documents(manifest: dict, rows: list[dict], chunks: li
 
 BASELINES = {"day-07-retrieval.json": "manifest.json", "day-08-retrieval.json": "manifest.json",
              "day-09-retrieval.json": "manifest.json", "day-10-retrieval.json": "manifest.json",
-             "day-10-retrieval-v2.json": "manifest-v2.json"}
+             "day-10-retrieval-v2.json": "manifest-v2.json", "day-11-retrieval-v3.json": "manifest-v3.json"}
+CONTEXTS = {"weighted+neighbours"}   # Day 11: what was sent to the reader, not a ranking (checked separately below)
 
 
 @pytest.mark.parametrize("name", list(BASELINES))
@@ -145,7 +157,7 @@ def test_baseline_belongs_to_this_dataset_and_adds_up(name: str) -> None:
     # The metrics follow from the per-query ranks
     for kind in ("questions", "lookups"):
         selection = [r for r in rows if r["answer_chunks"] and (r["kind"] == "question") == (kind == "questions")]
-        for retriever in baseline["retrievers"]:
+        for retriever in set(baseline["retrievers"]) - CONTEXTS:
             m, entries = baseline["metrics"][f"{kind}, {retriever}"], [baseline["queries"][r["id"]][retriever]
                                                                        for r in selection]
             ranks = [e["first_relevant"] for e in entries]
@@ -168,24 +180,28 @@ def test_baseline_belongs_to_this_dataset_and_adds_up(name: str) -> None:
             assert not set(r["restricted_chunks"]) & set(e["top3"]), f"{qid} {retriever}: a restricted chunk was retrieved"
     # The error list is exactly the answerable queries missed in the top 3, each with a diagnosis
     missed = {(retriever, qid) for qid, per_retriever in baseline["queries"].items()
-              for retriever, e in per_retriever.items()
+              for retriever, e in per_retriever.items() if retriever not in CONTEXTS
               if by_id[qid]["answer_chunks"] and (e["first_relevant"] is None or e["first_relevant"] > top_k)}
-    assert {(e["retriever"], e["id"]) for e in baseline["errors"]} == missed
+    assert {(e["retriever"], e["id"]) for e in baseline["errors"] if e["retriever"] in baseline["retrievers"]
+            and e["retriever"] not in CONTEXTS} == missed
     assert all(e["category"] and e["why"] for e in baseline["errors"])
     day07 = json.loads((EVALS / "baselines" / "day-07-retrieval.json").read_text(encoding="utf-8"))
     if name == "day-07-retrieval.json":
         assert baseline["thresholds"]["day06"] == {"min_retrieval_score": answering.MIN_RETRIEVAL_SCORE,
                                                    "min_sentence_score": answering.MIN_SENTENCE_SCORE}
-    elif name == "day-10-retrieval-v2.json":   # the same retrievers as Day 10's v1 file, the same results on v1's queries
-        earlier = json.loads((EVALS / "baselines" / "day-10-retrieval.json").read_text(encoding="utf-8"))
+    elif name in ("day-10-retrieval-v2.json", "day-11-retrieval-v3.json"):   # the previous file's retrievers, the same
+        earlier = json.loads((EVALS / "baselines" / {"day-10-retrieval-v2.json": "day-10-retrieval.json",   # results on
+                                                     "day-11-retrieval-v3.json": "day-10-retrieval-v2.json"}[name])  # its
+                             .read_text(encoding="utf-8"))                                                  # queries
         shared = set(earlier["queries"])
-        for retriever in baseline["retrievers"]:
+        for retriever in set(baseline["retrievers"]) - CONTEXTS:
             assert baseline["retrievers"][retriever] == earlier["retrievers"][retriever]
             assert {qid: per[retriever] for qid, per in baseline["queries"].items() if qid in shared} == \
                    {qid: per[retriever] for qid, per in earlier["queries"].items()}
-        assert [e for e in baseline["errors"] if e["id"] in shared] == \
+        assert [e for e in baseline["errors"] if e["id"] in shared and e["retriever"] in earlier["retrievers"]] == \
                [e for e in earlier["errors"] if e["retriever"] in baseline["retrievers"]]
-        assert baseline["thresholds"] == earlier["thresholds"]
+        if name == "day-10-retrieval-v2.json":
+            assert baseline["thresholds"] == earlier["thresholds"]
     else:   # a later day adds retrievers without changing the ones it inherits: their entries and errors are unchanged
         earlier_name, inherited = {"day-08-retrieval.json": ("day-07-retrieval.json", ("BM25", "dense")),
                                    "day-09-retrieval.json": ("day-08-retrieval.json", ("BM25", "dense", "RRF", "weighted")),
@@ -222,3 +238,57 @@ def test_baseline_belongs_to_this_dataset_and_adds_up(name: str) -> None:
         assert [tuple(outcomes[f"{rule}, dev"].values()) for rule in ("Day 06 names rule", "new names rule")] == \
                [(16, 16, 8, 8)] * 2 and "**the new rule gives the same, 16 of 16 and 8 of 8**" in prereg
         assert set(thresholds["decisions"].values()) == {"not adopted"}
+
+
+def test_day_11_contexts_follow_the_preregistered_rules(chunks: list) -> None:
+    # Every context in Day 11's baseline, rebuilt from the chunk texts and the document structure (no model): the hits are
+    # the weighted fusion's top 3, then only sections next to a hit in the same document, nothing the asker may not read,
+    # within the budget; its ranks, words, control results, metrics and errors follow; the rule's dev values are the
+    # pre-registered ones.
+    manifest = _manifest("manifest-v3.json")
+    by_id = {r["id"]: r for r in _rows(manifest)}
+    baseline = json.loads((EVALS / "baselines" / "day-11-retrieval-v3.json").read_text(encoding="utf-8"))
+    settings, name = baseline["retrievers"]["weighted+neighbours"], "weighted+neighbours"
+    assert settings["setting"] == "neighbours" and settings["hits"] == answering.TOP_K
+    assert settings["budget_words"] == answering.MAX_CONTEXT_WORDS
+    by_cid = {c.chunk_id: c for c in chunks}
+    sections = {}
+    for c in chunks:
+        sections.setdefault(c.doc_id, []).append(c.chunk_id)
+    neighbours = {cid: set(ids[max(0, i - 1):i] + ids[i + 1:i + 2]) for ids in sections.values() for i, cid in enumerate(ids)}
+    words = {cid: len(c.text.split()) for cid, c in by_cid.items()}
+    in_context = {}
+    for qid, per in baseline["queries"].items():
+        r, e, hits = by_id[qid], per[name], per["weighted"]["top3"]
+        groups = answering.DIRECTORY[r["user"]]
+        assert e["top3"] == hits == e["sent"][:3] and e["top_score"] == per["weighted"]["top_score"], qid
+        assert len(set(e["sent"])) == len(e["sent"]) and set(e["sent"][3:]) <= set().union(*(neighbours[h] for h in hits)), qid
+        assert e["words"] == sum(words[cid] for cid in e["sent"]) <= settings["budget_words"], qid
+        assert all(set(by_cid[cid].allowed_groups) & groups for cid in e["sent"]), f"{qid}: a section the asker may not read"
+        assert not set(r["restricted_chunks"]) & set(e["sent"]), qid
+        found_at = next((i for i, cid in enumerate(e["sent"], start=1) if cid in r["answer_chunks"]), None)
+        assert e["first_relevant"] == (found_at if r["answer_chunks"] else None), qid
+        if r["answer_chunks"]:
+            rank = per["weighted"]["first_relevant"]           # the control: the weighted fusion's top m, m = sections sent
+            assert e["control_found"] == (rank is not None and rank <= len(e["sent"])), qid
+            in_context[qid] = (per["weighted"]["first_relevant"] is not None and per["weighted"]["first_relevant"] <= 3,
+                               found_at is not None, e["control_found"])
+        else:
+            assert e["margin"] is None and e["control_found"] is None, qid
+    for label, ids in (("questions", [q for q in in_context if by_id[q]["kind"] == "question"]),
+                       ("lookups", [q for q in in_context if by_id[q]["kind"] == "lookup"]),
+                       ("v3 test questions", [q for q in in_context if by_id[q]["split"] == "test"])):
+        m = baseline["metrics"][f"{label}, {name}"]
+        assert m["n"] == len(ids) and [m["top 3 in context"], m["in context"], m["control in context"]] == \
+               [sum(in_context[q][i] for q in ids) for i in range(3)], label
+    errors = {(e["retriever"], e["id"]) for e in baseline["errors"]}
+    assert {k for k in errors if k[0] == name} == {(name, q) for q, v in in_context.items() if not v[1]}
+    assert {k for k in errors if k[0] == "control (weighted top m)"} == \
+           {("control (weighted top m)", q) for q, v in in_context.items() if not v[2]}
+    # The rule's dev values and the decision are the pre-registered ones
+    thresholds = baseline["thresholds"]
+    prereg = (REPO_ROOT / thresholds["preregistration"]).read_text(encoding="utf-8")
+    assert "**The rule chooses neighbours.**" in prereg
+    for setting, values in thresholds["setting_rule_on_dev"].items():
+        assert f"| {setting} | {values['found']} | {values['mean_words']} |" in prereg, setting
+    assert thresholds["decisions"] == {"D1 section expansion in the default context": "not adopted"}

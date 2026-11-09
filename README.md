@@ -6,7 +6,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 **How it's different:** every day starts from a transparent baseline, shows its evidence, and is measured before anything more complex is added. No framework is required to follow along. Where a tool is used, the lesson explains why and what the alternatives are.
 
-> **Status:** Days 01–10 are available. Days 11–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
+> **Status:** Days 01–11 are available. Days 12–15 are planned in [`ROADMAP.md`](ROADMAP.md) and will be added one at a time.
 
 ## Day index
 
@@ -22,7 +22,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 | 08 | Hybrid search and rank fusion | [LEARN.md](docs/day-08/LEARN.md) | [notebook](notebooks/day_08_hybrid_search_and_fusion.ipynb) · [baseline](evals/baselines/day-08-retrieval.json) | [slides](assets/day-08/) | [post](linkedin/day-08.md) | ✅ Tested 2026-10-23 |
 | 09 | Reranking and context selection | [LEARN.md](docs/day-09/LEARN.md) | [notebook](notebooks/day_09_reranking_and_context_selection.ipynb) · [rules](evals/preregistration/day-09.md) · [baseline](evals/baselines/day-09-retrieval.json) | [slides](assets/day-09/) | [post](linkedin/day-09.md) | ✅ Tested 2026-10-28 |
 | 10 | Query understanding and transformations | [LEARN.md](docs/day-10/LEARN.md) | [notebook](notebooks/day_10_query_understanding_and_transformations.ipynb) · [rules](evals/preregistration/day-10.md) · [new questions](evals/questions-v2.jsonl) · baselines [v1](evals/baselines/day-10-retrieval.json), [v2](evals/baselines/day-10-retrieval-v2.json) | [slides](assets/day-10/) | [post](linkedin/day-10.md) | ✅ Tested 2026-10-30 |
-| 11 | Advanced retrieval for harder questions | — | — | — | — | Planned |
+| 11 | Advanced retrieval for harder questions | [LEARN.md](docs/day-11/LEARN.md) | [notebook](notebooks/day_11_advanced_retrieval_section_expansion.ipynb) · [rules](evals/preregistration/day-11.md) · [new questions](evals/questions-v3.jsonl) · [baseline](evals/baselines/day-11-retrieval-v3.json) | [slides](assets/day-11/) | [post](linkedin/day-11.md) | ✅ Tested 2026-11-09 |
 | 12 | Answer evaluation and regression tests | — | — | — | — | Planned |
 | 13 | Operations: tracing, latency and cost | — | — | — | — | Planned |
 | 14 | Security, governance and freshness | — | — | — | — | Planned |
@@ -30,7 +30,7 @@ A hands-on, 15-day series that teaches **Retrieval-Augmented Generation (RAG)** 
 
 ## Quick start
 
-**You need:** Python **3.11 or newer**, Git, and about 700 MB of disk space (from Day 04: a 133 MB embedding model and its runtime; from Day 09: a 91 MB reranker). No API keys: Day 06 can optionally call a language model you configure, local or hosted, but runs without one. Days 04 and 09 download their model from Hugging Face on first run (Day 10 reuses both); every other day runs offline.
+**You need:** Python **3.11 or newer**, Git, and about 700 MB of disk space (from Day 04: a 133 MB embedding model and its runtime; from Day 09: a 91 MB reranker). No API keys: Day 06 can optionally call a language model you configure, local or hosted, but runs without one. Days 04 and 09 download their model from Hugging Face on first run (Day 10 reuses both, Day 11 Day 04's); every other day runs offline.
 
 ```bash
 git clone https://github.com/shashanksuresh18/15-days-of-rag-from-scratch.git
@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 jupyter lab notebooks/day_01_rag_foundations.ipynb   # or any other day's notebook
 ```
 
-Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 to 10 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
+Already set up for an earlier day? Run `git pull` and `python -m pip install -r requirements.txt` again: later days may add a package (Day 02 adds `pypdf`; Day 03 adds nothing; Day 04 adds `numpy`, `onnxruntime`, `tokenizers` and `huggingface-hub`; Days 05 to 11 add nothing). Day 04 needs Linux, Windows or an Apple silicon Mac: `onnxruntime` has no wheels for Intel Macs.
 
 In JupyterLab choose **Kernel → Restart Kernel and Run All Cells**. Prefer VS Code? Open the notebook and select the `.venv` interpreter as the kernel.
 
@@ -150,9 +150,19 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 |---|---|
 | **How to run** | Quick start above, then open `notebooks/day_10_query_understanding_and_transformations.ipynb` (about a minute). Uses Day 04's model and Day 09's reranker, downloaded once if they aren't in `models/` yet |
 | **What you build** | Query understanding and one query transformation, with every rule committed before any held-out question was scored ([`evals/preregistration/day-10.md`](evals/preregistration/day-10.md)) together with 41 new test questions ([`evals/questions-v2.jsonl`](evals/questions-v2.jsonl)): a check that Day 09's six retrievers reproduce its baseline → `analyse()`: sentences, values, names, places (a G20 gazetteer) and a route that leaves exact values alone → a reviewed vocabulary map, every entry tied to a recorded failure, appended to BM25's query (where it goes chosen by a dev rule) → v1's 81 queries against Day 09's baseline, and the 41 new questions, query by query → when not to rewrite: word-level drift, a true synonym that hurts, exact values, unanswerable questions, permissions, and a guard for any rewriter → Day 06's names rule fixed (every sentence's first word, typed places) and followed end to end → two pre-registered decisions → accepted baselines for both versions of the questions |
-| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-30, from both the repo root and `notebooks/` (85 passed and 1 skipped; 95 passed with Pillow), and offline with no network attempt. 19 of 20 deliberate bugs in the notebook were caught (the 20th is equivalent on this data; [LEARN.md, section 18](docs/day-10/LEARN.md#18-expected-output-and-what-was-tested)). Day 09's reranker was copied to `src/rag_from_scratch/reranking.py` and Day 07's `outcome()` to `evaluation.py`, each with a test that it matches its notebook. Before publication: Windows 11, one test file per process, 85 passed and 1 skipped (52 offline); CI's first run failed one new test on macOS, which compared a reranker margin with Day 09's baseline in the fourth decimal, so the test now allows one unit in that digit ([LEARN.md, section 18](docs/day-10/LEARN.md#18-expected-output-and-what-was-tested)). GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-10-30, from both the repo root and `notebooks/` (85 passed and 1 skipped; 95 passed with Pillow), and offline with no network attempt. 19 of 20 deliberate bugs in the notebook were caught (the 20th is equivalent on this data; [LEARN.md, section 18](docs/day-10/LEARN.md#18-expected-output-and-what-was-tested)). Day 09's reranker was copied to `src/rag_from_scratch/reranking.py` and Day 07's `outcome()` to `evaluation.py`, each with a test that it matches its notebook. Before publication: Windows 11, one test file per process, 85 passed and 1 skipped (52 offline); CI's first run failed one new test on macOS, which compared a reranker margin with Day 09's baseline in the fourth decimal, so the test now allows one unit in that digit ([LEARN.md, section 18](docs/day-10/LEARN.md#18-expected-output-and-what-was-tested)). GitHub Actions runs the same tests on Linux, Windows and macOS on every push. **Verified after publication:** the fixed commit passed CI on the branch (run [41821780425](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/41821780425)) and on `main` (run [41929799772](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/41929799772)), 6 of 6 jobs each ([LEARN.md, section 18](docs/day-10/LEARN.md#18-expected-output-and-what-was-tested)) |
 | **Known limitations** | Both pre-registered decisions came out "not adopted": the map met 1 of the 41 new questions and moved nothing; the fixed names rule kept 4 more answerable questions and let 1 more unanswerable one through. A map covers only the gaps someone recorded; the gazetteer is a small stand-in; no language-model rewrite was run; the new test split has now decided twice and is used too; the fixed names rule is recorded, not wired into Day 06's pipeline; small question sets written by one author |
 | **Cost** | Free. No new packages, no new model, no API key. The analysis and the map take about a tenth of a millisecond per question, against 10 to 12 ms to embed it (2-vCPU machine) |
+
+## Day 11 at a glance
+
+| | |
+|---|---|
+| **How to run** | Quick start above, then open `notebooks/day_11_advanced_retrieval_section_expansion.ipynb` (under a minute). Uses Day 04's model, downloaded once if it isn't in `models/` yet |
+| **What you build** | One advanced retrieval pattern, **section expansion** (send the sections around each hit), with every rule committed before any held-out question was scored ([`evals/preregistration/day-11.md`](evals/preregistration/day-11.md)) together with 68 new test questions ([`evals/questions-v3.jsonl`](evals/questions-v3.jsonl)): a check that Day 10's five retrievers reproduce its baseline → the documents' structure (each section's position) → `expand_sections()`: hits first, then their neighbours, permission-checked, within Day 06's 300-word budget, with an off-switch and a per-query trace → which neighbours, chosen by a dev rule → a **control** that sends the same number of sections from further down the ranking → the 122 dev queries against Day 10's baseline and the 68 new questions, query by query → a section-level permission leak an unchecked lookup would cause → cost → end to end with Day 06's reader → one pre-registered decision → an accepted baseline for v3 |
+| **What was tested** | Notebook executed top to bottom and `pytest` passed on Linux with Python 3.11, 3.12, 3.13 and 3.14 on 2026-11-09, from both the repo root and `notebooks/` (96 passed and 1 skipped; 107 passed with Pillow), and offline with no network attempt. 20 of 22 deliberate bugs in the notebook were caught (the other 2 are equivalent on this data) and 12 of 12 drifts of the shared module ([LEARN.md, section 19](docs/day-11/LEARN.md#19-expected-output-and-what-was-tested)). Day 10's query analysis and map were copied to `src/rag_from_scratch/queries.py`, with a test that it matches its notebook. GitHub Actions runs the same tests on Linux, Windows and macOS on every push |
+| **Known limitations** | The pre-registered decision came out "not adopted": on the 52 answerable new questions the expansion reached 2 of the 3 answers the top 3 missed, and the control reached all 3. The corpus has whole-section chunks and a hybrid that already ranks every new answer 5th or better, which favours the control; multi-hop or agentic retrieval wasn't built; the end-to-end reader didn't use the sections the expansion added (Day 12); the new test split has decided and is used; questions written by one author who knew the pattern |
+| **Cost** | Free. No new packages, no new model, no API key. The expansion step takes hundredths of a millisecond; it about doubles what the reader reads (114 → 214 words, 137 → 259 tokens, on average per answerable query) |
 
 ## Repository layout
 
@@ -170,8 +180,8 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 ├── data/sample/access-control.json  simulated permission export (Day 02)
 ├── docs/day-XX/LEARN.md          one lesson per day
 ├── notebooks/                    one runnable notebook per day
-├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index, answering, evaluation, fusion, reranking), see below
-├── evals/                        labelled questions (v1, v2), the document snapshot they belong to, accepted baselines (Days 07–10), rules committed before scoring (Days 09–10)
+├── src/rag_from_scratch/         code reused by later days (ingestion, BM25, chunking, test questions, embeddings, vector index, answering, evaluation, fusion, reranking, query analysis), see below
+├── evals/                        labelled questions (v1, v2, v3), the document snapshot they belong to, accepted baselines (Days 07–11), rules committed before scoring (Days 09–11)
 ├── tests/                        smoke tests that execute the notebooks, shared-code, sample-data and label checks
 ├── linkedin/day-XX.md            post text, alt text, posting order
 ├── assets/day-XX/                slide PNGs + editable SVG sources + carousel PDF
@@ -182,7 +192,7 @@ python -m pytest tests/test_evals.py      # one file at a time uses the least me
 └── .github/workflows/tests.yml   CI on Linux, Windows and macOS
 ```
 
-**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync; Day 07 also imports Day 06's answering pipeline; Day 08 also imports Day 07's evaluation harness; Day 09 also imports Day 08's fusion; Day 10 also imports Day 09's reranker and Day 07's `outcome()`). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
+**Shared code (`src/rag_from_scratch/`).** Each technique is taught step by step in its own day's notebook. When a later day needs it again, a copy moves to `src/rag_from_scratch/` and later notebooks import it instead of repeating it (Day 03 imports Day 02's ingestion and Day 01's BM25; Day 04 also imports Day 03's chunker and its 13 questions; Day 05 also imports Day 04's embedding model; Day 06 also imports Day 05's vector index and its sync; Day 07 also imports Day 06's answering pipeline; Day 08 also imports Day 07's evaluation harness; Day 09 also imports Day 08's fusion; Day 10 also imports Day 09's reranker and Day 07's `outcome()`; Day 11 also imports Day 10's query analysis and vocabulary map). `tests/test_shared_code.py` runs the original notebooks' code and checks that the shared copy returns identical results. Nothing needs installing: notebooks add `src/` to the import path themselves, and `pytest.ini` does the same for the tests.
 
 ## Principles
 
