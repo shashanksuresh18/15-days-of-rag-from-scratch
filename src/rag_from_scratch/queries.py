@@ -7,6 +7,11 @@ typed as the query), and expand() appends the documents' words for the asker's w
 map of whole phrases and the abbreviations the documents define themselves. Day 11 reuses it to
 reproduce Day 10's two map retrievers (BM25+map and weighted+map) before changing anything.
 
+Day 12 adds Day 10's revised names rule (section 8): unknown_names_v2(), which skips every sentence's first word
+and counts a gazetteer place as known when a source mentions its type ("Use the Other cities row for any city not
+listed"), and NamesReader, Day 06's extractive reader with the names rule as a setting. Day 10 measured the rule
+and didn't adopt it; Day 12 measures it again, end to end, on new held-out questions.
+
 One change in shape: the notebook's expand() read its entries from a global, ENTRIES, built from the
 chunks. Here the entries are an argument, so a later day builds them from its own chunks:
 
@@ -19,15 +24,13 @@ first): the default retriever doesn't use it. Like any query transformation, it 
 for, never who is searching.
 
 tests/test_shared_code.py runs the Day 10 notebook's own cells and checks that this module returns
-identical analyses, harvested abbreviations, phrase matches and expansions.
-
-Standard library only.
+identical analyses, harvested abbreviations, phrase matches, expansions, unknown names and answers.
 """
 
 import re
 from dataclasses import dataclass
 
-from .answering import NAME, SENTENCE
+from .answering import ABSTAIN, NAME, SENTENCE, ExtractiveReader, Reply, answer_units, unknown_names
 
 # ----------------------------------------------------------------------------- query analysis (Day 10, section 3)
 # A stand-in gazetteer (a list of place names with their types). Chosen by an external rule, the G20's member
@@ -118,3 +121,40 @@ def expand(question: str, entries) -> Expansion:
     added = list(dict.fromkeys(t for _, terms in matched for t in terms))
     return Expansion(f"{question} {' '.join(added)}" if added else question, tuple(matched),
                      "expanded" if added else "no match")
+
+
+# ----------------------------------------------------------------------------- the revised names rule (Day 10, section 8)
+TYPE_WORDS = {"city": ("city", "cities"), "country": ("country", "countries")}
+
+
+def unknown_names_v2(question: str, sources) -> list[str]:
+    # Day 06's names rule with the two changes: every sentence's first word skipped, and a gazetteer place counts as
+    # known if a source mentions its TYPE ("Use the Other cities row for any city not listed")
+    text = " ".join(s.text for s in sources)
+    unknown = [name for name, kind in question_names(question)
+               if not contains(text, name) and not (kind and any(contains(text, w) for w in TYPE_WORDS[kind]))]
+    return list(dict.fromkeys(unknown))
+
+
+class NamesReader(ExtractiveReader):
+    """Day 06's extractive reader with the names rule as a setting. The rest of generate() is Day 06's, unchanged."""
+
+    def __init__(self, embedder, names_rule=unknown_names, **settings):
+        super().__init__(embedder, **settings)
+        self.names_rule = names_rule
+
+    def generate(self, context):
+        if not context.sources:
+            return Reply(ABSTAIN, self.name, "no sources")
+        missing = self.names_rule(context.question, context.sources)
+        if missing:                                    # the question is about something the sources never mention
+            return Reply(ABSTAIN, self.name, f"no source mentions {', '.join(missing)}")
+        ranked = self.scored_units(context)
+        best_score, best_source, _ = ranked[0]
+        if best_score < self.min_score:                # nothing in the sources is close enough
+            return Reply(ABSTAIN, self.name, f"best sentence scores {best_score:.2f} < {self.min_score}")
+        picked = [u for score, s, u in ranked if s.id == best_source.id and score >= best_score - self.margin]
+        order = answer_units(best_source)
+        picked = sorted(picked[:self.max_sentences], key=order.index)        # in the document's order
+        text = " ".join(f"{u.rstrip('.')} [{best_source.id}]." for u in picked)
+        return Reply(text, self.name, f"best sentence scores {best_score:.2f} >= {self.min_score}")

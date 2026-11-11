@@ -11,7 +11,7 @@
 | **Code** | [`notebooks/day_11_advanced_retrieval_section_expansion.ipynb`](../../notebooks/day_11_advanced_retrieval_section_expansion.ipynb) — standard-library Python for the expansion, plus the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 10's query analysis and vocabulary map today |
 | **Data** | [`evals/`](../../evals/): **68 new held-out questions** in [`evals/questions-v3.jsonl`](../../evals/questions-v3.jsonl) (with v2's 122 queries, unchanged); today's rules, committed first, in [`evals/preregistration/day-11.md`](../../evals/preregistration/day-11.md); today's accepted baseline, [`day-11-retrieval-v3.json`](../../evals/baselines/day-11-retrieval-v3.json) |
 | **Visuals** | [`assets/day-11/`](../../assets/day-11/) |
-| **Verified** | Notebook executed top to bottom on 2026-11-09 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push (section 19). |
+| **Verified** | Notebook executed top to bottom on 2026-11-09 on Linux with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. Verified on Windows 11 before publication and in CI on Linux, Windows and macOS on the branch and on `main` (section 19). |
 
 ---
 
@@ -413,6 +413,11 @@ Run all cells. The first run downloads Day 04's embedding model (133 MB) if it i
 - The rules were committed before anything scored a held-out question (section 3): the pre-registration and the new questions are the first commit on today's branch, and the notebook asserts that the rule reproduces its committed values. That commit's time is local (section 3).
 
 **In the test environment** Hugging Face wasn't reachable, so the model's files came from a copy whose SHA-256 values and sizes match the pinned ones (as on Days 04–10). CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push.
+
+**Verified after publication (recorded on 2026-11-11):**
+
+- **Windows 11** (Python 3.11, one test file per process, on 2026-11-11 before publication): 96 passed and 1 skipped (the slide test, which needs Pillow); offline, with `HF_ENDPOINT` pointed at a dead address, the three test files that load models passed (60 tests) and nothing was downloaded. Peak memory measured inside each pytest process: about 80 MB for the notebook test files (their kernels are separate processes the measurement doesn't include), 308 MB for Day 06's (it loads the model in the test process) and 672 MB for `tests/test_shared_code.py`. Windows' event log shows no sleep or standby during the run (the first run with the PC on mains power and the display kept on: Day 10's run had stalled in Modern Standby), and every file was faster than on Day 10 (the Day 09 notebook test 178 s against 811 s; `tests/test_shared_code.py` 378 s against 603 s).
+- **GitHub Actions** on Linux, Windows and macOS with Python 3.11 and 3.14: run [42971538292](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/42971538292) on the `day-11` branch (18 min) and run [42976008914](https://github.com/shashanksuresh18/15-days-of-rag-from-scratch/actions/runs/42976008914) on `main` (20 min) both succeeded, 6 of 6 jobs each, every job 96 passed and 1 skipped.
 
 **Expected differences on your machine:** timings, and scores in the last decimal places. A few cut-offs are closer than 0.001 (the closest for an answerable query, 0.0002, is between the 8th and 9th sections for "Who approves admin rights?"), but they decide nothing: in each, the labelled chunk is ranked above the cut-off, and a sanity check asserts this for every query. End to end, the closest calls are known ones: the Wi-Fi question's dense top score is 0.6206 against the 0.62 gate (Day 07), and the taxi question's best sentence scores 0.6289 against the 0.63 reader threshold (refused in every context). If a sanity check fails, please open an issue with your OS, CPU and Python version.
 

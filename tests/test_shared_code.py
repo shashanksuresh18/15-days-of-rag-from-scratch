@@ -11,21 +11,33 @@ cleared and garbage-collected, so only one day's notebook and model are in memor
 Day 08 added the Day 07 class (the evaluation harness in evaluation.py); Day 09 the Day 08 class (rank fusion in
 fusion.py); Day 10 the Day 09 class (the cross-encoder reranker in reranking.py) and a test of outcome(), which Day 10
 copied from the Day 07 notebook into evaluation.py; Day 11 the Day 10 class (query analysis and the map in queries.py),
-which runs only the Day 10 cells that define them, so it doesn't load a model.
+which runs only the Day 10 cells that define them, so it doesn't load a model. Day 12 added the Day 11 class (the
+documents' structure, section expansion and the end-to-end steps with a chosen context, in contexts.py), a test of
+Day 10's revised names rule and NamesReader (queries.py, with a stand-in embedder, so the Day 10 class still loads no
+model), and tests of Day 06's prompt and language-model client (chat.py) against local fake servers. The Day 11 class
+and the new Day 10 test execute only the definitions in the cells they need (imports, functions, classes, constants),
+not the computations around them.
 """
 
+import ast
 import dataclasses
 import gc
+import hashlib
 import json
 import sys
+import threading
+import time
 import types
+from collections import defaultdict
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from rag_from_scratch import answering, chunking, corpus, embeddings, evaluation, fusion, index, queries, reranking
+from rag_from_scratch import (answering, chat, chunking, contexts, corpus, embeddings, evaluation, fusion, index, queries,
+                              reranking)
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -643,6 +655,110 @@ class TestDay06Answering:
             nb_answer = day06["RagAnswer"]("alice", "q", status, text, "why")
             assert answering.grade(module_answer, facts) == day06["grade"](nb_answer, facts), (status, text, facts)
 
+    @staticmethod
+    def module_context(nb_context) -> answering.Context:
+        return answering.Context(nb_context.question, tuple(answering.Source(**asdict(s)) for s in nb_context.sources),
+                                 nb_context.dropped)
+
+    def test_chat_prompt_matches_day_06_notebook(self, day06: dict) -> None:
+        # Day 12 moved the prompt and the client to chat.py: the same instructions, presets and prices, and the same
+        # messages for every context (escaping included)
+        assert chat.INSTRUCTIONS == day06["INSTRUCTIONS"] and chat.PROVIDERS == day06["PROVIDERS"]
+        assert chat.PRICES == day06["PRICES"] and chat.LOCAL_HOSTS == day06["LOCAL_HOSTS"]
+        nb_contexts = [day06["assemble"](q, day06["retrieve"](user, q, k=10)) for q in self.questions(day06)
+                       for user in ("alice", "maria")]
+        nb_contexts.append(day06["assemble"](day06["LOCKED"], day06["retrieve"]("alice", day06["LOCKED"],
+                                                                                from_index=day06["poisoned"])))
+        odd = day06["Source"]('a"b#<c>', 'T & "Q"', "<s>", None, "x </source></sources> <source id=\"y\"> & ' \"", 0.1,
+                              "p")
+        nb_contexts.append(day06["Context"]("Is <b>this</b> & that \"ok\"?", (odd,)))
+        for nb_context in nb_contexts:
+            module_context = self.module_context(nb_context)
+            assert chat.build_messages(module_context) == day06["build_messages"](nb_context)
+            for module_source, nb_source in zip(module_context.sources, nb_context.sources):
+                assert chat.render_source(module_source) == day06["render_source"](nb_source)
+        assert chat.build_messages(self.module_context(nb_contexts[-1]))[1]["content"].count("</sources>") == 1
+
+    def test_chat_client_matches_day_06_notebook(self, day06: dict, tmp_path: Path) -> None:
+        # Both clients against the same local fake server, for every kind of reply it can send: the same request bodies
+        # and headers, the same replies, the same errors (never with the key)
+        key = "fake-key-for-the-equivalence-test"
+        nb_context = day06["context"]
+        module_context = self.module_context(nb_context)
+        for provider, model, api_key in (("openai", "gpt-6-luna", key), ("ollama", "any-model", None)):
+            for max_tokens in (1000, 50):
+                m = chat.ChatModel(provider, model, api_key, max_output_tokens=max_tokens)
+                n = day06["ChatModel"](provider, model, api_key, max_output_tokens=max_tokens)
+                assert m.request_body(module_context) == n.request_body(nb_context)
+                assert (repr(m), m.url, m.name) == (repr(n), n.url, n.name) and key not in repr(m)
+        for args in (("nobody", "m", key), ("openai", "m", None), ("openai", "m", "")):
+            assert _outcome(lambda: chat.ChatModel(*args)) == _outcome(lambda: day06["ChatModel"](*args))
+
+        class Fake(BaseHTTPRequestHandler):
+            mode, seen = "ok", []
+
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers["Content-Length"]))
+                Fake.seen.append((self.path, self.headers.get("Authorization"), json.loads(body)))
+                if Fake.mode == "slow":
+                    time.sleep(1.5)
+                status, payload = {
+                    "ok": (200, {"choices": [{"finish_reason": "stop", "message": {"content": " An answer [x]. "}}],
+                                 "usage": {"prompt_tokens": 11, "completion_tokens": 3}}),
+                    "no usage": (200, {"choices": [{"message": {"content": "Hi"}}]}),
+                    "echo": (500, {"error": {"message": f"boom {self.headers.get('Authorization')}"}}),
+                    "denied": (401, {"error": {"message": f"Incorrect API key {self.headers.get('Authorization')}"}}),
+                    "limits": (429, {"error": {"message": "slow down"}}),
+                    "no choices": (200, {"choices": []}),
+                    "empty": (200, {"choices": [{"finish_reason": "length", "message": {"content": ""}}]}),
+                    "slow": (200, {"choices": [{"message": {"content": "late"}}]}),
+                }.get(Fake.mode, (200, None))
+                data = b"<html>not json</html>" if payload is None else json.dumps(payload).encode("utf-8")
+                self.send_response(status)
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+            def log_message(self, *args):
+                pass
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Fake)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        url = f"http://127.0.0.1:{server.server_address[1]}/v1"
+        try:
+            for mode in ("ok", "no usage", "echo", "denied", "limits", "no choices", "empty", "not json", "slow"):
+                Fake.mode, Fake.seen = mode, []
+                results = []
+                for client in (chat.ChatModel("openai", "gpt-6-luna", key, url, timeout=1),
+                               day06["ChatModel"]("openai", "gpt-6-luna", key, url, timeout=1)):
+                    try:
+                        results.append(("ok", asdict(client.generate(module_context if isinstance(client, chat.ChatModel)
+                                                                     else nb_context))))
+                    except Exception as error:
+                        results.append((type(error).__name__, str(error)))
+                assert results[0] == results[1], mode
+                assert key not in str(results[0]), mode
+                assert Fake.seen[0] == Fake.seen[1], mode
+        finally:
+            server.shutdown()
+            server.server_close()
+        unreachable = [_outcome(lambda: c.generate(ctx)) for c, ctx in (
+            (chat.ChatModel("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=2), module_context),
+            (day06["ChatModel"]("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=2), nb_context))]
+        assert unreachable[0] == unreachable[1] and unreachable[0][0] == "GeneratorError"
+        # .env files: the same values, and the same client (or none) built from them
+        for i, text in enumerate(["", "# only a comment\n", "RAG_CHAT_PROVIDER=ollama\nRAG_CHAT_MODEL=llama\n",
+                                  f"RAG_CHAT_PROVIDER = openai\nRAG_CHAT_MODEL='gpt-6-luna'\nRAG_CHAT_API_KEY=\"{key}\"\n",
+                                  "RAG_CHAT_PROVIDER=openai # the preset\nRAG_CHAT_MODEL=m\nRAG_CHAT_API_KEY=k # x\n"
+                                  "RAG_CHAT_BASE_URL=http://localhost:8000/v1/\nnot a line\n=x\n",
+                                  "RAG_CHAT_PROVIDER=openai\nRAG_CHAT_MODEL=m\n"]):
+            env = tmp_path / f"env-{i}"
+            env.write_text(text, encoding="utf-8")
+            assert chat.read_env_file(env) == day06["read_env_file"](env), text
+            m, n = _outcome(lambda: chat.chat_model_from_env(env)), _outcome(lambda: day06["chat_model_from_env"](env))
+            assert (m[0], repr(m[1]) if m[0] == "ok" else m[1]) == (n[0], repr(n[1]) if n[0] == "ok" else n[1]), text
+        assert chat.read_env_file(tmp_path / "missing") == {} == day06["read_env_file"](tmp_path / "missing")
+
 
 # ----------------------------------------------------------------------------- Day 07: the evaluation harness
 @pytest.fixture(scope="class")
@@ -1003,11 +1119,12 @@ class TestDay09Reranking:
 DAY10_CELLS = ("cell-02", "cell-03", "cell-12", "cell-14")   # setup, settings, analyse() (section 3), the map (4)
 
 
-def run_notebook_cells(name: str, cell_ids, inputs: dict) -> dict:
-    """Execute some of a notebook's code cells, in order, with the variables they read from earlier cells given."""
+def run_notebook_cells(name: str, cell_ids, inputs: dict, definitions_of=()) -> dict:
+    """Execute some of a notebook's code cells, in order, with the variables they read from earlier cells given; then,
+    from the cells in `definitions_of`, only what they define (see definitions() below), in the same namespace."""
     nb = json.loads((NOTEBOOKS / name).read_text(encoding="utf-8"))
     cells = {c.get("id"): "".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code"}
-    source = "\n\n".join(cells[i] for i in cell_ids)
+    source = "\n\n".join([cells[i] for i in cell_ids] + [definitions(cells[i]) for i in definitions_of])
     module = types.ModuleType(name.removesuffix(".ipynb"))
     module.__dict__.update(inputs)
     with pytest.MonkeyPatch.context() as mp:
@@ -1088,3 +1205,202 @@ class TestDay10Queries:
                 assert asdict(queries.expand(text, e)) == asdict(day10["expand"](text, e)), text
         assert [q.id for q in day10["queries"] if queries.expand(q.question, entries).matched] == \
                ["d01-01", "d01-02", "d07-a03", "d07-a08", "d07-a11", "d07-u12"]
+
+    def test_revised_names_rule_matches_day_10_notebook(self, day10: dict) -> None:
+        # Day 12 moved Day 10's revised names rule and NamesReader (section 8) to queries.py. Only their definitions are
+        # executed (the cells also rank every question); a stand-in embedder keeps this class free of any model.
+        ns = run_notebook_cells("day_10_query_understanding_and_transformations.ipynb", DAY10_CELLS,
+                                {k: day10[k] for k in ("chunks", "queries", "by_qid")}, definitions_of=("cell-36", "cell-38"))
+        assert queries.TYPE_WORDS == ns["TYPE_WORDS"]
+        chunks = day10["chunks"]
+        by_doc = defaultdict(list)
+        for c in chunks:
+            by_doc[c.doc_id].append(answering.Source(c.chunk_id, c.title, c.section, c.last_reviewed, c.text, 0.5,
+                                                     c.source_path))
+        made_up = [answering.Source("made-up#cities", "Made up", "Cities", None, "Use the Other cities row for anywhere "
+                                    "else.", 0.5, "made-up.md"),     # one type word each: either form must count
+                   answering.Source("made-up#offices", "Made up", "Offices", None, "Each country office sets its own "
+                                    "hours.", 0.5, "made-up.md")]
+        source_sets = [[], *by_doc.values(), [s for ss in by_doc.values() for s in ss][:5], made_up[:1], made_up[1:]]
+        texts = [q.question for q in evaluation.load_queries(REPO_ROOT / "evals" / "questions-v4.jsonl")] + DAY10_TEXTS
+        texts += ["Is Mexico City a city? And Italy a country?", "What about New Delhi. And Rome?", "Tokyo",
+                  "Is Slack allowed? Can I install Slack at home?", "Can I fly to Italy? Is Italy covered?"]
+        for sources in source_sets:
+            for text in texts:
+                assert queries.unknown_names_v2(text, sources) == ns["unknown_names_v2"](text, sources), text
+        fake = HashEmbedder()
+        for min_score in (-1.0, 0.0, 0.63):
+            for rule_name in ("unknown_names", "unknown_names_v2"):
+                module_reader = queries.NamesReader(fake, getattr(queries, rule_name) if rule_name.endswith("v2")
+                                                    else answering.unknown_names, min_score=min_score)
+                nb_reader = ns["NamesReader"](fake, ns[rule_name], min_score=min_score)
+                for sources in source_sets:
+                    for text in texts[::7]:
+                        context = answering.Context(text, tuple(sources))
+                        assert asdict(module_reader.generate(context)) == asdict(nb_reader.generate(context)), text
+        assert queries.NamesReader.name == ns["NamesReader"].name == answering.ExtractiveReader.name
+
+
+class HashEmbedder:
+    """A stand-in for the embedding model: a fixed pseudo-random unit vector per text, the same for both readers."""
+    model = {"repo": "stand-in"}
+
+    @staticmethod
+    def vector(text: str) -> np.ndarray:
+        rng = np.random.default_rng(int(hashlib.sha256(text.encode("utf-8")).hexdigest()[:16], 16))
+        v = rng.standard_normal(16)
+        return (v / np.linalg.norm(v)).astype(np.float32)
+
+    def embed(self, texts, batch_size: int = 16):
+        return np.stack([self.vector(t) for t in texts])
+
+    def embed_query(self, question: str, instruction: str = ""):
+        return self.vector("query: " + question)
+
+
+def definitions(source: str) -> str:
+    """Only what a cell defines: its imports, functions, classes and constants (literal values), not its computations."""
+    keep = []
+    for node in ast.parse(source).body:
+        if isinstance(node, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.ClassDef)):
+            keep.append(node)
+        elif isinstance(node, ast.Assign):
+            try:
+                ast.literal_eval(node.value)
+                keep.append(node)
+            except ValueError:
+                pass
+    return ast.unparse(ast.Module(body=keep, type_ignores=[]))
+
+
+# ----------------------------------------------------------------------------- Day 11: contexts and end-to-end steps
+DAY11 = "day_11_advanced_retrieval_section_expansion.ipynb"
+
+
+@pytest.fixture(scope="class")
+def day11(embedder: embeddings.Embedder):
+    # The Day 11 notebook's setup and settings cells, then only the definitions in its sections 3 and 8 (the notebook
+    # also ranks 190 queries with six retrievers and answers 160 questions three ways). Their inputs, the sections in
+    # order, the records and the rankings, are built here by shared code that earlier classes check.
+    documents, _ = ingest(REPO_ROOT)
+    chunks = [c for d in documents for c in chunking.section_chunks(d)]
+    by_cid = {c.chunk_id: c for c in chunks}
+    queries3 = evaluation.load_queries(REPO_ROOT / "evals" / "questions-v3.jsonl")
+    store = index.VectorIndex(embedder.model["repo"], embedder.revision, embedder.dimensions)
+    index.sync(store, chunks, embedder.embed)
+    rag = answering.Pipeline(store, embedder)
+    bm25 = {user: BM25Index({c.chunk_id: c.text for c in chunks if set(c.allowed_groups) & groups})
+            for user, groups in answering.DIRECTORY.items()}
+    rankings = {"dense": {}, "weighted": {}}
+    for q in queries3:
+        lexical = [(h.id, h.score) for h in bm25[q.user].search(q.question, len(chunks))]
+        rankings["dense"][q.id] = [(r.id, r.score) for r in rag.retrieve(q.user, q.question, len(chunks))]
+        rankings["weighted"][q.id] = fusion.weighted(lexical, rankings["dense"][q.id], fusion.ALPHA)
+    sections = defaultdict(list)                     # what the notebook's section 2 builds
+    for c in chunks:
+        sections[c.doc_id].append(c.chunk_id)
+    position = {cid: (doc, i) for doc, ids in sections.items() for i, cid in enumerate(ids)}
+    ns = run_notebook_cells(DAY11, ("cell-02", "cell-03"), {"chunks": chunks, "by_cid": by_cid, "rankings": rankings,
+                                                             "SECTIONS": sections, "POSITION": position},
+                            definitions_of=("cell-10", "cell-12", "cell-26"))
+    ns.update({"queries3": queries3, "embedder": embedder, "store": store})
+    yield ns
+    release(ns)
+
+
+class TestDay11Contexts:
+    @staticmethod
+    def restricted(day11: dict) -> dict:
+        secret = "security-incident-reporting#after-you-report"     # section 6's in-memory restriction
+        return {**day11["by_cid"], secret: dataclasses.replace(day11["by_cid"][secret], allowed_groups=("managers",))}
+
+    def test_settings_and_structure_match_day_11_notebook(self, day11: dict) -> None:
+        assert contexts.SETTINGS == day11["SETTINGS"]
+        assert [f.name for f in dataclasses.fields(contexts.Step)] == [f.name for f in dataclasses.fields(day11["Step"])]
+        assert [f.name for f in dataclasses.fields(contexts.SectionContext)] == \
+               [f.name for f in dataclasses.fields(day11["Context"])]
+        structure = contexts.DocumentStructure(day11["chunks"])
+        assert dict(structure.sections) == dict(day11["SECTIONS"]) and structure.position == day11["POSITION"]
+        restricted = self.restricted(day11)
+        for c in day11["chunks"]:
+            assert structure.where(c.chunk_id) == day11["where"](c.chunk_id)
+            for setting in ("off",) + contexts.SETTINGS:
+                assert structure.around(c.chunk_id, setting) == day11["around"](c.chunk_id, setting), c.chunk_id
+            for user in ("alice", "maria", "mallory"):
+                for records in (day11["by_cid"], restricted):
+                    assert contexts.may_read(c.chunk_id, user, records) == day11["may_read"](c.chunk_id, user, records)
+
+    def test_expansion_matches_day_11_notebook(self, day11: dict, monkeypatch) -> None:
+        structure = contexts.DocumentStructure(day11["chunks"])
+        restricted = self.restricted(day11)
+        for q in day11["queries3"]:
+            ranked = day11["rankings"]["weighted"][q.id]
+            for setting in ("off",) + contexts.SETTINGS:
+                for records in (day11["by_cid"], restricted):
+                    for budget, hits in ((300, 3), (150, 3), (40, 3), (300, 1), (300, 5)):
+                        module_context = contexts.expand_sections(ranked, q.user, q.question, setting, records,
+                                                                  structure, budget, hits)
+                        nb_context = day11["expand_sections"](ranked, q.user, q.question, setting, records, budget, hits)
+                        assert asdict(module_context) == asdict(nb_context), (q.id, setting, budget, hits)
+        # Another directory: the module takes it as a setting, the notebook reads its global on every call
+        other = {"alice": {"managers"}, "maria": set()}
+        monkeypatch.setitem(day11, "DIRECTORY", other)
+        for q in day11["queries3"][::5]:
+            ranked = day11["rankings"]["weighted"][q.id]
+            assert asdict(contexts.expand_sections(ranked, q.user, q.question, "parent", day11["by_cid"], structure,
+                                                   directory=other)) == \
+                   asdict(day11["expand_sections"](ranked, q.user, q.question, "parent", day11["by_cid"]))
+
+    def test_end_to_end_matches_day_11_notebook(self, day11: dict, monkeypatch) -> None:
+        texts = [c.text for c in day11["chunks"][:9]] + ["a", "Ünïcödé", day11["chunks"][0].text]
+        module_cache, nb_cache = contexts.SentenceCache(day11["embedder"]), day11["SentenceCache"](day11["embedder"])
+        assert np.array_equal(module_cache.embed(texts), nb_cache.embed(texts))
+        assert np.array_equal(module_cache.embed_query("x?"), nb_cache.embed_query("x?"))
+        assert module_cache.model == nb_cache.model
+        reader = answering.ExtractiveReader(module_cache, min_score=day11["READER_THRESHOLD"])
+        structure = contexts.DocumentStructure(day11["chunks"])
+        natural = [q for q in day11["queries3"] if q.kind == "question"]
+
+        def both(q, sent, gate):
+            module_answer = contexts.answer_context(q.user, q.question, sent, day11["by_cid"],
+                                                    dict(day11["rankings"]["weighted"][q.id]),
+                                                    day11["rankings"]["dense"][q.id][0][1], reader, gate=gate)
+            return module_answer, day11["answer_with"](q, sent, reader)
+
+        for q in natural:
+            top3 = tuple(cid for cid, _ in day11["rankings"]["weighted"][q.id][:3])
+            expanded = contexts.expand_sections(day11["rankings"]["weighted"][q.id], q.user, q.question, "neighbours",
+                                                day11["by_cid"], structure).sent
+            for sent in (top3, expanded):
+                module_answer, nb_answer = both(q, sent, day11["DENSE_GATE"])
+                assert asdict(module_answer) == asdict(nb_answer), q.id
+                assert contexts.why_refused(module_answer) == day11["why_refused"](nb_answer)
+        # Other gates and budgets: the module takes them as settings, the notebook reads its globals
+        for gate, budget in ((0.0, 300), (0.7, 300), (0.62, 60)):
+            monkeypatch.setitem(day11, "DENSE_GATE", gate)
+            monkeypatch.setitem(day11, "BUDGET", budget)
+            for q in natural[::4]:
+                top3 = tuple(cid for cid, _ in day11["rankings"]["weighted"][q.id][:3])
+                module_answer = contexts.answer_context(q.user, q.question, top3, day11["by_cid"],
+                                                        dict(day11["rankings"]["weighted"][q.id]),
+                                                        day11["rankings"]["dense"][q.id][0][1], reader, gate=gate,
+                                                        budget=budget)
+                assert asdict(module_answer) == asdict(day11["answer_with"](q, top3, reader)), (q.id, gate, budget)
+        # On the boundary (a gate exactly equal to the dense top score lets the question through in both), and a
+        # context holding a chunk the asker may not read (both refuse before anything is sent)
+        q = natural[0]
+        top = day11["rankings"]["dense"][q.id][0][1]
+        monkeypatch.setitem(day11, "DENSE_GATE", top)
+        monkeypatch.setitem(day11, "BUDGET", 300)
+        sent = tuple(cid for cid, _ in day11["rankings"]["weighted"][q.id][:3])
+        on_the_line = contexts.answer_context(q.user, q.question, sent, day11["by_cid"],
+                                              dict(day11["rankings"]["weighted"][q.id]), top, reader, gate=top)
+        assert asdict(on_the_line) == asdict(day11["answer_with"](q, sent, reader)) and on_the_line.context is not None
+        pay = "manager-pay-review-guide#overview"
+        leaky = sent + (pay,)
+        scores = {**dict(day11["rankings"]["weighted"][q.id]), pay: 0.1}
+        assert _outcome(lambda: contexts.answer_context("alice", q.question, leaky, day11["by_cid"], scores, top, reader,
+                                                        gate=top)) == \
+               ("PermissionError", "a context holds a chunk alice may not read")
+        alice_q = dataclasses.replace(q, user="alice")
+        assert _outcome(lambda: day11["answer_with"](alice_q, leaky, reader))[0] == "PermissionError"

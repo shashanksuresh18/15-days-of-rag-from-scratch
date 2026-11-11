@@ -16,8 +16,12 @@ it again, a copy moves here so the new notebook can import it instead of repeati
                  interval, the sign test, compare() against an accepted baseline)
 - fusion.py:  Day 08's rank fusion (rrf(), min_max(), weighted() and RRF's near-tie margin)
 - reranking.py: Day 09's cross-encoder reranker (Reranker: (question, text) pairs -> logits; rerank(), rerank_margin())
-- queries.py: Day 10's query analysis (analyse(): sentences, values, names, places, exact values) and its reviewed
-              vocabulary map (expand(), VOCABULARY, defined_abbreviations())
+- queries.py: Day 10's query analysis (analyse(): sentences, values, names, places, exact values), its reviewed
+              vocabulary map (expand(), VOCABULARY, defined_abbreviations()) and its revised names rule
+              (unknown_names_v2(), NamesReader; added on Day 12)
+- contexts.py: Day 11's contexts (DocumentStructure, expand_sections() with its trace) and the end-to-end steps
+               with a chosen context (answer_context(), SentenceCache, why_refused())
+- chat.py:    Day 06's prompt (build_messages()) and optional language-model client (ChatModel, chat_model_from_env())
 
 tests/test_shared_code.py checks each module against the notebook it came from.
 """

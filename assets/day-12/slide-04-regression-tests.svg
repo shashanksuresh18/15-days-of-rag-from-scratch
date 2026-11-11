@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <title>Every recorded failure, a test</title>
+  <defs>
+    <pattern id="dots" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="17" cy="17" r="1.6" fill="#DEE2E6"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1350" fill="#FFFFFF"/>
+  <rect width="1080" height="1350" fill="url(#dots)"/>
+  <text x="60.0" y="96.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="26" font-weight="800" fill="#1E1E1E">15 DAYS OF RAG</text>
+  <path d="M59.8,107.0 C78.1,107.2 133.0,107.4 169.3,107.9 C205.6,108.4 259.7,109.8 277.7,110.2" fill="none" stroke="#0C8599" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="871.5" y="68.3" width="146.5" height="40.0" rx="20.0" fill="#FFEC99"/>
+  <path d="M891.2,66.1 C900.0,66.3 926.1,67.1 944.0,67.1 C961.8,67.1 986.6,65.4 998.2,66.3 C1009.8,67.2 1009.9,68.7 1013.6,72.4 C1017.2,76.1 1019.1,86.1 1020.1,88.6 C1021.1,91.2 1019.4,87.8 1019.4,87.6 C1019.4,87.4 1019.9,87.5 1020.0,87.6 C1020.1,87.7 1021.1,85.4 1019.9,88.0 C1018.7,90.7 1016.6,100.0 1013.0,103.7 C1009.4,107.4 1001.0,109.4 998.4,110.4 C995.8,111.3 1006.5,109.3 997.4,109.4 C988.3,109.6 961.6,111.1 944.0,111.3 C926.4,111.5 903.2,111.6 891.9,110.4 C880.5,109.3 879.8,107.9 876.0,104.3 C872.3,100.7 870.1,91.4 869.1,88.7 C868.1,85.9 870.1,88.0 870.2,87.9 C870.4,87.8 870.1,87.9 870.0,88.0 C869.9,88.0 868.8,90.5 869.7,88.0 C870.7,85.6 872.1,77.0 875.6,73.3 C879.2,69.7 888.6,67.2 891.2,66.0 C893.8,64.8 882.4,65.9 891.2,66.1 C900.0,66.3 935.2,66.9 944.0,67.1" fill="none" stroke="#F08C00" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M891.1,66.3 C899.9,66.2 926.4,65.4 944.2,65.4 C962.0,65.4 986.4,64.9 997.8,66.3 C1009.3,67.6 1009.4,69.7 1013.0,73.3 C1016.6,77.0 1018.2,85.7 1019.5,88.3 C1020.9,90.9 1020.7,88.8 1020.9,88.9 C1021.1,89.1 1020.9,89.3 1020.8,89.2 C1020.7,89.1 1021.4,86.0 1020.2,88.4 C1019.0,90.8 1017.3,100.0 1013.6,103.6 C1010.0,107.3 1001.1,109.3 998.5,110.3 C996.0,111.3 1007.5,109.7 998.4,109.7 C989.3,109.7 961.7,110.3 943.9,110.4 C926.2,110.5 903.5,111.3 892.1,110.2 C880.7,109.1 879.4,107.5 875.7,103.8 C872.0,100.1 871.2,90.5 870.1,88.0 C869.1,85.5 869.5,88.7 869.4,88.7 C869.2,88.8 869.1,88.3 869.0,88.3 C869.0,88.3 868.1,91.4 869.2,88.7 C870.3,86.0 871.8,76.0 875.5,72.3 C879.2,68.6 888.8,67.6 891.4,66.6 C894.0,65.6 882.3,66.5 891.1,66.3 C899.9,66.1 935.3,65.6 944.2,65.4" fill="none" stroke="#F08C00" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="944.8" y="96.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="24" font-weight="800" fill="#1E1E1E" text-anchor="middle">Day 12/15</text>
+  <path d="M60.9,1261.9 C140.7,1262.2 380.3,1264.0 540.0,1264.0 C699.7,1264.1 939.3,1262.4 1019.2,1262.0" fill="none" stroke="#CED4DA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="60.0" y="1306.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="24" font-weight="500" fill="#495057">github.com/shashanksuresh18/15-days-of-rag-from-scratch</text>
+  <text x="1020.0" y="1306.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="26" font-weight="800" fill="#1E1E1E" text-anchor="end">4 / 4</text>
+  <text x="60.0" y="190.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="54" font-weight="800" fill="#1E1E1E">Every recorded failure, a test</text>
+  <text x="60.0" y="238.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="25" font-weight="500" fill="#495057">29 cases from Days 01–11, run on every push.</text>
+  <rect x="62.0" y="276.0" width="302.7" height="286.0" rx="20" fill="#EBFBEE"/>
+  <path d="M83.5,274.2 C97.6,274.4 139.6,275.4 168.5,275.5 C197.4,275.6 227.6,275.3 256.8,274.9 C286.1,274.6 326.4,272.3 343.8,273.4 C361.1,274.4 357.5,277.3 361.1,281.0 C364.8,284.8 364.9,293.6 365.7,295.9 C366.6,298.3 366.5,281.6 366.4,295.1 C366.4,308.7 365.5,350.1 365.4,377.4 C365.2,404.7 365.2,431.6 365.5,459.0 C365.8,486.4 368.3,525.3 367.4,541.7 C366.4,558.1 363.7,553.5 359.8,557.4 C355.9,561.2 346.4,563.6 343.9,564.8 C341.4,566.0 358.9,564.9 344.7,564.5 C330.5,564.2 287.8,562.9 258.7,562.8 C229.5,562.7 199.1,563.7 169.8,563.9 C140.4,564.2 99.8,565.4 82.5,564.2 C65.3,563.0 70.1,560.5 66.3,556.8 C62.6,553.2 60.9,545.1 60.1,542.6 C59.2,540.1 61.4,555.5 61.4,541.9 C61.4,528.3 60.3,488.3 60.0,461.0 C59.8,433.6 59.8,405.1 59.8,377.7 C59.9,350.3 59.3,312.8 60.5,296.7 C61.6,280.7 63.5,285.0 67.0,281.3 C70.4,277.5 78.6,275.2 81.4,274.1 C84.1,272.9 68.9,273.9 83.5,274.2 C98.0,274.4 154.3,275.3 168.5,275.5" fill="none" stroke="#2F9E44" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80.6,275.4 C95.3,275.2 139.2,274.3 168.7,274.1 C198.2,273.8 228.4,273.9 257.7,273.9 C287.0,273.9 327.5,272.8 344.6,273.9 C361.7,275.1 356.6,277.0 360.4,280.7 C364.1,284.4 366.1,293.6 367.1,295.9 C368.1,298.3 366.7,281.3 366.4,294.9 C366.0,308.5 364.8,349.9 365.1,377.4 C365.4,404.9 368.0,432.5 368.1,459.9 C368.3,487.3 367.2,525.6 366.0,542.0 C364.8,558.3 364.3,554.5 360.7,558.2 C357.1,561.9 347.3,563.1 344.4,564.2 C341.5,565.4 357.9,565.3 343.2,565.1 C328.6,564.8 285.9,562.8 256.8,562.8 C227.7,562.8 197.6,564.9 168.6,565.0 C139.6,565.1 99.6,564.8 82.7,563.4 C65.9,562.1 71.3,560.7 67.3,557.0 C63.4,553.3 60.6,543.5 59.2,541.1 C57.8,538.7 58.7,556.0 58.9,542.7 C59.1,529.4 60.2,489.0 60.2,461.3 C60.2,433.7 59.0,404.5 59.1,376.9 C59.1,349.4 59.5,312.0 60.7,296.0 C61.9,280.0 63.0,284.7 66.4,280.9 C69.8,277.1 78.7,274.1 81.0,273.1 C83.4,272.2 66.0,275.2 80.6,275.4 C95.2,275.6 154.0,274.3 168.7,274.1" fill="none" stroke="#2F9E44" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(84.0,302.0) scale(1.1667)" fill="none" stroke="#2F9E44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" />
+  <path d="m16 9-5.5 5.5L8 12" /></g>
+  <text x="124.0" y="326.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="22" font-weight="800" fill="#247A37">FIXED</text>
+  <text x="86.0" y="414.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="56" font-weight="800" fill="#1E1E1E">9</text>
+  <text x="86.0" y="460.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="800" fill="#1E1E1E">must stay fixed</text>
+  <text x="86.0" y="496.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="16" font-weight="700" fill="#495057">new dads: in the top 3</text>
+  <rect x="388.7" y="276.0" width="302.7" height="286.0" rx="20" fill="#E7F5FF"/>
+  <path d="M407.3,273.5 C421.9,273.6 465.6,274.1 494.9,274.1 C524.3,274.1 554.2,273.6 583.5,273.6 C612.8,273.5 653.6,272.6 670.9,273.9 C688.2,275.2 683.5,277.8 687.4,281.3 C691.3,284.8 693.2,292.5 694.3,295.1 C695.3,297.6 693.7,282.9 693.7,296.8 C693.8,310.6 694.9,351.0 694.7,378.2 C694.5,405.3 692.6,432.6 692.5,459.8 C692.4,487.0 695.1,525.1 694.2,541.3 C693.3,557.5 690.8,553.7 686.9,557.3 C683.0,561.0 673.6,562.0 671.0,563.2 C668.4,564.4 685.6,563.9 671.2,564.3 C656.8,564.7 614.0,565.6 584.7,565.5 C555.5,565.3 525.1,563.6 495.6,563.3 C466.2,563.1 425.0,565.0 408.0,564.0 C391.0,563.1 397.2,561.4 393.7,557.9 C390.1,554.3 387.5,545.3 386.6,542.9 C385.6,540.4 388.2,557.0 388.1,543.3 C388.0,529.6 386.6,488.1 386.1,460.6 C385.6,433.2 385.2,405.8 385.2,378.4 C385.2,351.0 384.7,312.4 386.2,296.0 C387.7,279.6 390.4,283.7 394.1,280.0 C397.7,276.4 406.0,275.4 408.2,274.3 C410.4,273.2 392.9,273.6 407.3,273.5 C421.8,273.5 480.3,274.0 494.9,274.1" fill="none" stroke="#1971C2" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M407.5,273.3 C422.4,273.2 467.7,272.7 497.2,272.8 C526.8,272.9 555.7,273.4 584.7,273.7 C613.6,274.1 654.2,273.8 671.2,274.8 C688.2,275.8 683.0,276.1 686.7,279.6 C690.5,283.1 692.2,293.1 693.5,295.9 C694.7,298.6 694.2,282.3 694.3,296.1 C694.4,309.9 694.3,351.2 694.2,378.7 C694.1,406.2 693.9,434.0 693.8,461.1 C693.7,488.1 694.9,525.3 693.7,541.2 C692.4,557.2 689.9,552.8 686.2,556.8 C682.5,560.7 674.0,563.9 671.3,564.9 C668.7,565.9 685.2,562.8 670.5,562.7 C655.7,562.6 611.6,563.9 582.8,564.4 C553.9,564.8 526.6,565.3 497.4,565.2 C468.2,565.0 425.2,564.6 407.9,563.3 C390.5,562.0 396.5,561.0 393.0,557.4 C389.6,553.8 388.3,544.1 387.4,541.8 C386.5,539.4 387.7,557.1 387.8,543.3 C387.9,529.4 388.0,486.0 387.9,458.4 C387.8,430.8 387.3,404.5 387.2,377.6 C387.1,350.7 386.6,313.1 387.5,296.8 C388.3,280.5 388.8,283.5 392.3,279.7 C395.8,275.9 406.1,275.1 408.6,274.1 C411.2,273.0 392.7,273.5 407.5,273.3 C422.2,273.1 482.3,272.9 497.2,272.8" fill="none" stroke="#1971C2" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(410.7,302.0) scale(1.1667)" fill="none" stroke="#1971C2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" /></g>
+  <text x="450.7" y="326.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="22" font-weight="800" fill="#1864AB">GUARD</text>
+  <text x="412.7" y="414.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="56" font-weight="800" fill="#1E1E1E">13</text>
+  <text x="412.7" y="460.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="800" fill="#1E1E1E">must always hold</text>
+  <text x="412.7" y="496.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="16" font-weight="700" fill="#495057">no managers-only chunk for</text>
+  <text x="412.7" y="518.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="16" font-weight="700" fill="#495057">alice</text>
+  <rect x="715.3" y="276.0" width="302.7" height="286.0" rx="20" fill="#FFF5F5"/>
+  <path d="M734.2,272.5 C748.8,272.6 792.6,273.2 821.7,273.4 C850.9,273.6 879.8,273.7 909.1,273.8 C938.5,273.8 980.3,272.7 997.7,273.8 C1015.2,274.8 1010.2,276.5 1013.8,280.2 C1017.4,283.9 1018.0,293.2 1019.2,295.9 C1020.4,298.7 1020.8,283.1 1021.0,296.9 C1021.2,310.7 1020.3,351.9 1020.4,378.9 C1020.5,406.0 1021.6,431.9 1021.5,459.1 C1021.5,486.3 1021.4,525.4 1020.2,542.0 C1018.9,558.5 1017.8,554.6 1014.0,558.4 C1010.1,562.3 999.9,564.2 997.2,564.9 C994.5,565.6 1012.3,562.5 997.8,562.4 C983.3,562.4 939.1,563.9 910.1,564.4 C881.0,564.9 852.5,565.6 823.5,565.6 C794.4,565.6 753.0,566.0 735.6,564.5 C718.2,563.0 722.9,560.6 719.2,556.8 C715.4,553.0 714.1,544.0 713.2,541.6 C712.3,539.1 713.6,555.8 713.6,542.3 C713.6,528.8 713.0,487.9 713.1,460.6 C713.2,433.3 714.2,405.9 714.2,378.4 C714.1,350.9 711.7,311.9 712.7,295.6 C713.6,279.4 716.1,284.5 719.8,280.9 C723.5,277.3 732.5,275.6 734.9,274.2 C737.3,272.8 719.7,272.6 734.2,272.5 C748.7,272.4 807.1,273.2 821.7,273.4" fill="none" stroke="#E03131" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M734.2,274.6 C749.2,274.5 794.8,274.2 823.9,274.0 C853.0,273.8 879.9,273.2 909.0,273.3 C938.2,273.3 981.5,272.9 998.9,274.2 C1016.4,275.6 1010.3,277.6 1013.8,281.3 C1017.3,285.0 1018.9,293.8 1020.1,296.3 C1021.4,298.8 1021.1,282.8 1021.2,296.3 C1021.3,309.7 1020.7,349.2 1020.7,376.8 C1020.7,404.3 1021.4,434.1 1021.2,461.5 C1020.9,488.8 1020.5,525.1 1019.3,541.1 C1018.1,557.0 1017.3,553.3 1013.8,557.1 C1010.2,561.0 1000.9,562.9 998.0,563.9 C995.1,565.0 1010.8,563.2 996.4,563.2 C982.0,563.2 940.6,563.5 911.7,563.9 C882.8,564.2 852.5,565.4 823.0,565.4 C793.5,565.4 751.9,565.0 734.7,563.8 C717.4,562.6 723.2,561.5 719.6,558.0 C716.0,554.5 714.1,545.3 713.3,542.8 C712.4,540.3 714.6,557.0 714.4,543.2 C714.3,529.4 713.0,487.3 712.6,459.8 C712.1,432.4 711.8,405.7 711.8,378.4 C711.8,351.1 711.2,312.1 712.6,295.9 C714.0,279.7 716.3,285.0 719.9,281.2 C723.6,277.4 732.3,274.3 734.7,273.2 C737.1,272.1 719.3,274.4 734.2,274.6 C749.1,274.7 809.0,274.1 823.9,274.0" fill="none" stroke="#E03131" stroke-width="2.2399999999999998" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(737.3,302.0) scale(1.1667)" fill="none" stroke="#E03131" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" /></g>
+  <text x="777.3" y="326.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="22" font-weight="800" fill="#C92A2A">KNOWN</text>
+  <text x="739.3" y="414.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="56" font-weight="800" fill="#1E1E1E">7</text>
+  <text x="739.3" y="460.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="800" fill="#1E1E1E">pinned as it fails</text>
+  <text x="739.3" y="496.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="16" font-weight="700" fill="#495057">a copied “1.” is blocked</text>
+  <rect x="62.0" y="588.0" width="956.0" height="246.0" rx="20" fill="#FFF5F5"/>
+  <path d="M82.4,584.5 C99.1,584.5 148.4,584.2 182.5,584.5 C216.6,584.8 252.9,586.2 287.0,586.3 C321.1,586.4 353.7,585.2 387.2,585.2 C420.8,585.2 454.3,586.3 488.3,586.3 C522.3,586.4 557.3,585.7 591.1,585.6 C625.0,585.5 657.8,585.7 691.6,585.8 C725.4,585.8 760.0,586.0 794.1,585.9 C828.2,585.8 862.0,584.9 896.0,584.9 C930.1,585.0 978.9,584.8 998.4,586.1 C1017.8,587.3 1009.2,588.6 1012.7,592.4 C1016.3,596.2 1018.6,605.8 1019.7,608.7 C1020.8,611.5 1018.9,592.3 1019.2,609.3 C1019.4,626.2 1020.9,676.0 1021.2,710.1 C1021.5,744.2 1021.9,794.1 1020.8,813.9 C1019.7,833.7 1018.4,825.3 1014.5,828.9 C1010.6,832.4 1000.0,834.0 997.3,835.3 C994.7,836.6 1015.5,836.9 998.5,836.8 C981.6,836.7 929.4,834.9 895.6,834.8 C861.7,834.7 829.7,836.0 795.7,836.1 C761.7,836.3 725.6,835.7 691.6,835.7 C657.7,835.7 626.0,836.0 592.0,836.1 C558.1,836.2 522.0,836.4 487.9,836.3 C453.9,836.2 421.5,835.8 387.9,835.5 C354.2,835.2 319.9,834.3 286.0,834.5 C252.2,834.7 218.8,836.5 184.9,836.7 C150.9,836.9 102.0,837.0 82.2,835.8 C62.5,834.5 70.2,832.8 66.4,829.1 C62.7,825.4 60.4,816.4 59.5,813.8 C58.5,811.2 61.0,830.8 60.8,813.4 C60.7,796.0 58.8,743.8 58.7,709.5 C58.6,675.2 59.1,627.4 60.3,607.8 C61.4,588.3 62.1,595.8 65.7,592.2 C69.3,588.6 78.9,587.5 81.7,586.2 C84.5,585.0 65.6,584.8 82.4,584.5 C99.2,584.2 165.8,584.5 182.5,584.5" fill="none" stroke="#E03131" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="14 11"/>
+  <g transform="translate(84.0,612.0) scale(1.1667)" fill="none" stroke="#E03131" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" /></g>
+  <text x="124.0" y="635.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="22" font-weight="800" fill="#C92A2A">HOW A KNOWN CASE WORKS</text>
+  <text x="90.0" y="686.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="20" font-weight="800" fill="#1E1E1E">the failure still happens</text>
+  <path d="M530.0,679.0 C533.1,679.0 542.4,679.1 548.4,679.0 C554.4,678.9 560.0,678.4 566.1,678.5 C572.2,678.7 578.9,680.0 585.1,680.1 C591.2,680.1 597.1,678.9 602.9,678.7 C608.7,678.5 617.2,678.9 620.0,679.0" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M620.5,679.5 C619.5,679.0 616.5,677.3 614.6,676.3 C612.8,675.3 610.3,673.9 609.4,673.4" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M620.5,679.5 C619.6,679.9 616.5,681.0 614.7,681.7 C612.8,682.5 610.2,683.8 609.3,684.2" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="640.0" y="686.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="20" font-weight="800" fill="#247A37">the test passes</text>
+  <text x="90.0" y="740.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="20" font-weight="800" fill="#1E1E1E">it stops, or changes shape</text>
+  <path d="M530.0,733.0 C532.9,732.9 541.4,732.2 547.3,732.3 C553.3,732.4 559.8,733.6 565.7,733.7 C571.7,733.9 577.0,733.2 583.1,733.3 C589.3,733.4 596.4,734.1 602.6,734.1 C608.7,734.0 617.1,733.2 620.0,733.0" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M619.2,732.2 C618.5,731.9 616.3,730.9 614.6,730.3 C613.0,729.7 610.4,728.7 609.5,728.3" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M619.6,733.7 C618.8,734.1 616.4,735.0 614.7,735.7 C612.9,736.5 609.9,737.8 608.9,738.2" fill="none" stroke="#1E1E1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="640.0" y="740.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="20" font-weight="800" fill="#C92A2A">the test fails, and says why</text>
+  <text x="90.0" y="800.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="19" font-weight="800" fill="#C92A2A">fixed on purpose? move it to fixed. never delete it</text>
+  <rect x="62.0" y="860.0" width="956.0" height="376.0" rx="20" fill="#F8F9FA"/>
+  <path d="M80.6,859.0 C97.9,858.8 150.0,858.1 184.2,858.0 C218.4,857.8 252.1,858.0 286.0,858.0 C319.8,858.0 353.7,858.1 387.5,858.0 C421.2,858.0 455.0,857.4 488.6,857.6 C522.3,857.9 555.4,859.6 589.4,859.4 C623.3,859.3 658.4,857.2 692.3,856.9 C726.3,856.5 759.3,856.9 793.0,857.1 C826.8,857.4 860.4,858.4 894.7,858.4 C929.0,858.4 979.1,856.1 998.7,857.1 C1018.4,858.1 1009.2,860.6 1012.8,864.4 C1016.5,868.3 1019.4,877.5 1020.7,880.3 C1022.0,883.2 1020.8,867.4 1020.7,881.4 C1020.7,895.4 1020.3,936.9 1020.4,964.4 C1020.4,991.9 1021.0,1018.6 1020.9,1046.4 C1020.9,1074.3 1020.2,1103.0 1020.0,1131.4 C1019.8,1159.8 1020.9,1200.1 1019.7,1216.7 C1018.5,1233.4 1016.4,1227.7 1012.8,1231.2 C1009.2,1234.6 1000.7,1236.3 998.1,1237.2 C995.5,1238.1 1014.4,1236.3 997.3,1236.6 C980.2,1236.8 929.0,1238.2 895.4,1238.7 C861.8,1239.2 829.6,1239.7 795.6,1239.6 C761.7,1239.4 726.2,1238.3 691.9,1237.8 C657.6,1237.2 623.8,1236.6 589.8,1236.5 C555.9,1236.3 522.0,1236.9 488.1,1237.0 C454.2,1237.2 420.2,1237.0 386.6,1237.2 C352.9,1237.4 319.6,1238.0 286.0,1238.2 C252.5,1238.4 219.3,1238.4 185.2,1238.4 C151.2,1238.4 101.4,1239.1 81.6,1238.0 C61.9,1237.0 70.6,1235.7 66.8,1232.1 C63.1,1228.6 60.5,1219.2 59.1,1216.6 C57.8,1214.1 58.8,1231.2 58.8,1216.8 C58.9,1202.5 58.9,1158.6 59.3,1130.4 C59.6,1102.3 60.8,1075.5 60.9,1047.9 C61.1,1020.3 60.3,992.8 60.3,964.8 C60.2,936.7 59.6,896.2 60.7,879.6 C61.9,863.0 63.7,868.9 67.2,865.3 C70.7,861.7 79.5,858.9 81.7,857.8 C83.9,856.8 63.5,859.0 80.6,859.0 C97.7,859.0 166.9,858.1 184.2,858.0" fill="none" stroke="#868E96" stroke-width="2.08" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82.5,857.2 C99.6,857.3 151.1,857.5 185.2,857.7 C219.2,857.9 253.0,858.6 286.6,858.7 C320.2,858.7 353.0,858.3 386.9,858.1 C420.8,857.9 456.0,857.5 490.0,857.4 C524.1,857.3 557.4,857.3 591.2,857.5 C624.9,857.7 658.8,858.2 692.5,858.5 C726.2,858.8 759.4,859.6 793.2,859.3 C827.0,859.0 861.2,857.0 895.4,856.7 C929.6,856.5 979.0,856.6 998.7,857.8 C1018.3,859.0 1010.1,860.1 1013.5,863.8 C1017.0,867.6 1018.3,877.8 1019.3,880.4 C1020.4,883.0 1020.0,865.6 1019.9,879.4 C1019.8,893.3 1018.9,935.4 1018.9,963.6 C1018.9,991.7 1019.5,1020.3 1019.9,1048.4 C1020.2,1076.5 1020.7,1104.3 1020.9,1132.3 C1021.1,1160.3 1022.1,1199.7 1020.9,1216.2 C1019.7,1232.7 1017.4,1227.5 1013.7,1231.2 C1010.0,1234.9 1001.2,1237.4 998.6,1238.4 C996.1,1239.3 1015.5,1237.1 998.5,1236.9 C981.5,1236.8 931.1,1237.1 896.9,1237.3 C862.7,1237.5 827.5,1238.0 793.3,1237.9 C759.1,1237.8 725.3,1236.8 691.8,1236.8 C658.2,1236.9 625.8,1238.3 592.0,1238.3 C558.1,1238.3 522.8,1237.0 488.7,1236.8 C454.7,1236.7 421.7,1237.0 387.7,1237.4 C353.8,1237.9 318.9,1239.3 285.1,1239.3 C251.3,1239.4 218.6,1237.8 184.7,1237.6 C150.9,1237.4 101.9,1239.0 82.0,1238.0 C62.2,1237.0 69.2,1235.3 65.7,1231.6 C62.2,1227.9 62.1,1218.2 61.0,1215.7 C59.8,1213.1 59.2,1230.3 59.0,1216.1 C58.8,1202.0 59.7,1158.5 59.9,1130.6 C60.1,1102.8 60.1,1076.8 60.2,1049.1 C60.3,1021.5 60.3,993.0 60.3,964.8 C60.3,936.5 59.1,896.2 60.0,879.5 C60.9,862.8 62.0,868.3 65.7,864.5 C69.4,860.8 79.2,858.4 82.0,857.2 C84.8,855.9 65.3,857.1 82.5,857.2 C99.7,857.3 168.0,857.6 185.2,857.7" fill="none" stroke="#868E96" stroke-width="2.08" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(86.0,888.0) scale(1.1667)" fill="none" stroke="#495057" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10" />
+  <path d="M11 12h10" />
+  <path d="M11 19h10" />
+  <path d="M4 4h1v5" />
+  <path d="M4 9h2" />
+  <path d="M6.5 20H3.4c0-1 2.6-1.925 2.6-3.5a1.5 1.5 0 0 0-2.6-1.02" /></g>
+  <text x="130.0" y="910.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="22" font-weight="800" fill="#1E1E1E">BEFORE YOU TRUST AN ANSWER METRIC</text>
+  <g transform="translate(98.0,955.0) scale(1.0000)" fill="none" stroke="#495057" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" />
+  <path d="M4.929 4.929 19.07 19.071" /></g>
+  <text x="144.0" y="974.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="21" font-weight="800" fill="#1E1E1E">grade refusals too</text>
+  <text x="470.0" y="974.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="700" fill="#495057">refusing everything has no wrong answers</text>
+  <g transform="translate(98.0,1011.0) scale(1.0000)" fill="none" stroke="#495057" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" /></g>
+  <text x="144.0" y="1030.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="21" font-weight="800" fill="#1E1E1E">name the stage</text>
+  <text x="470.0" y="1030.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="700" fill="#495057">so the grade says what to fix</text>
+  <g transform="translate(98.0,1067.0) scale(1.0000)" fill="none" stroke="#495057" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" /></g>
+  <text x="144.0" y="1086.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="21" font-weight="800" fill="#1E1E1E">check the grader</text>
+  <text x="470.0" y="1086.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="700" fill="#495057">against people, per generator</text>
+  <g transform="translate(98.0,1123.0) scale(1.0000)" fill="none" stroke="#495057" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" />
+  <line x1="8" x2="16" y1="6" y2="6" />
+  <line x1="16" x2="16" y1="14" y2="18" />
+  <path d="M16 10h.01" />
+  <path d="M12 10h.01" />
+  <path d="M8 10h.01" />
+  <path d="M12 14h.01" />
+  <path d="M8 14h.01" />
+  <path d="M12 18h.01" />
+  <path d="M8 18h.01" /></g>
+  <text x="144.0" y="1142.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="21" font-weight="800" fill="#1E1E1E">state the cost first</text>
+  <text x="470.0" y="1142.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="700" fill="#495057">of a wrong answer vs a refusal</text>
+  <g transform="translate(98.0,1179.0) scale(1.0000)" fill="none" stroke="#495057" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" /></g>
+  <text x="144.0" y="1198.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="21" font-weight="800" fill="#1E1E1E">pin failures as tests</text>
+  <text x="470.0" y="1198.0" font-family="'Shantell Sans', 'Comic Neue', 'Segoe Print', sans-serif" font-size="18" font-weight="700" fill="#495057">fixed, guard or known</text>
+</svg>

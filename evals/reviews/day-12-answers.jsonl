@@ -1,0 +1,180 @@
+{"id": "d03-01", "answer_sha256": "66334950b5bdca43", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-02", "answer_sha256": "912e596994e2eb07", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-03", "answer_sha256": "307e971db8a5bd39", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-04", "answer_sha256": "a47f0f784d702563", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-05", "answer_sha256": "96e399d39ef745b7", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-06", "answer_sha256": "243a6f6c28e6b9c5", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-07", "answer_sha256": "2c8da638225efcac", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-08", "answer_sha256": "364eb4cfcaff8df6", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-09", "answer_sha256": "9728b4fbdc9a75a3", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-10", "answer_sha256": "277f1bde602e6410", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-11", "answer_sha256": "92b21765d68eb2b6", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-12", "answer_sha256": "ec67743483d4abed", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d03-13", "answer_sha256": "5c50c7a467ebb53f", "grade": "partly", "note": "'straight away' is true (the travel policy), but the documented deadline is within one hour", "split": "dev"}
+{"id": "d01-01", "answer_sha256": "ba17ead13f149367", "grade": "wrong", "note": "a phased return, not the leave entitlement", "split": "dev"}
+{"id": "d01-02", "answer_sha256": "80362c1e4580c231", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d06-01", "answer_sha256": "1b73fd81446f4456", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a01", "answer_sha256": "17fdd17c54244f29", "grade": "partly", "note": "lists three rows, including Other cities (USD 180), without saying which applies to Tokyo", "split": "dev"}
+{"id": "d07-a02", "answer_sha256": "84aa7e3ef74e01f5", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a03", "answer_sha256": "3afd5c629501ab39", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a04", "answer_sha256": "d76da8f9050d8c79", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a05", "answer_sha256": "776fe22233c110ba", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a06", "answer_sha256": "54eaf3d4a5c3e4fc", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a07", "answer_sha256": "13bd3000f3d3c23f", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a08", "answer_sha256": "7ccc04b812d476a0", "grade": "wrong", "note": "the policy's scope, which suggests meals are covered; alcohol isn't reimbursed", "split": "dev"}
+{"id": "d07-a09", "answer_sha256": "000366eb3d54650e", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a10", "answer_sha256": "bd7edf4ad673bccb", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a11", "answer_sha256": "b2500cd5c2998f5e", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a12", "answer_sha256": "fc62243574fb969e", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a13", "answer_sha256": "c7575c916817adb9", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a14", "answer_sha256": "ed929c70a4bd6536", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-a15", "answer_sha256": "51fe0462c1db0074", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d07-u01", "answer_sha256": "6e6cd86658dc637d", "grade": "wrong", "note": "parental leave presented as annual leave", "split": "dev"}
+{"id": "d07-u03", "answer_sha256": "4bdabe6f6be89758", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d07-u04", "answer_sha256": "9b95f844a86b7f7c", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d07-u11", "answer_sha256": "db12b0d8ca76c492", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d07-u12", "answer_sha256": "9728b4fbdc9a75a3", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-a01", "answer_sha256": "5926a09f99458d73", "grade": "partly", "note": "lists London and Other cities (USD 180) without saying which applies to Berlin", "split": "dev"}
+{"id": "d10-a02", "answer_sha256": "a75ffa19b360da57", "grade": "wrong", "note": "the London row for Paris; the Other cities row applies (USD 50)", "split": "dev"}
+{"id": "d10-a04", "answer_sha256": "c940a0e12d7ffdc7", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a05", "answer_sha256": "b947f3fdc0db68a5", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a06", "answer_sha256": "05399115e8f84a07", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a07", "answer_sha256": "a47f0f784d702563", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a08", "answer_sha256": "b4d4e58df0fd6675", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a09", "answer_sha256": "be789f6002dab480", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a10", "answer_sha256": "ba17ead13f149367", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a11", "answer_sha256": "fc724f739c4c7f98", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a12", "answer_sha256": "2617b341f02a3b62", "grade": "wrong", "note": "password length and reuse, not what happens after failed attempts", "split": "dev"}
+{"id": "d10-a13", "answer_sha256": "6a1b5086d23483b6", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a14", "answer_sha256": "f1243f2102185531", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a15", "answer_sha256": "0cf279cced8b18cf", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a16", "answer_sha256": "674663a471671989", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a17", "answer_sha256": "681d5f77b1a93f1b", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a19", "answer_sha256": "0b135a64a2c480a4", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a20", "answer_sha256": "6ac3162cd3b3d594", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a21", "answer_sha256": "b86afe53c01a69f3", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a22", "answer_sha256": "31f7b2cbe39d3028", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a23", "answer_sha256": "2dcb171418a82a02", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a24", "answer_sha256": "5c50c7a467ebb53f", "grade": "wrong", "note": "says to report straight away, not who to tell", "split": "dev"}
+{"id": "d10-a25", "answer_sha256": "2f8e1e19642791a3", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a26", "answer_sha256": "5b4d8b398f44ff70", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d10-a27", "answer_sha256": "5b4d8b398f44ff70", "grade": "wrong", "note": "troubleshooting, not how to tell it is connected (the green icon)", "split": "dev"}
+{"id": "d10-a29", "answer_sha256": "364eb4cfcaff8df6", "grade": "wrong", "note": "how to claim it, not that the allowance is one-time", "split": "dev"}
+{"id": "d10-u02", "answer_sha256": "38991ba048239a55", "grade": "wrong", "note": "how to claim expenses, which suggests a gym membership is claimable", "split": "dev"}
+{"id": "d10-u04", "answer_sha256": "6e6cd86658dc637d", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-u05", "answer_sha256": "7ccc04b812d476a0", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-u06", "answer_sha256": "07c273d1a8d05a88", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-u09", "answer_sha256": "7ccc04b812d476a0", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-u10", "answer_sha256": "2617b341f02a3b62", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d10-u12", "answer_sha256": "4c8a527f955c6b3d", "grade": "wrong", "note": "the approval for fully remote work, not whether an arrangement carries over", "split": "dev"}
+{"id": "d11-a01", "answer_sha256": "95dd7301336246a4", "grade": "wrong", "note": "what the policy sets, not why (legal and security risk)", "split": "dev"}
+{"id": "d11-a02", "answer_sha256": "f463b9e651b84697", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a03", "answer_sha256": "b86afe53c01a69f3", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a04", "answer_sha256": "ed929c70a4bd6536", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a05", "answer_sha256": "7ccc04b812d476a0", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a06", "answer_sha256": "46ee663c2280afa9", "grade": "partly", "note": "says train fares are reimbursed at cost, not how to claim them", "split": "dev"}
+{"id": "d11-a07", "answer_sha256": "ce7cf772939de089", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a08", "answer_sha256": "672ccb656283da9e", "grade": "wrong", "note": "the submission deadline, not when approved claims are paid", "split": "dev"}
+{"id": "d11-a12", "answer_sha256": "307e971db8a5bd39", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a14", "answer_sha256": "674663a471671989", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a15", "answer_sha256": "efc5272cb9f72fca", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a16", "answer_sha256": "93009c0cc4b1ff69", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a17", "answer_sha256": "179664bed0b89df4", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a18", "answer_sha256": "07c273d1a8d05a88", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a19", "answer_sha256": "a588ecbcb942db75", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a20", "answer_sha256": "4ea5005a9290bc1c", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a21", "answer_sha256": "92b21765d68eb2b6", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a24", "answer_sha256": "6e6cd86658dc637d", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a25", "answer_sha256": "a1df92311e6d3439", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a27", "answer_sha256": "ba17ead13f149367", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a28", "answer_sha256": "57b1735ea33fa357", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a29", "answer_sha256": "441941ddf216f94b", "grade": "wrong", "note": "the MFA device needed for a reset, not which apps or devices to use", "split": "dev"}
+{"id": "d11-a30", "answer_sha256": "aea8f2e83d05e5b9", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a31", "answer_sha256": "087a9363b3cf66cb", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a32", "answer_sha256": "4f4ac3e0b5155058", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a33", "answer_sha256": "24fc842e46d156b0", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a34", "answer_sha256": "3afd5c629501ab39", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a35", "answer_sha256": "9b95f844a86b7f7c", "grade": "wrong", "note": "the VPN and public places, not the approval a fully remote arrangement needs", "split": "dev"}
+{"id": "d11-a36", "answer_sha256": "2a624029c584e847", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a37", "answer_sha256": "2c8da638225efcac", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a38", "answer_sha256": "6e76f3a3bc6fdc27", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a39", "answer_sha256": "195a405c4cb64b4a", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a40", "answer_sha256": "fc724f739c4c7f98", "grade": "wrong", "note": "what not to do, not where to report", "split": "dev"}
+{"id": "d11-a41", "answer_sha256": "fc724f739c4c7f98", "grade": "wrong", "note": "what not to do, not that you should report even if unsure", "split": "dev"}
+{"id": "d11-a42", "answer_sha256": "fc724f739c4c7f98", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a43", "answer_sha256": "ad04822d5beb0f2c", "grade": "wrong", "note": "the definition of an incident, not the sentence about regulators", "split": "dev"}
+{"id": "d11-a44", "answer_sha256": "5d5915f652f1428b", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a45", "answer_sha256": "ce5a2214209d4522", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a46", "answer_sha256": "217e132375dfd8cc", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a47", "answer_sha256": "912e596994e2eb07", "grade": "wrong", "note": "the New York row, not the written approval needed before the trip", "split": "dev"}
+{"id": "d11-a48", "answer_sha256": "2dcb171418a82a02", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a49", "answer_sha256": "3f3a856f73a7295c", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a50", "answer_sha256": "5f2e072497d4823a", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a51", "answer_sha256": "9e826fa2e53f7877", "grade": "correct", "note": "", "split": "dev"}
+{"id": "d11-a52", "answer_sha256": "5b4d8b398f44ff70", "grade": "wrong", "note": "restart the client (already done), not who to contact", "split": "dev"}
+{"id": "d11-u03", "answer_sha256": "a47f0f784d702563", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u04", "answer_sha256": "bd2a06d347c3098e", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u06", "answer_sha256": "7ccc04b812d476a0", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u07", "answer_sha256": "243a6f6c28e6b9c5", "grade": "wrong", "note": "application logs, not job applications: a word match, misleading", "split": "dev"}
+{"id": "d11-u10", "answer_sha256": "bd2a06d347c3098e", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u12", "answer_sha256": "db12b0d8ca76c492", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u13", "answer_sha256": "05399115e8f84a07", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d11-u15", "answer_sha256": "38991ba048239a55", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "dev"}
+{"id": "d12-a01", "answer_sha256": "54eaf3d4a5c3e4fc", "grade": "wrong", "note": "customer deletion requests, not how long financial records are kept", "split": "test"}
+{"id": "d12-a02", "answer_sha256": "ee7233d332f48da1", "grade": "partly", "note": "two of the three record types; customer data is missing", "split": "test"}
+{"id": "d12-a03", "answer_sha256": "6ac3162cd3b3d594", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a04", "answer_sha256": "05399115e8f84a07", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a05", "answer_sha256": "7f5962559dec927b", "grade": "wrong", "note": "the meal limit, not the receipt rule (receipts over USD 25)", "split": "test"}
+{"id": "d12-a06", "answer_sha256": "c4a091d91711dd80", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a07", "answer_sha256": "38991ba048239a55", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a08", "answer_sha256": "000366eb3d54650e", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a10", "answer_sha256": "11f869ef787f481a", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a13", "answer_sha256": "0cf279cced8b18cf", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a15", "answer_sha256": "93009c0cc4b1ff69", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a16", "answer_sha256": "4a417df2123f944c", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a17", "answer_sha256": "f67d15330c9c2723", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a18", "answer_sha256": "a588ecbcb942db75", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a19", "answer_sha256": "179664bed0b89df4", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a20", "answer_sha256": "ddf54f3287668636", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a21", "answer_sha256": "07c273d1a8d05a88", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a22", "answer_sha256": "92b21765d68eb2b6", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a23", "answer_sha256": "be789f6002dab480", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a24", "answer_sha256": "bf65e2ea80ec323e", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a25", "answer_sha256": "6e6cd86658dc637d", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a26", "answer_sha256": "6e6cd86658dc637d", "grade": "correct", "note": "gives both entitlements; the main carer is the primary caregiver (16 weeks)", "split": "test"}
+{"id": "d12-a27", "answer_sha256": "087a9363b3cf66cb", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a28", "answer_sha256": "bd7edf4ad673bccb", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a29", "answer_sha256": "6d3e3850e865a1a4", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a30", "answer_sha256": "6a1b5086d23483b6", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a31", "answer_sha256": "a31e9a38bbf7572c", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a32", "answer_sha256": "3afd5c629501ab39", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a33", "answer_sha256": "4c8a527f955c6b3d", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a35", "answer_sha256": "ebf8c5a452ac184e", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a36", "answer_sha256": "68ac46d048e58ae1", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a37", "answer_sha256": "b2500cd5c2998f5e", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a38", "answer_sha256": "fc724f739c4c7f98", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a39", "answer_sha256": "2e4dd4da7f7a1ccb", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a40", "answer_sha256": "476f75ea83fd1f97", "grade": "wrong", "note": "what not to do, not the address to report to", "split": "test"}
+{"id": "d12-a41", "answer_sha256": "97fec2cce7ac9cbf", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a42", "answer_sha256": "a75ffa19b360da57", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a43", "answer_sha256": "66334950b5bdca43", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a45", "answer_sha256": "217e132375dfd8cc", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a46", "answer_sha256": "2f8e1e19642791a3", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a47", "answer_sha256": "c86da486ab717460", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a49", "answer_sha256": "17fdd17c54244f29", "grade": "partly", "note": "lists all three rows; the lowest limit (Other cities, USD 180) isn't picked out", "split": "test"}
+{"id": "d12-a50", "answer_sha256": "5b4d8b398f44ff70", "grade": "wrong", "note": "VPN troubleshooting, not 'do not download VPN software'", "split": "test"}
+{"id": "d12-a51", "answer_sha256": "9e826fa2e53f7877", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-a52", "answer_sha256": "7c0cbaab55b20abb", "grade": "correct", "note": "", "split": "test"}
+{"id": "d12-u01", "answer_sha256": "74ed86bfa2713ab2", "grade": "wrong", "note": "ground transport on business travel, which suggests a commute is claimable", "split": "test"}
+{"id": "d12-u03", "answer_sha256": "7ccc04b812d476a0", "grade": "wrong", "note": "the policy's scope, which suggests a team lunch in the office is covered", "split": "test"}
+{"id": "d12-u05", "answer_sha256": "937f7a4bac1ce2e4", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u06", "answer_sha256": "9728b4fbdc9a75a3", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u07", "answer_sha256": "3f3a856f73a7295c", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u09", "answer_sha256": "d44a8f338d32c48b", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u10", "answer_sha256": "ce7cf772939de089", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u12", "answer_sha256": "b4d4e58df0fd6675", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u13", "answer_sha256": "6e76f3a3bc6fdc27", "grade": "wrong", "note": "the home office allowance, which isn't a phone allowance", "split": "test"}
+{"id": "d12-u15", "answer_sha256": "ebf8c5a452ac184e", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u19", "answer_sha256": "dc1c70f67adedd70", "grade": "wrong", "note": "approval for travel costs above the limits, unrelated to pay", "split": "test"}
+{"id": "d12-u21", "answer_sha256": "0b135a64a2c480a4", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
+{"id": "d12-u24", "answer_sha256": "681d5f77b1a93f1b", "grade": "wrong", "note": "presents a rule that doesn't answer the question", "split": "test"}
