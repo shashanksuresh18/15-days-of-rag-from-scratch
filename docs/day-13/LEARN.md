@@ -11,7 +11,7 @@
 | **Code** | [`notebooks/day_13_rag_operations_tracing_latency_cost.ipynb`](../../notebooks/day_13_rag_operations_tracing_latency_cost.ipynb), with the shared code in [`src/rag_from_scratch/`](../../src/rag_from_scratch/), which gains Day 12's answer rubric (`rubric.py`) today |
 | **Data** | [`evals/`](../../evals/): **51 new held-out questions** in [`evals/questions-v5.jsonl`](../../evals/questions-v5.jsonl) (with v4's 266 queries, unchanged); today's rules, committed first, in [`evals/preregistration/day-13.md`](../../evals/preregistration/day-13.md); the accepted run, [`day-13-answers-v5.json`](../../evals/baselines/day-13-answers-v5.json); Day 12's live replies with the author's reading of each, [`evals/reviews/day-12-live-gpt-6-luna.jsonl`](../../evals/reviews/day-12-live-gpt-6-luna.jsonl); four new cases in [`evals/regressions.jsonl`](../../evals/regressions.jsonl) |
 | **Visuals** | [`assets/day-13/`](../../assets/day-13/) |
-| **Verified** | Notebook executed top to bottom on 2026-11-12 on Linux; tests passed on 2026-11-13 with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. The optional live pass was run against a local fake server only (section 21). |
+| **Verified** | Notebook executed top to bottom on 2026-11-12 on Linux; tests passed on 2026-11-13 with Python 3.11, 3.12, 3.13 and 3.14, from both the repo root and `notebooks/`. CI runs the same tests on Linux, Windows and macOS on every push. Before publication: Windows 11 (155 passed, 1 skipped), one live pass with `gpt-6-luna`, and a flaky Windows test fixed (section 21). |
 
 ---
 
@@ -518,6 +518,12 @@ The bound assumes one billed call per request with up to 1,000 output tokens and
 - The rules were committed before anything scored a held-out question (section 3).
 
 **In the test environment** Hugging Face wasn't reachable, so the model's files came from a copy whose SHA-256 values and sizes match the pinned ones (as on Days 04–12). CI runs today's notebook on Linux, Windows and macOS with Python 3.11 and 3.14 on every push. **Not tested here:** Windows and macOS by hand (CI covers them on every push), a real hosted model through the new client, and timings on any other machine.
+
+**Before publication (Windows and CI, 2026-11-13):**
+
+- **Windows 11, Python 3.11.9, one test file per process:** 155 passed and 1 skipped in 22 min 10 s; offline 113 passed, nothing downloaded. Every file's peak memory was below Day 12's on the same counter (`tests/test_shared_code.py` 676 MB, against 1,099–1,141 MB), and Day 12's `WinError 10053` tracebacks were gone. The PC went into Modern Standby once while idle, during `tests/test_shared_code.py`; that file took about as long as in the offline run, so the tests weren't paused. (The Day 13 test helper didn't block sleep the way Day 12's did; Claude Code kept the PC awake instead.)
+- **The live pass through the resilient client** (section 16): 20 requests to `gpt-6-luna`, no retries, no fallbacks, about USD 0.0012 (the bound was USD 0.011), no key in any output. One outcome differs from the same model's on 2026-11-12: d12-a04, correct then, was refused by the citation check this time. One run of one model: an observation.
+- **GitHub Actions run 43446003140** on the branch failed one test on one of six jobs (windows-latest, Python 3.14): `test_chat_client_matches_day_06_notebook` gave both chat clients 2 seconds to reach a closed port, and Windows takes about that long to report a refused local connection, so one client timed out while the other was refused. Nothing in either client differed. The test now waits 10 seconds, so the refusal arrives first everywhere, and `CLAUDE.md` says why. The fix was tested on Linux with Python 3.11–3.14 from a fresh clone; its Windows and CI runs are recorded after publication.
 
 **Expected differences on your machine:** every timing, and scores in the last decimal places. A few answers are decided by gaps under 0.001 (the closest: d13-a08, 0.0001); `compare_answers()` sets such changes apart as CPU rounding, and the cache's closest decision is d13-a07, 0.0033 from θ. If a sanity check fails, please open an issue with your OS, CPU and Python version.
 

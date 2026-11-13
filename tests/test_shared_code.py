@@ -755,9 +755,12 @@ class TestDay06Answering:
         finally:
             server.shutdown()
             server.server_close()
+        # Nothing listens on port 9, so both clients are refused. Windows takes about 2 s to report a refused local
+        # connection (it retries first), so a 2 s timeout raced the refusal and each client could get either error
+        # (CI run 43446003140, windows-latest / Python 3.14). 10 s leaves the refusal to arrive first everywhere.
         unreachable = [_outcome(lambda: c.generate(ctx)) for c, ctx in (
-            (chat.ChatModel("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=2), module_context),
-            (day06["ChatModel"]("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=2), nb_context))]
+            (chat.ChatModel("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=10), module_context),
+            (day06["ChatModel"]("ollama", "m", base_url="http://127.0.0.1:9/v1", timeout=10), nb_context))]
         assert unreachable[0] == unreachable[1] and unreachable[0][0] == "GeneratorError"
         # .env files: the same values, and the same client (or none) built from them
         for i, text in enumerate(["", "# only a comment\n", "RAG_CHAT_PROVIDER=ollama\nRAG_CHAT_MODEL=llama\n",
