@@ -1,0 +1,2657 @@
+{
+ "name": "Day 13 answer baseline (questions v5)",
+ "dataset": {
+  "questions": "evals/questions-v5.jsonl",
+  "version": 5,
+  "sha256": "ad5fad68dbed6d622a61c7b146cbd160ebc63211efc1684c96566d5c5adb3fe0",
+  "snapshot": "3f8344d00b8b4878291cd7c156631ce8bc21345219083f8444afb4054fc89342"
+ },
+ "pipelines": {
+  "current": {
+   "version": "day-13.1",
+   "same as": "names-v2 in evals/baselines/day-12-answers-v4.json",
+   "retriever": "weighted fusion (Day 08, alpha_dense 0.7) of BM25 and dense, each permission-filtered",
+   "context": "the weighted fusion's top 3",
+   "budget_words": 300,
+   "gate": {
+    "on": "the dense top score",
+    "value": 0.62,
+    "from": "Day 07"
+   },
+   "reader": {
+    "code": "rag_from_scratch.queries.NamesReader (Day 10)",
+    "min_score": 0.63,
+    "names_rule": "Day 10's unknown_names_v2"
+   },
+   "check": "rag_from_scratch.answering.check_citations (Day 06)"
+  }
+ },
+ "rubric": {
+  "outcome": "Day 07's outcome(): correct if every fact is a case-insensitive substring of the answer",
+  "grounded": "the citation check passed and every sentence has support >= 0.75",
+  "support": "the share of a sentence's content words found in the sources it cites",
+  "value": {
+   "correct": 1,
+   "refused": 0,
+   "wrong": -2,
+   "answered (unanswerable)": -2
+  },
+  "near_tie": "an answer whose closest call is under 0.001",
+  "stages": [
+   "answered: nothing answers it",
+   "answered: restricted to others",
+   "citation check",
+   "gate",
+   "names rule: a name",
+   "names rule: a sentence's first word",
+   "ok",
+   "reader threshold",
+   "reader: answer in the context, not used",
+   "reader: right source, wrong part",
+   "retrieval: answer not in the context"
+  ]
+ },
+ "metrics": {
+  "v5 test": {
+   "current": {
+    "correct": 20,
+    "wrong": 7,
+    "refused": 6,
+    "unanswerable refused": 6,
+    "unanswerable answered": 12,
+    "value at cost 2": -18
+   }
+  }
+ },
+ "questions": {
+  "d13-a01": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d03-01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel"
+    ],
+    "dense_top": 0.6644,
+    "first_relevant": 1,
+    "margin": 0.0264
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: Singapore | Hotel per night: USD 220 | Meals per day: USD 60 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.76 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0264,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-01",
+    "cosine": 0.8616,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a02": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d03-01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel"
+    ],
+    "dense_top": 0.7202,
+    "first_relevant": 1,
+    "margin": 0.0593
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: New York | Hotel per night: USD 300 | Meals per day: USD 75 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.84 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0593,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a42",
+    "cosine": 0.8021,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a03": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d03-09",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "it-software-requests#overview"
+    ],
+    "dense_top": 0.6591,
+    "first_relevant": 1,
+    "margin": 0.0156
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "no source mentions OK, PC",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "names rule",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "names rule: a name",
+    "closest_call": [
+     0.0156,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-09",
+    "cosine": 0.7742,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u01": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d03-09",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "dense_top": 0.6129,
+    "first_relevant": null,
+    "margin": 0.077
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0071,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-09",
+    "cosine": 0.8732,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a04": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d07-a01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#scope",
+     "travel-policy#purpose"
+    ],
+    "dense_top": 0.6096,
+    "first_relevant": 1,
+    "margin": 0.0082
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "gate",
+    "closest_call": [
+     0.0082,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d07-a01",
+    "cosine": 0.8063,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a05": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d07-a01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#travel"
+    ],
+    "dense_top": 0.7208,
+    "first_relevant": 1,
+    "margin": 0.0002
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: Singapore | Hotel per night: USD 220 | Meals per day: USD 60 [travel-policy#daily-limits-by-city]. City: Other cities | Hotel per night: USD 180 | Meals per day: USD 50 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.73 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0002,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d07-a01",
+    "cosine": 0.8343,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a06": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d07-a09",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#approval-times",
+     "it-software-requests#overview",
+     "it-software-requests#free-and-open-source-software"
+    ],
+    "dense_top": 0.6876,
+    "first_relevant": 1,
+    "margin": 0.0192
+   },
+   "current": {
+    "status": "answered",
+    "text": "Free software still needs a request: licences and security updates matter even when there is no cost [it-software-requests#free-and-open-source-software].",
+    "reason": "best sentence scores 0.69 >= 0.63",
+    "cited": [
+     "it-software-requests#free-and-open-source-software"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": false,
+    "citation_precision": 0.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: answer in the context, not used",
+    "closest_call": [
+     0.0002,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d07-a09",
+    "cosine": 0.8322,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a07": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d07-a09",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#approval-times",
+     "it-software-requests#overview",
+     "expense-reimbursement-policy#approval-and-payment"
+    ],
+    "dense_top": 0.6808,
+    "first_relevant": 1,
+    "margin": 0.0112
+   },
+   "current": {
+    "status": "answered",
+    "text": "Request type: Browser extension | Who approves: IT Security | Typical time: 5 business days [it-software-requests#approval-times].",
+    "reason": "best sentence scores 0.77 >= 0.63",
+    "cited": [
+     "it-software-requests#approval-times"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0112,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a15",
+    "cosine": 0.8933,
+    "hit": true,
+    "served_outcome": "correct"
+   }
+  },
+  "d13-a08": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d10-a02",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "travel-policy#claiming-travel-costs",
+     "expense-reimbursement-policy#meals"
+    ],
+    "dense_top": 0.7093,
+    "first_relevant": 1,
+    "margin": 0.1806
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: London | Hotel per night: USD 250 | Meals per day: USD 75 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.72 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: right source, wrong part",
+    "closest_call": [
+     0.0001,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a02",
+    "cosine": 0.865,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a09": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d10-a02",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "expense-reimbursement-policy#meals",
+     "travel-policy#booking-travel"
+    ],
+    "dense_top": 0.7174,
+    "first_relevant": 1,
+    "margin": 0.0227
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: London | Hotel per night: USD 250 | Meals per day: USD 75 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.77 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0227,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a02",
+    "cosine": 0.8338,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a10": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d10-a10",
+   "retrieval": {
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "parental-leave-policy#how-to-request-leave",
+     "parental-leave-policy#who-is-eligible"
+    ],
+    "dense_top": 0.8409,
+    "first_relevant": 1,
+    "margin": 0.0502
+   },
+   "current": {
+    "status": "answered",
+    "text": "You may return on a phased schedule of reduced hours for up to four weeks without a change in pay [parental-leave-policy#returning-to-work].",
+    "reason": "best sentence scores 0.84 >= 0.63",
+    "cited": [
+     "parental-leave-policy#returning-to-work"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0502,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a27",
+    "cosine": 0.815,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u02": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d10-a10",
+   "retrieval": {
+    "top3": [
+     "parental-leave-policy#returning-to-work",
+     "remote-work-policy#purpose",
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "dense_top": 0.705,
+    "first_relevant": null,
+    "margin": 0.0612
+   },
+   "current": {
+    "status": "answered",
+    "text": "You may return on a phased schedule of reduced hours for up to four weeks without a change in pay [parental-leave-policy#returning-to-work].",
+    "reason": "best sentence scores 0.71 >= 0.63",
+    "cited": [
+     "parental-leave-policy#returning-to-work"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0612,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a10",
+    "cosine": 0.8246,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a11": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d10-a18",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn",
+     "travel-policy#safety-while-travelling"
+    ],
+    "dense_top": 0.62,
+    "first_relevant": 1,
+    "margin": 0.0052
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "gate",
+    "closest_call": [
+     0.0,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-09",
+    "cosine": 0.6595,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a12": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d10-a18",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#when-to-use-the-vpn",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "dense_top": 0.7447,
+    "first_relevant": 1,
+    "margin": 0.0454
+   },
+   "current": {
+    "status": "answered",
+    "text": "Public websites and email do not need the VPN [vpn-access-guide#when-to-use-the-vpn].",
+    "reason": "best sentence scores 0.74 >= 0.63",
+    "cited": [
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": false,
+    "citation_precision": 0.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0051,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d07-a13",
+    "cosine": 0.7222,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a13": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d10-a26",
+   "retrieval": {
+    "top3": [
+     "vpn-access-guide#troubleshooting",
+     "remote-work-policy#security-while-remote",
+     "vpn-access-guide#connecting"
+    ],
+    "dense_top": 0.8062,
+    "first_relevant": 1,
+    "margin": 0.0718
+   },
+   "current": {
+    "status": "answered",
+    "text": "If the VPN does not connect, restart the client and check your internet connection [vpn-access-guide#troubleshooting].",
+    "reason": "best sentence scores 0.81 >= 0.63",
+    "cited": [
+     "vpn-access-guide#troubleshooting"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0395,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a26",
+    "cosine": 0.8865,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a14": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d10-a26",
+   "retrieval": {
+    "top3": [
+     "vpn-access-guide#installing-the-client",
+     "vpn-access-guide#troubleshooting",
+     "vpn-access-guide#connecting"
+    ],
+    "dense_top": 0.8093,
+    "first_relevant": 1,
+    "margin": 0.111
+   },
+   "current": {
+    "status": "answered",
+    "text": "If the VPN does not connect, restart the client and check your internet connection [vpn-access-guide#troubleshooting].",
+    "reason": "best sentence scores 0.83 >= 0.63",
+    "cited": [
+     "vpn-access-guide#troubleshooting"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": false,
+    "citation_precision": 0.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: answer in the context, not used",
+    "closest_call": [
+     0.0262,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a26",
+    "cosine": 0.8687,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a15": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a05",
+   "retrieval": {
+    "top3": [
+     "expense-reimbursement-policy#scope",
+     "travel-policy#claiming-travel-costs",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "dense_top": 0.7175,
+    "first_relevant": 1,
+    "margin": 0.0261
+   },
+   "current": {
+    "status": "answered",
+    "text": "This policy covers business expenses that employees pay personally and claim back from Acme, including travel, meals and approved purchases [expense-reimbursement-policy#scope].",
+    "reason": "best sentence scores 0.72 >= 0.63",
+    "cited": [
+     "expense-reimbursement-policy#scope"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0261,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a05",
+    "cosine": 0.9155,
+    "hit": true,
+    "served_outcome": "correct"
+   }
+  },
+  "d13-u03": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a05",
+   "retrieval": {
+    "top3": [
+     "expense-reimbursement-policy#scope",
+     "travel-policy#claiming-travel-costs",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "dense_top": 0.7654,
+    "first_relevant": null,
+    "margin": 0.0361
+   },
+   "current": {
+    "status": "answered",
+    "text": "This policy covers business expenses that employees pay personally and claim back from Acme, including travel, meals and approved purchases [expense-reimbursement-policy#scope].",
+    "reason": "best sentence scores 0.77 >= 0.63",
+    "cited": [
+     "expense-reimbursement-policy#scope"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0361,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a05",
+    "cosine": 0.9046,
+    "hit": true,
+    "served_outcome": "answered"
+   }
+  },
+  "d13-a16": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a13",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#how-to-request-software",
+     "it-software-requests#approval-times",
+     "it-software-requests#free-and-open-source-software"
+    ],
+    "dense_top": 0.6976,
+    "first_relevant": 2,
+    "margin": 0.0781
+   },
+   "current": {
+    "status": "answered",
+    "text": "Request type: Catalogue software | Who approves: No approval needed | Typical time: Same day [it-software-requests#approval-times].",
+    "reason": "best sentence scores 0.72 >= 0.63",
+    "cited": [
+     "it-software-requests#approval-times"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0196,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a08",
+    "cosine": 0.7429,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u04": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a13",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#how-to-request-software",
+     "it-software-requests#approval-times",
+     "it-software-requests#overview"
+    ],
+    "dense_top": 0.7302,
+    "first_relevant": null,
+    "margin": 0.0657
+   },
+   "current": {
+    "status": "answered",
+    "text": "Request type: Catalogue software | Who approves: No approval needed | Typical time: Same day [it-software-requests#approval-times].",
+    "reason": "best sentence scores 0.73 >= 0.63",
+    "cited": [
+     "it-software-requests#approval-times"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.007,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a10",
+    "cosine": 0.7515,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a17": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a21",
+   "retrieval": {
+    "top3": [
+     "new-starter-it-checklist#training",
+     "new-starter-it-checklist#your-first-day",
+     "security-incident-reporting#how-to-report"
+    ],
+    "dense_top": 0.7787,
+    "first_relevant": 1,
+    "margin": 0.022
+   },
+   "current": {
+    "status": "answered",
+    "text": "Complete the security awareness and data protection courses within your first two weeks [new-starter-it-checklist#training].",
+    "reason": "best sentence scores 0.78 >= 0.63",
+    "cited": [
+     "new-starter-it-checklist#training"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.022,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a22",
+    "cosine": 0.874,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u05": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a21",
+   "retrieval": {
+    "top3": [
+     "new-starter-it-checklist#training",
+     "travel-policy#safety-while-travelling",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "dense_top": 0.644,
+    "first_relevant": null,
+    "margin": 0.0379
+   },
+   "current": {
+    "status": "answered",
+    "text": "Complete the security awareness and data protection courses within your first two weeks [new-starter-it-checklist#training].",
+    "reason": "best sentence scores 0.64 >= 0.63",
+    "cited": [
+     "new-starter-it-checklist#training"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0128,
+     "reader threshold"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a21",
+    "cosine": 0.7946,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a18": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a29",
+   "retrieval": {
+    "top3": [
+     "password-and-mfa-standard#multi-factor-authentication",
+     "password-and-mfa-standard#passwords",
+     "password-and-mfa-standard#account-lockout"
+    ],
+    "dense_top": 0.6978,
+    "first_relevant": 1,
+    "margin": 0.0531
+   },
+   "current": {
+    "status": "answered",
+    "text": "Multi-factor authentication (MFA) is required for email, the VPN and all internal applications [password-and-mfa-standard#multi-factor-authentication]. Use the authenticator app on your company phone or a hardware security key [password-and-mfa-standard#multi-factor-authentication].",
+    "reason": "best sentence scores 0.68 >= 0.63",
+    "cited": [
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0111,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a13",
+    "cosine": 0.7227,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a19": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a29",
+   "retrieval": {
+    "top3": [
+     "password-and-mfa-standard#multi-factor-authentication",
+     "password-and-mfa-standard#resetting-your-password",
+     "vpn-access-guide#connecting"
+    ],
+    "dense_top": 0.7705,
+    "first_relevant": 1,
+    "margin": 0.0525
+   },
+   "current": {
+    "status": "answered",
+    "text": "Multi-factor authentication (MFA) is required for email, the VPN and all internal applications [password-and-mfa-standard#multi-factor-authentication].",
+    "reason": "best sentence scores 0.79 >= 0.63",
+    "cited": [
+     "password-and-mfa-standard#multi-factor-authentication"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0525,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a29",
+    "cosine": 0.7759,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a20": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a37",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#scope",
+     "remote-work-policy#security-while-remote"
+    ],
+    "dense_top": 0.7164,
+    "first_relevant": 1,
+    "margin": 0.0283
+   },
+   "current": {
+    "status": "answered",
+    "text": "Employees approved for remote work receive a one-time home office allowance of USD 500 for a desk, chair or monitor [remote-work-policy#equipment-and-home-office].",
+    "reason": "best sentence scores 0.74 >= 0.63",
+    "cited": [
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0283,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a37",
+    "cosine": 0.9281,
+    "hit": true,
+    "served_outcome": "correct"
+   }
+  },
+  "d13-u06": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a37",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#scope",
+     "vpn-access-guide#when-to-use-the-vpn"
+    ],
+    "dense_top": 0.6915,
+    "first_relevant": null,
+    "margin": 0.0003
+   },
+   "current": {
+    "status": "answered",
+    "text": "Employees approved for remote work receive a one-time home office allowance of USD 500 for a desk, chair or monitor [remote-work-policy#equipment-and-home-office]. Claim the allowance through the expense system within 60 days of approval [remote-work-policy#equipment-and-home-office].",
+    "reason": "best sentence scores 0.69 >= 0.63",
+    "cited": [
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0003,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a37",
+    "cosine": 0.8304,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a21": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-a45",
+   "retrieval": {
+    "top3": [
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel",
+     "expense-reimbursement-policy#meals"
+    ],
+    "dense_top": 0.7297,
+    "first_relevant": 1,
+    "margin": 0.0705
+   },
+   "current": {
+    "status": "answered",
+    "text": "Flights of six hours or more may be booked in premium economy with your manager's approval [travel-policy#booking-travel].",
+    "reason": "best sentence scores 0.80 >= 0.63",
+    "cited": [
+     "travel-policy#booking-travel"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0284,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a45",
+    "cosine": 0.9276,
+    "hit": true,
+    "served_outcome": "correct"
+   }
+  },
+  "d13-a22": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d11-a45",
+   "retrieval": {
+    "top3": [
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel",
+     "travel-policy#purpose"
+    ],
+    "dense_top": 0.7663,
+    "first_relevant": 1,
+    "margin": 0.0127
+   },
+   "current": {
+    "status": "answered",
+    "text": "Flights of six hours or more may be booked in premium economy with your manager's approval [travel-policy#booking-travel].",
+    "reason": "best sentence scores 0.83 >= 0.63",
+    "cited": [
+     "travel-policy#booking-travel"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: right source, wrong part",
+    "closest_call": [
+     0.0127,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a45",
+    "cosine": 0.9267,
+    "hit": true,
+    "served_outcome": "wrong"
+   }
+  },
+  "d13-a23": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a01",
+   "retrieval": {
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "expense-reimbursement-policy#submitting-a-claim",
+     "data-retention-policy#deletion-requests"
+    ],
+    "dense_top": 0.6096,
+    "first_relevant": 1,
+    "margin": 0.0047
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "gate",
+    "closest_call": [
+     0.0047,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a01",
+    "cosine": 0.8774,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a24": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a01",
+   "retrieval": {
+    "top3": [
+     "data-retention-policy#retention-periods",
+     "data-retention-policy#deletion-requests",
+     "data-retention-policy#legal-holds"
+    ],
+    "dense_top": 0.6396,
+    "first_relevant": 1,
+    "margin": 0.0721
+   },
+   "current": {
+    "status": "answered",
+    "text": "Application logs are kept for 13 months [data-retention-policy#retention-periods].",
+    "reason": "best sentence scores 0.66 >= 0.63",
+    "cited": [
+     "data-retention-policy#retention-periods"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0196,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a01",
+    "cosine": 0.8574,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a25": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a09",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#how-to-request-software",
+     "new-starter-it-checklist#getting-help",
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "dense_top": 0.5774,
+    "first_relevant": 1,
+    "margin": 0.0511
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "gate",
+    "closest_call": [
+     0.0426,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a19",
+    "cosine": 0.6966,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u07": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a09",
+   "retrieval": {
+    "top3": [
+     "new-starter-it-checklist#your-first-day",
+     "it-software-requests#how-to-request-software",
+     "new-starter-it-checklist#getting-help"
+    ],
+    "dense_top": 0.6083,
+    "first_relevant": null,
+    "margin": 0.0019
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0019,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-09",
+    "cosine": 0.66,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a26": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a17",
+   "retrieval": {
+    "top3": [
+     "manager-pay-review-guide#overview",
+     "expense-reimbursement-policy#approval-and-payment",
+     "expense-reimbursement-policy#scope"
+    ],
+    "dense_top": 0.607,
+    "first_relevant": 1,
+    "margin": 0.011
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": true,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "gate",
+    "closest_call": [
+     0.011,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a17",
+    "cosine": 0.8222,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u08": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a17",
+   "retrieval": {
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "travel-policy#claiming-travel-costs",
+     "expense-reimbursement-policy#scope"
+    ],
+    "dense_top": 0.7144,
+    "first_relevant": null,
+    "margin": 0.2332
+   },
+   "current": {
+    "status": "answered",
+    "text": "Submit expense claims in the expense system within 30 days of the purchase [expense-reimbursement-policy#submitting-a-claim]. Attach an itemised receipt for every expense over USD 25 [expense-reimbursement-policy#submitting-a-claim].",
+    "reason": "best sentence scores 0.71 >= 0.63",
+    "cited": [
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0218,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a17",
+    "cosine": 0.8099,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a27": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a25",
+   "retrieval": {
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "dense_top": 0.8493,
+    "first_relevant": 1,
+    "margin": 0.0406
+   },
+   "current": {
+    "status": "answered",
+    "text": "Primary caregivers receive 16 weeks of fully paid leave [parental-leave-policy#leave-entitlement]. Secondary caregivers receive 6 weeks of fully paid leave [parental-leave-policy#leave-entitlement].",
+    "reason": "best sentence scores 0.83 >= 0.63",
+    "cited": [
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0291,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a25",
+    "cosine": 0.9384,
+    "hit": true,
+    "served_outcome": "correct"
+   }
+  },
+  "d13-a28": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a25",
+   "retrieval": {
+    "top3": [
+     "parental-leave-policy#leave-entitlement",
+     "parental-leave-policy#who-is-eligible",
+     "parental-leave-policy#returning-to-work"
+    ],
+    "dense_top": 0.8142,
+    "first_relevant": 2,
+    "margin": 0.2013
+   },
+   "current": {
+    "status": "answered",
+    "text": "Primary caregivers receive 16 weeks of fully paid leave [parental-leave-policy#leave-entitlement]. Secondary caregivers receive 6 weeks of fully paid leave [parental-leave-policy#leave-entitlement].",
+    "reason": "best sentence scores 0.80 >= 0.63",
+    "cited": [
+     "parental-leave-policy#leave-entitlement"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": false,
+    "citation_precision": 0.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: answer in the context, not used",
+    "closest_call": [
+     0.0272,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a25",
+    "cosine": 0.9415,
+    "hit": true,
+    "served_outcome": "wrong"
+   }
+  },
+  "d13-a29": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a33",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#purpose",
+     "remote-work-policy#eligibility",
+     "remote-work-policy#equipment-and-home-office"
+    ],
+    "dense_top": 0.7014,
+    "first_relevant": 2,
+    "margin": 0.1265
+   },
+   "current": {
+    "status": "answered",
+    "text": "Fully remote arrangements need written approval from your manager and the People Team [remote-work-policy#eligibility].",
+    "reason": "best sentence scores 0.80 >= 0.63",
+    "cited": [
+     "remote-work-policy#eligibility"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0626,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a33",
+    "cosine": 0.8033,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a30": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a33",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#eligibility",
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#core-hours"
+    ],
+    "dense_top": 0.6376,
+    "first_relevant": 4,
+    "margin": 0.0083
+   },
+   "current": {
+    "status": "answered",
+    "text": "Fully remote arrangements need written approval from your manager and the People Team [remote-work-policy#eligibility].",
+    "reason": "best sentence scores 0.81 >= 0.63",
+    "cited": [
+     "remote-work-policy#eligibility"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": false,
+    "cites_label": false,
+    "citation_precision": 0.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "retrieval: answer not in the context",
+    "closest_call": [
+     0.0083,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a33",
+    "cosine": 0.9412,
+    "hit": true,
+    "served_outcome": "wrong"
+   }
+  },
+  "d13-a31": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a41",
+   "retrieval": {
+    "top3": [
+     "security-incident-reporting#how-to-report",
+     "security-incident-reporting#after-you-report",
+     "security-incident-reporting#what-not-to-do"
+    ],
+    "dense_top": 0.7527,
+    "first_relevant": 1,
+    "margin": 0.002
+   },
+   "current": {
+    "status": "answered",
+    "text": "Report even if you are unsure; false alarms are welcome [security-incident-reporting#how-to-report].",
+    "reason": "best sentence scores 0.78 >= 0.63",
+    "cited": [
+     "security-incident-reporting#how-to-report"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.002,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-12",
+    "cosine": 0.8331,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u09": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a41",
+   "retrieval": {
+    "top3": [
+     "security-incident-reporting#how-to-report",
+     "security-incident-reporting#after-you-report",
+     "security-incident-reporting#what-not-to-do"
+    ],
+    "dense_top": 0.7089,
+    "first_relevant": null,
+    "margin": 0.0425
+   },
+   "current": {
+    "status": "answered",
+    "text": "Do not try to investigate the incident yourself, delete evidence or forward suspicious emails to colleagues [security-incident-reporting#what-not-to-do].",
+    "reason": "best sentence scores 0.72 >= 0.63",
+    "cited": [
+     "security-incident-reporting#what-not-to-do"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0064,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a41",
+    "cosine": 0.8778,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a32": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-a49",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "travel-policy#booking-travel",
+     "travel-policy#claiming-travel-costs"
+    ],
+    "dense_top": 0.667,
+    "first_relevant": 1,
+    "margin": 0.0064
+   },
+   "current": {
+    "status": "answered",
+    "text": "City: London | Hotel per night: USD 250 | Meals per day: USD 75 [travel-policy#daily-limits-by-city]. City: Singapore | Hotel per night: USD 220 | Meals per day: USD 60 [travel-policy#daily-limits-by-city]. City: Other cities | Hotel per night: USD 180 | Meals per day: USD 50 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.69 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "correct",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "ok",
+    "closest_call": [
+     0.0003,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a49",
+    "cosine": 0.8424,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-a33": {
+   "split": "test",
+   "type": "near-neighbour",
+   "written_from": "d12-a49",
+   "retrieval": {
+    "top3": [
+     "travel-policy#daily-limits-by-city",
+     "travel-policy#claiming-travel-costs",
+     "travel-policy#booking-travel"
+    ],
+    "dense_top": 0.708,
+    "first_relevant": 1,
+    "margin": 0.0211
+   },
+   "current": {
+    "status": "answered",
+    "text": "Hotel and meal costs are reimbursed up to the daily limits below [travel-policy#daily-limits-by-city]. City: London | Hotel per night: USD 250 | Meals per day: USD 75 [travel-policy#daily-limits-by-city]. City: Other cities | Hotel per night: USD 180 | Meals per day: USD 50 [travel-policy#daily-limits-by-city].",
+    "reason": "best sentence scores 0.73 >= 0.63",
+    "cited": [
+     "travel-policy#daily-limits-by-city"
+    ],
+    "outcome": "wrong",
+    "refused_by": null,
+    "label_in_context": true,
+    "cites_label": true,
+    "citation_precision": 1.0,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "reader: right source, wrong part",
+    "closest_call": [
+     0.0122,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a49",
+    "cosine": 0.8708,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u10": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d01-03",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "remote-work-policy#security-while-remote",
+     "remote-work-policy#eligibility"
+    ],
+    "dense_top": 0.6116,
+    "first_relevant": null,
+    "margin": 0.0771
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0084,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-a17",
+    "cosine": 0.6999,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u11": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d07-u01",
+   "retrieval": {
+    "top3": [
+     "it-software-requests#approval-times",
+     "expense-reimbursement-policy#submitting-a-claim",
+     "expense-reimbursement-policy#meals"
+    ],
+    "dense_top": 0.6379,
+    "first_relevant": null,
+    "margin": 0.0133
+   },
+   "current": {
+    "status": "answered",
+    "text": "Meals during business travel are reimbursed up to USD 75 per day [expense-reimbursement-policy#meals].",
+    "reason": "best sentence scores 0.63 >= 0.63",
+    "cited": [
+     "expense-reimbursement-policy#meals"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0025,
+     "reader threshold"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d07-u01",
+    "cosine": 0.6571,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u12": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d07-u09",
+   "retrieval": {
+    "top3": [
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#meals",
+     "expense-reimbursement-policy#travel"
+    ],
+    "dense_top": 0.5258,
+    "first_relevant": null,
+    "margin": 0.0004
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0004,
+     "which sections are sent"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a08",
+    "cosine": 0.5564,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u13": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d10-u05",
+   "retrieval": {
+    "top3": [
+     "travel-policy#purpose",
+     "expense-reimbursement-policy#scope",
+     "password-and-mfa-standard#passwords"
+    ],
+    "dense_top": 0.6211,
+    "first_relevant": null,
+    "margin": 0.0312
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "best sentence scores 0.62 < 0.63",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "reader threshold",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0011,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d10-u05",
+    "cosine": 0.9436,
+    "hit": true,
+    "served_outcome": "answered"
+   }
+  },
+  "d13-u14": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-u01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#safety-while-travelling",
+     "travel-policy#booking-travel",
+     "expense-reimbursement-policy#travel"
+    ],
+    "dense_top": 0.5793,
+    "first_relevant": null,
+    "margin": 0.1027
+   },
+   "current": {
+    "status": "abstained",
+    "text": "I don't know based on the provided documents.",
+    "reason": "below the dense gate: no generator called",
+    "cited": [],
+    "outcome": "refused",
+    "refused_by": "gate",
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": null,
+    "grounded": null,
+    "stage": "ok",
+    "closest_call": [
+     0.0407,
+     "gate"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-a46",
+    "cosine": 0.7143,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u15": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d11-u09",
+   "retrieval": {
+    "top3": [
+     "new-starter-it-checklist#training",
+     "security-incident-reporting#what-not-to-do",
+     "security-incident-reporting#what-counts-as-an-incident"
+    ],
+    "dense_top": 0.629,
+    "first_relevant": null,
+    "margin": 0.0403
+   },
+   "current": {
+    "status": "answered",
+    "text": "Do not try to investigate the incident yourself, delete evidence or forward suspicious emails to colleagues [security-incident-reporting#what-not-to-do]. Disconnect a possibly infected laptop from the network but do not turn it off [security-incident-reporting#what-not-to-do].",
+    "reason": "best sentence scores 0.64 >= 0.63",
+    "cited": [
+     "security-incident-reporting#what-not-to-do"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.008,
+     "reader threshold"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d11-a21",
+    "cosine": 0.8034,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u16": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-u01",
+   "retrieval": {
+    "top3": [
+     "travel-policy#claiming-travel-costs",
+     "remote-work-policy#equipment-and-home-office",
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "dense_top": 0.6785,
+    "first_relevant": null,
+    "margin": 0.0206
+   },
+   "current": {
+    "status": "answered",
+    "text": "Claim travel costs in the expense system, as described in the Expense Reimbursement Policy, and attach itemised receipts [travel-policy#claiming-travel-costs]. Costs above the daily limits need written approval from your manager before the trip [travel-policy#claiming-travel-costs].",
+    "reason": "best sentence scores 0.68 >= 0.63",
+    "cited": [
+     "travel-policy#claiming-travel-costs"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0052,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-u01",
+    "cosine": 0.883,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u17": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-u09",
+   "retrieval": {
+    "top3": [
+     "expense-reimbursement-policy#submitting-a-claim",
+     "travel-policy#claiming-travel-costs",
+     "expense-reimbursement-policy#scope"
+    ],
+    "dense_top": 0.6587,
+    "first_relevant": null,
+    "margin": 0.1607
+   },
+   "current": {
+    "status": "answered",
+    "text": "Submit expense claims in the expense system within 30 days of the purchase [expense-reimbursement-policy#submitting-a-claim]. Claims submitted after 90 days are not reimbursed unless Finance grants an exception [expense-reimbursement-policy#submitting-a-claim].",
+    "reason": "best sentence scores 0.68 >= 0.63",
+    "cited": [
+     "expense-reimbursement-policy#submitting-a-claim"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0115,
+     "which sentences are copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d12-u09",
+    "cosine": 0.8658,
+    "hit": false,
+    "served_outcome": null
+   }
+  },
+  "d13-u18": {
+   "split": "test",
+   "type": "paraphrase",
+   "written_from": "d12-u17",
+   "retrieval": {
+    "top3": [
+     "new-starter-it-checklist#accounts-and-access",
+     "parental-leave-policy#how-to-request-leave",
+     "new-starter-it-checklist#your-first-day"
+    ],
+    "dense_top": 0.6577,
+    "first_relevant": null,
+    "margin": 0.1782
+   },
+   "current": {
+    "status": "answered",
+    "text": "Tell your manager and submit a request in the HR portal at least eight weeks before you plan to start your leave, where possible [parental-leave-policy#how-to-request-leave].",
+    "reason": "best sentence scores 0.66 >= 0.63",
+    "cited": [
+     "parental-leave-policy#how-to-request-leave"
+    ],
+    "outcome": "answered",
+    "refused_by": null,
+    "label_in_context": null,
+    "cites_label": null,
+    "citation_precision": null,
+    "support": 1.0,
+    "grounded": true,
+    "stage": "answered: nothing answers it",
+    "closest_call": [
+     0.0342,
+     "which source is copied"
+    ]
+   },
+   "semantic_cache": {
+    "nearest": "d03-11",
+    "cosine": 0.6979,
+    "hit": false,
+    "served_outcome": null
+   }
+  }
+ },
+ "semantic_cache": {
+  "theta": 0.89,
+  "key": "the dense query vector (bge-small, query instruction)",
+  "scope": "the asker's groups and the index fingerprint",
+  "entries": "answered answers of the 236 dev questions",
+  "dev (in-sample, leave one out)": {
+   "0.80": {
+    "hits": 53,
+    "better": 2,
+    "worse": 14,
+    "near": 0,
+    "delta": {
+     "1": -24,
+     "2": -38,
+     "3": -52
+    }
+   },
+   "0.81": {
+    "hits": 42,
+    "better": 1,
+    "worse": 10,
+    "near": 0,
+    "delta": {
+     "1": -19,
+     "2": -29,
+     "3": -39
+    }
+   },
+   "0.82": {
+    "hits": 36,
+    "better": 1,
+    "worse": 6,
+    "near": 0,
+    "delta": {
+     "1": -11,
+     "2": -17,
+     "3": -23
+    }
+   },
+   "0.83": {
+    "hits": 32,
+    "better": 1,
+    "worse": 6,
+    "near": 0,
+    "delta": {
+     "1": -11,
+     "2": -17,
+     "3": -23
+    }
+   },
+   "0.84": {
+    "hits": 21,
+    "better": 0,
+    "worse": 6,
+    "near": 0,
+    "delta": {
+     "1": -12,
+     "2": -18,
+     "3": -24
+    }
+   },
+   "0.85": {
+    "hits": 16,
+    "better": 0,
+    "worse": 4,
+    "near": 0,
+    "delta": {
+     "1": -8,
+     "2": -12,
+     "3": -16
+    }
+   },
+   "0.86": {
+    "hits": 8,
+    "better": 0,
+    "worse": 2,
+    "near": 0,
+    "delta": {
+     "1": -4,
+     "2": -6,
+     "3": -8
+    }
+   },
+   "0.87": {
+    "hits": 8,
+    "better": 0,
+    "worse": 2,
+    "near": 0,
+    "delta": {
+     "1": -4,
+     "2": -6,
+     "3": -8
+    }
+   },
+   "0.88": {
+    "hits": 6,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -2,
+     "2": -3,
+     "3": -4
+    }
+   },
+   "0.89": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.90": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.91": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.92": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.93": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.94": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.95": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.96": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.97": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.98": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.99": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "1.00": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   }
+  },
+  "v5 test": {
+   "hits": [
+    "d13-a07",
+    "d13-a15",
+    "d13-u03",
+    "d13-a20",
+    "d13-a21",
+    "d13-a22",
+    "d13-a27",
+    "d13-a28",
+    "d13-a30",
+    "d13-u13"
+   ],
+   "better": [],
+   "worse": [
+    "d13-u13"
+   ],
+   "near": [],
+   "delta": {
+    "1": -1,
+    "2": -2,
+    "3": -3
+   }
+  },
+  "v5 test, every threshold (description)": {
+   "0.80": {
+    "hits": 36,
+    "better": 3,
+    "worse": 6,
+    "near": 0,
+    "delta": {
+     "1": -5,
+     "2": -10,
+     "3": -15
+    }
+   },
+   "0.81": {
+    "hits": 31,
+    "better": 2,
+    "worse": 5,
+    "near": 0,
+    "delta": {
+     "1": -4,
+     "2": -8,
+     "3": -12
+    }
+   },
+   "0.82": {
+    "hits": 30,
+    "better": 2,
+    "worse": 5,
+    "near": 0,
+    "delta": {
+     "1": -4,
+     "2": -8,
+     "3": -12
+    }
+   },
+   "0.83": {
+    "hits": 28,
+    "better": 1,
+    "worse": 5,
+    "near": 0,
+    "delta": {
+     "1": -5,
+     "2": -9,
+     "3": -13
+    }
+   },
+   "0.84": {
+    "hits": 23,
+    "better": 0,
+    "worse": 4,
+    "near": 0,
+    "delta": {
+     "1": -5,
+     "2": -9,
+     "3": -13
+    }
+   },
+   "0.85": {
+    "hits": 22,
+    "better": 0,
+    "worse": 4,
+    "near": 0,
+    "delta": {
+     "1": -5,
+     "2": -9,
+     "3": -13
+    }
+   },
+   "0.86": {
+    "hits": 21,
+    "better": 0,
+    "worse": 3,
+    "near": 0,
+    "delta": {
+     "1": -3,
+     "2": -6,
+     "3": -9
+    }
+   },
+   "0.87": {
+    "hits": 17,
+    "better": 0,
+    "worse": 3,
+    "near": 0,
+    "delta": {
+     "1": -3,
+     "2": -6,
+     "3": -9
+    }
+   },
+   "0.88": {
+    "hits": 12,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.89": {
+    "hits": 10,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.90": {
+    "hits": 9,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.91": {
+    "hits": 8,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.92": {
+    "hits": 7,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.93": {
+    "hits": 4,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.94": {
+    "hits": 3,
+    "better": 0,
+    "worse": 1,
+    "near": 0,
+    "delta": {
+     "1": -1,
+     "2": -2,
+     "3": -3
+    }
+   },
+   "0.95": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.96": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.97": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.98": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "0.99": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   },
+   "1.00": {
+    "hits": 0,
+    "better": 0,
+    "worse": 0,
+    "near": 0,
+    "delta": {
+     "1": 0,
+     "2": 0,
+     "3": 0
+    }
+   }
+  }
+ },
+ "fallback": {
+  "dev (in-sample)": {
+   "correct": 124,
+   "wrong": 23,
+   "refused": 17,
+   "unanswerable refused": 39,
+   "unanswerable answered": 33,
+   "value": {
+    "1": 68,
+    "2": 12,
+    "3": -44
+   }
+  },
+  "v5 test": {
+   "value": {
+    "1": 1,
+    "2": -18,
+    "3": -37
+   }
+  }
+ },
+ "decisions": {
+  "preregistration": "evals/preregistration/day-13.md",
+  "D1 a semantic answer cache (theta 0.89)": "not adopted",
+  "D2 the API-free reader as the fallback when the model fails": "not adopted"
+ }
+}

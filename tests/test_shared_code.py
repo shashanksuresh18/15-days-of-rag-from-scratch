@@ -16,7 +16,10 @@ documents' structure, section expansion and the end-to-end steps with a chosen c
 Day 10's revised names rule and NamesReader (queries.py, with a stand-in embedder, so the Day 10 class still loads no
 model), and tests of Day 06's prompt and language-model client (chat.py) against local fake servers. The Day 11 class
 and the new Day 10 test execute only the definitions in the cells they need (imports, functions, classes, constants),
-not the computations around them.
+not the computations around them. Day 13 added the Day 12 class (the answer rubric in rubric.py: verdicts, values,
+closest calls and the comparison with an accepted answer baseline), which runs the Day 12 notebook's setup cells and
+only the definitions it needs, on answers built by already-tested shared code. Its local fake servers don't print a
+traceback when a client gives up first (QuietServer).
 """
 
 import ast
@@ -37,7 +40,7 @@ import numpy as np
 import pytest
 
 from rag_from_scratch import (answering, chat, chunking, contexts, corpus, embeddings, evaluation, fusion, index, queries,
-                              reranking)
+                              reranking, rubric)
 from rag_from_scratch.bm25 import BM25Index
 from rag_from_scratch.ingest import ingest
 from rag_from_scratch.probes import DAY03_PROBES
@@ -57,6 +60,16 @@ def run_notebook_code(name: str) -> dict:
         mp.setitem(sys.modules, module.__name__, module)   # dataclasses look up their module
         exec(compile(source, name, "exec"), module.__dict__)
     return module.__dict__
+
+
+class QuietServer(ThreadingHTTPServer):
+    """A local test server that doesn't print a traceback when a client closes the connection first (a client that
+    timed out on purpose); anything else is still printed."""
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        if not isinstance(sys.exc_info()[1], (ConnectionAbortedError, ConnectionResetError, BrokenPipeError)):
+            super().handle_error(request, client_address)
 
 
 def release(namespace: dict) -> None:
@@ -722,7 +735,7 @@ class TestDay06Answering:
             def log_message(self, *args):
                 pass
 
-        server = ThreadingHTTPServer(("127.0.0.1", 0), Fake)
+        server = QuietServer(("127.0.0.1", 0), Fake)
         threading.Thread(target=server.serve_forever, daemon=True).start()
         url = f"http://127.0.0.1:{server.server_address[1]}/v1"
         try:
@@ -1404,3 +1417,201 @@ class TestDay11Contexts:
                ("PermissionError", "a context holds a chunk alice may not read")
         alice_q = dataclasses.replace(q, user="alice")
         assert _outcome(lambda: day11["answer_with"](alice_q, leaky, reader))[0] == "PermissionError"
+
+
+# ----------------------------------------------------------------------------- Day 12: the answer rubric
+DAY12 = "day_12_answer_evaluation_and_regression_tests.ipynb"
+GATE, READER_THRESHOLD = 0.62, 0.63                  # Day 07's measured values, as in Day 12's pipelines
+
+
+def assignments(source: str, names) -> str:
+    """Only the assignments to `names` in a cell: module-level constants that aren't literals (a set built from a
+    string, a compiled pattern), which definitions() leaves out."""
+    keep = [node for node in ast.parse(source).body if isinstance(node, ast.Assign) and
+            any(isinstance(t, ast.Name) and t.id in names for t in node.targets)]
+    return ast.unparse(ast.Module(body=keep, type_ignores=[]))
+
+
+@pytest.fixture(scope="class")
+def day12(embedder: embeddings.Embedder):
+    # The Day 12 notebook's setup and settings cells, then only what its sections 3, 5 and 11 define (the notebook also
+    # answers 236 questions twice, reviews them and decides). The answers they grade, and the rankings and readers
+    # closest_call() reads, are built here by shared code that earlier classes check.
+    documents, _ = ingest(REPO_ROOT)
+    chunks = [c for d in documents for c in chunking.section_chunks(d)]
+    by_cid = {c.chunk_id: c for c in chunks}
+    natural = [q for q in evaluation.load_queries(REPO_ROOT / "evals" / "questions-v4.jsonl") if q.kind == "question"]
+    store = index.VectorIndex(embedder.model["repo"], embedder.revision, embedder.dimensions)
+    index.sync(store, chunks, embedder.embed)
+    rag = answering.Pipeline(store, embedder)
+    bm25 = {user: BM25Index({c.chunk_id: c.text for c in chunks if set(c.allowed_groups) & groups})
+            for user, groups in answering.DIRECTORY.items()}
+    rankings = {"dense": {}, "weighted": {}}
+    for q in natural:
+        lexical = [(h.id, h.score) for h in bm25[q.user].search(q.question, len(chunks))]
+        rankings["dense"][q.id] = [(r.id, r.score) for r in rag.retrieve(q.user, q.question, len(chunks))]
+        rankings["weighted"][q.id] = fusion.weighted(lexical, rankings["dense"][q.id], fusion.ALPHA)
+    cache = contexts.SentenceCache(embedder)
+    readers = {"current": answering.ExtractiveReader(cache, min_score=READER_THRESHOLD),
+               "names-v2": queries.NamesReader(cache, queries.unknown_names_v2, min_score=READER_THRESHOLD)}
+    sent = {q.id: tuple(cid for cid, _ in rankings["weighted"][q.id][:3]) for q in natural}
+    answers = {p: {q.id: contexts.answer_context(q.user, q.question, sent[q.id], by_cid, dict(rankings["weighted"][q.id]),
+                                                 rankings["dense"][q.id][0][1], readers[p], gate=GATE)
+                   for q in natural} for p in readers}
+    nb = json.loads((NOTEBOOKS / DAY12).read_text(encoding="utf-8"))
+    cells = {c.get("id"): "".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code"}
+    source = "\n\n".join([cells["cell-02"], cells["cell-03"], definitions(cells["cell-06"]),
+                           assignments(cells["cell-12"], {"STOPWORDS", "WORD"}), definitions(cells["cell-12"]),
+                           definitions(cells["cell-18"]), assignments(cells["cell-34"], {"GRADE_FIELDS"}),
+                           definitions(cells["cell-34"])])
+    module = types.ModuleType(DAY12.removesuffix(".ipynb"))
+    module.__dict__.update({"rankings": rankings, "ANSWERS": answers, "READERS": readers})
+    with pytest.MonkeyPatch.context() as mp:
+        mp.chdir(REPO_ROOT)
+        mp.setitem(sys.modules, module.__name__, module)
+        exec(compile(source, DAY12, "exec"), module.__dict__)
+    ns = module.__dict__
+    ns.update({"natural": natural, "by_cid": by_cid, "sent": sent, "answers": answers, "readers": readers,
+               "rankings_": rankings})
+    yield ns
+    release(ns)
+
+
+class TestDay12Rubric:
+    @staticmethod
+    def handmade(day12: dict) -> list:
+        # Answers no pipeline gave: hand-written replies through the same steps, a model's own abstention, a gate
+        # refusal, a blocked reply, a reply citing a chunk it wasn't sent, an unanswerable question answered
+        by_qid = {q.id: q for q in day12["natural"]}
+        dads, france, lost = by_qid["d01-01"], by_qid["d01-04"], by_qid["d03-13"]
+        luna = ("Secondary caregivers receive 6 weeks of fully paid leave, and leave can be taken in up to two blocks "
+                "within 12 months of the child's arrival. [parental-leave-policy#leave-entitlement]")
+        replies = [luna, "Primary caregivers get 16 weeks of paid leave and secondary caregivers get 6 weeks "
+                         "[parental-leave-policy#leave-entitlement].",
+                   "Primary caregivers receive 18 weeks of fully paid leave [parental-leave-policy#leave-entitlement].",
+                   "Leave is generous. Ask HR [parental-leave-policy#leave-entitlement].",
+                   "Dads get time off [parental-leave-policy#leave-entitlement] [travel-policy#booking-travel]."]
+        miscited = ("Report it within one hour to security@acme.example [travel-policy#safety-while-travelling].",
+                    "Report it within one hour [security-incident-reporting#how-to-report]. Then tell the Security "
+                    "Team [travel-policy#safety-while-travelling].")   # the words are in a source sent but not cited
+        made = []
+        for q in (dads, lost, by_qid["d06-02"], by_qid["d07-u01"]):
+            for text in replies + list(miscited) + [answering.ABSTAIN]:
+                a = contexts.answer_context(q.user, q.question, day12["sent"][q.id], day12["by_cid"],
+                                            dict(day12["rankings_"]["weighted"][q.id]),
+                                            day12["rankings_"]["dense"][q.id][0][1], answering.FixedReply(text),
+                                            gate=GATE)
+                made.append((q, a))
+        gate = contexts.answer_context(france.user, france.question, day12["sent"][france.id], day12["by_cid"],
+                                       dict(day12["rankings_"]["weighted"][france.id]),
+                                       day12["rankings_"]["dense"][france.id][0][1], answering.FixedReply("x [y]."),
+                                       gate=GATE)
+        model_abstained = dataclasses.replace(made[7][1], reason="")       # a live model's own "I don't know"
+        return made + [(france, gate), (dads, model_abstained)]
+
+    def test_rubric_settings_match_day_12_notebook(self, day12: dict) -> None:
+        assert rubric.STOPWORDS == day12["STOPWORDS"] and rubric.WORD.pattern == day12["WORD"].pattern
+        assert (rubric.SUPPORT_MIN, rubric.COST) == (day12["SUPPORT_MIN"], day12["COST"])
+        assert [f.name for f in dataclasses.fields(rubric.Grade)] == [f.name for f in dataclasses.fields(day12["Grade"])]
+        assert rubric.GRADE_FIELDS == day12["GRADE_FIELDS"]
+        texts = ["", "a", "The policy's 14-day limit (USD 1,000) applies; see https://it.acme.example/reset at 10:00.",
+                 "Ünïcödé café, e-mail: people-team@acme.example!", "I can't do it, can I? No.",
+                 "My laptop might have a virus. Should I switch it off? Now!", "One sentence only",
+                 "Two. Sentences.", "  Leading space. And another one", "Ask HR or IT on your PC, ok? It's 2 km."]
+        for text in texts:
+            assert rubric.content_words(text) == day12["content_words"](text), text
+            assert rubric.first_words(text) == day12["first_words"](text), text
+        sources = [answering.Source("a", "T", "S", None, text, 0.5, "p") for text in texts[2:5]]
+        for text in texts:
+            for k in range(len(sources) + 1):
+                assert rubric.support(text, sources[:k]) == day12["support"](text, sources[:k]), (text, k)
+
+    def test_grades_match_day_12_notebook(self, day12: dict) -> None:
+        graded = 0
+        for p, by_qid in day12["answers"].items():
+            for q in day12["natural"]:
+                a = by_qid[q.id]
+                for sent in (day12["sent"][q.id], (), tuple(q.answer_chunks) or ("none",)):
+                    assert asdict(rubric.grade(a, q, sent)) == asdict(day12["grade"](a, q, sent)), (p, q.id, sent)
+                    graded += 1
+        made = self.handmade(day12)
+        for q, a in made:
+            assert asdict(rubric.grade(a, q, day12["sent"][q.id])) == asdict(day12["grade"](a, q, day12["sent"][q.id]))
+        miscited = [rubric.grade(a, q, day12["sent"][q.id]) for q, a in made
+                    if q.id == "d03-13" and a.status == "answered" and "within one hour" in a.text]
+        assert [g.grounded for g in miscited] == [False, False] and made[-1][1].reason == "" and \
+            rubric.grade(made[-1][1], made[-1][0], ()).refused_by == "the model"
+        assert graded == 3 * 2 * 236
+        stages = {rubric.grade(a, q, day12["sent"][q.id]).stage for p in day12["answers"] for q in day12["natural"]
+                  for a in [day12["answers"][p][q.id]]}
+        assert {"ok", "gate", "names rule: a sentence's first word", "names rule: a name", "citation check",
+                "reader: answer in the context, not used", "answered: nothing answers it"} <= stages
+
+    def test_values_and_comparisons_match_day_12_notebook(self, day12: dict, monkeypatch) -> None:
+        for out in ("correct", "refused", "wrong", "answered"):
+            for cost in (0, 1, 2, 3, 2.5):
+                assert rubric.value(out, cost) == day12["value"](out, cost), (out, cost)
+            assert rubric.value(out) == day12["value"](out)
+        by_qid = {q.id: q for q in day12["natural"]}
+        for q in (by_qid["d01-01"], by_qid["d07-u01"]):
+            outs = ("correct", "refused", "wrong") if q.answerable else ("refused", "answered")
+            for a_out in outs:
+                for b_out in outs:
+                    grades = {"a": {q.id: day12["Grade"](a_out, *[None] * 6, "ok")},
+                              "b": {q.id: day12["Grade"](b_out, *[None] * 6, "ok")}}
+                    monkeypatch.setitem(day12, "GRADES", grades)
+                    assert rubric.better_or_worse(q, a_out, b_out) == day12["better_or_worse"](q, "a", "b"), \
+                        (q.id, a_out, b_out)
+
+    def test_closest_calls_and_entries_match_day_12_notebook(self, day12: dict, monkeypatch) -> None:
+        for p, by_qid in day12["answers"].items():
+            grades = {q.id: rubric.grade(by_qid[q.id], q, day12["sent"][q.id]) for q in day12["natural"]}
+            monkeypatch.setitem(day12, "GRADES", {p: grades})
+            for q in day12["natural"]:
+                a = by_qid[q.id]
+                call = rubric.closest_call(a, day12["readers"][p], day12["rankings_"]["dense"][q.id][0][1], GATE,
+                                           day12["cutoff_gap"](q, 3))
+                assert call == day12["closest_call"](q, p), (p, q.id)
+                assert rubric.answer_entry(a, grades[q.id], call) == day12["answer_entry"](q, p), (p, q.id)
+        # Other gates: the module takes the gate as an argument, the notebook reads its global
+        q = day12["natural"][0]
+        for gate in (0.0, 0.5, 0.7, day12["rankings_"]["dense"][q.id][0][1]):
+            monkeypatch.setitem(day12, "GATE", gate)
+            for p in day12["answers"]:
+                a = day12["answers"][p][q.id]
+                assert rubric.closest_call(a, day12["readers"][p], day12["rankings_"]["dense"][q.id][0][1], gate,
+                                           day12["cutoff_gap"](q, 3)) == day12["closest_call"](q, p)
+
+    def test_compare_answers_matches_day_12_notebook(self, day12: dict) -> None:
+        accepted = json.loads((REPO_ROOT / "evals" / "baselines" / "day-12-answers-v4.json").read_text(encoding="utf-8"))
+        pipelines = tuple(accepted["pipelines"])
+        qid = "d03-01"
+
+        def edited(change) -> dict:
+            run = json.loads(json.dumps(accepted))
+            change(run)
+            return run
+
+        def set_field(field, value, pipeline="names-v2", question=qid):
+            return lambda run: run["questions"][question][pipeline].__setitem__(field, value)
+
+        edits = [lambda run: None, set_field("status", "blocked"), set_field("text", "something else"),
+                 set_field("cited", []), set_field("outcome", "wrong"), set_field("stage", "gate"),
+                 set_field("support", 0.5, "current"), set_field("grounded", False),
+                 set_field("closest_call", [0.0002, "gate"]),
+                 lambda run: (set_field("closest_call", [0.0002, "gate"])(run), set_field("outcome", "wrong")(run)),
+                 lambda run: (set_field("closest_call", [0.001, "gate"])(run), set_field("outcome", "wrong")(run)),
+                 lambda run: (set_field("closest_call", [None, "x"])(run), set_field("outcome", "wrong")(run)),
+                 lambda run: run["metrics"]["dev"]["current"].__setitem__("correct", 0),
+                 lambda run: (set_field("closest_call", [0.0002, "gate"])(run), set_field("outcome", "wrong")(run),
+                              run["metrics"]["dev"]["current"].__setitem__("correct", 0)),
+                 lambda run: run["decisions"].__setitem__("D1 Day 10's names rule in the current pipeline", "no"),
+                 lambda run: run["dataset"].__setitem__("version", 3),
+                 lambda run: run["pipelines"]["current"].__setitem__("budget_words", 200),
+                 lambda run: run["rubric"].__setitem__("grounded", "x"),
+                 lambda run: run["questions"].__setitem__("new-question", run["questions"][qid]),
+                 lambda run: run["questions"].pop(qid)]
+        for i, change in enumerate(edits):
+            new = edited(change)
+            for old in (accepted, edited(set_field("text", "older"))):
+                assert rubric.compare_answers(new, old, pipelines) == day12["compare_answers"](new, old), i

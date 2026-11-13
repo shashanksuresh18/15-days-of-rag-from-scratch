@@ -11,14 +11,19 @@ recorded it, what failed, and the check below that pins it. Each case has one of
 
 The checks use the shared code in src/ only, no notebook: Day 08's weighted fusion and Day 11's end-to-end path with
 Day 07's measured gate (0.62) and reader threshold (0.63), as Day 12 measured the current pipeline. One embedding
-model is loaded for the whole file (about 20 seconds; no network once the model is downloaded).
+model is loaded for the whole file (about 20 seconds; no network once the model is downloaded). Day 13 added four
+cases: two correct replies of a live model that the citation check blocks, a live model ignoring the answer section in
+its context (the recorded replies are in evals/reviews/day-12-live-gpt-6-luna.jsonl), and Day 06's client waiting far
+past its timeout for a server that sends its reply a few bytes at a time (a local fake server; about 2 seconds).
 """
 
 import dataclasses
 import gc
 import json
+import sys
 import tempfile
 import threading
+import time
 import types
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -86,6 +91,15 @@ def world():
 
 def source(chunk, score: float = 0.5) -> Source:
     return Source(chunk.chunk_id, chunk.title, chunk.section, chunk.last_reviewed, chunk.text, score, chunk.source_path)
+
+
+class QuietServer(ThreadingHTTPServer):
+    """A local test server that doesn't print a traceback when a client closes the connection first."""
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        if not isinstance(sys.exc_info()[1], (ConnectionAbortedError, ConnectionResetError, BrokenPipeError)):
+            super().handle_error(request, client_address)
 
 
 class NeverCalled:
@@ -242,7 +256,7 @@ def key_never_echoed(w):
         def log_message(self, *args):
             pass
 
-    server = ThreadingHTTPServer(("127.0.0.1", 0), Echo)
+    server = QuietServer(("127.0.0.1", 0), Echo)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     messages = []
     try:
@@ -348,12 +362,64 @@ def stale_labels_reported(w):
     return ok, problems[:6]
 
 
+def citation_check_false_block(w, qid: str, reply: str, expect):
+    a = w.run(w.by_qid[qid], FixedReply(reply))
+    problems = list(a.check.problems) if a.check else None
+    return a.status == "blocked" and problems == expect and outcome(a, w.by_qid[qid]) == "refused", \
+        f"{a.status}: {problems}"
+
+
+def model_ignores_answer(w, qid: str, reply: str):
+    q = w.by_qid[qid]
+    a = w.run(q, FixedReply(reply))
+    sent = {s.id for s in a.context.sources} if a.context else set()
+    cited = {i for c in a.check.claims for i in c.cited} if a.check else set()
+    ok = a.status == "answered" and outcome(a, q) == "wrong" and bool(sent & set(q.answer_chunks)) and \
+        not cited & set(q.answer_chunks)
+    return ok, f"{a.status}, {outcome(a, q)}, sent {sorted(sent)}, cited {sorted(cited)}"
+
+
+def timeout_is_not_a_deadline(w, timeout: float, trickle: float):
+    reply = {"choices": [{"finish_reason": "stop", "message": {"content": "A slow answer [x]."}}],
+             "usage": {"prompt_tokens": 10, "completion_tokens": 4}}
+    data = json.dumps(reply).encode("utf-8")
+
+    class Trickle(BaseHTTPRequestHandler):
+        def do_POST(self):
+            self.rfile.read(int(self.headers["Content-Length"]))
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            for i in range(0, len(data), 8):           # 8 bytes at a time: no single read waits as long as the timeout
+                self.wfile.write(data[i:i + 8])
+                self.wfile.flush()
+                time.sleep(trickle / (len(data) / 8))
+
+        def log_message(self, *args):
+            pass
+
+    server = QuietServer(("127.0.0.1", 0), Trickle)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        model = ChatModel("ollama", "any-model", base_url=f"http://127.0.0.1:{server.server_address[1]}/v1",
+                          timeout=timeout)
+        started = time.perf_counter()
+        got = model.generate(types.SimpleNamespace(question="q", sources=()))
+        elapsed = time.perf_counter() - started
+    finally:
+        server.shutdown()
+        server.server_close()
+    return got.text == "A slow answer [x]." and elapsed >= 3 * timeout, \
+        f"waited {elapsed:.2f} s with a {timeout} s timeout"
+
+
 CHECKS = {f.__name__: f for f in (in_top3, table_rows_keep_header, pdf_hyphen_joined, quarantined, lookups_first,
                                   filter_before_ranking, no_restricted_in_top10, retired_chunks_deleted, atomic_save,
                                   duplicate_upsert, prompt_escaped, citation_check_blocks, right_numbers_wrong_meaning,
                                   key_never_echoed, gate_refuses, permission_end_to_end, list_number_blocked,
                                   names_rule, exact_values_not_expanded, off_switch, neighbour_lookup_checked,
-                                  reader_ignores_answer, stale_labels_reported)}
+                                  reader_ignores_answer, stale_labels_reported, citation_check_false_block,
+                                  model_ignores_answer, timeout_is_not_a_deadline)}
 
 
 def test_registry_is_well_formed() -> None:

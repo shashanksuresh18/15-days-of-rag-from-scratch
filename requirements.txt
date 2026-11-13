@@ -15,7 +15,9 @@
 # Day 11 adds nothing (checked on 2026-11-09 with Python 3.11, 3.12, 3.13 and 3.14 on Linux): section expansion is a
 # lookup in the documents' own structure, and it reuses Day 04's model. Day 12 adds nothing (checked on 2026-11-11 with
 # Python 3.11, 3.12, 3.13 and 3.14 on Linux): its answer rubric and regression tests are standard-library Python, and
-# its optional live run uses Day 06's urllib client.
+# its optional live run uses Day 06's urllib client. Day 13 adds nothing (checked on 2026-11-12 with Python 3.11, 3.12,
+# 3.13 and 3.14 on Linux): its traces, caches, timeouts, retries and circuit breaker are standard-library Python
+# (contextlib, random, http.server for the local fake servers), and its client builds on Day 06's urllib one.
 # The rest are for running notebooks (JupyterLab) and the smoke tests (pytest + nbclient).
 #
 # Day 01 set: installed and tested on 2026-10-13 with Python 3.11, 3.12, 3.13 and 3.14 on Linux

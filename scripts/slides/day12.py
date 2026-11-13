@@ -81,7 +81,9 @@ def from_baseline() -> dict:
     near = b["decisions"]["v4 test"]["near"]
     kinds = Counter("near tie" if qid in near else f"{a} -> {c}" for qid, (a, c) in changed.items())
     example = b["questions"]["d11-a17"]
-    cases = Counter(json.loads(line)["status"] for line in REGRESSIONS.read_text(encoding="utf-8").splitlines() if line)
+    # the cases recorded up to Day 12 (R01 to R29); later days add more
+    cases = Counter(r["status"] for r in (json.loads(line) for line in REGRESSIONS.read_text(encoding="utf-8").splitlines()
+                                          if line) if int(r["id"][1:]) <= 29)
     facts = {"answerable": len(answerable), "in_top3": in_top3, "correct": stages["ok"],
              "first_word": stages["names rule: a sentence's first word"], "a_name": stages["names rule: a name"],
              "reader": stages["reader: answer in the context, not used"] + stages["reader: right source, wrong part"],

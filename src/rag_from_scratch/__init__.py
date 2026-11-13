@@ -22,6 +22,8 @@ it again, a copy moves here so the new notebook can import it instead of repeati
 - contexts.py: Day 11's contexts (DocumentStructure, expand_sections() with its trace) and the end-to-end steps
                with a chosen context (answer_context(), SentenceCache, why_refused())
 - chat.py:    Day 06's prompt (build_messages()) and optional language-model client (ChatModel, chat_model_from_env())
+- rubric.py:  Day 12's answer rubric (grade(): one verdict per answer and the stage that lost it; value(), closest_call(),
+              compare_answers() against an accepted answer baseline)
 
 tests/test_shared_code.py checks each module against the notebook it came from.
 """

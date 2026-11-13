@@ -1,10 +1,12 @@
 """The labelled set in evals/, checked without running any model (a few seconds).
 
-Every check runs for all four versions of the questions: questions-v1.jsonl (manifest.json, Day 07),
+Every check runs for all five versions of the questions: questions-v1.jsonl (manifest.json, Day 07),
 questions-v2.jsonl (manifest-v2.json, Day 10: v1's 81 queries unchanged, its used test questions moved to dev,
 and 41 new test questions), questions-v3.jsonl (manifest-v3.json, Day 11: v2's 122 queries unchanged, its used
-test questions moved to dev, and 68 new test questions) and questions-v4.jsonl (manifest-v4.json, Day 12: v3's 190
-queries unchanged, its used test questions moved to dev, and 76 new test questions).
+test questions moved to dev, and 68 new test questions), questions-v4.jsonl (manifest-v4.json, Day 12: v3's 190
+queries unchanged, its used test questions moved to dev, and 76 new test questions) and questions-v5.jsonl
+(manifest-v5.json, Day 13: v4's 266 queries unchanged, its used test questions moved to dev, and 51 new test questions,
+each a paraphrase or a near neighbour of a dev question chosen by a fixed rule).
 
 1. The question file matches its manifest (hash, counts) and every row has the expected fields.
 2. The documents still match the snapshot the labels were written against, and every label can be
@@ -26,6 +28,11 @@ queries unchanged, its used test questions moved to dev, and 76 new test questio
    citations; no answer was given anything its asker may not read; the metrics, the paired comparison and the
    decision follow from the per-question entries and the rule committed in evals/preregistration/day-12.md; and
    every answered (question, answer) pair has the author's review, tied to its exact text.
+5. Day 13's answer baseline (day-13-answers-v5.json) is consistent in the same way for the current pipeline on the 51
+   v5 test questions, its semantic-cache lookups follow from their cosines and the threshold committed in
+   evals/preregistration/day-13.md, and both decisions follow from the entries; the new test questions follow the
+   protocol committed there; and the reading of Day 12's live replies (evals/reviews/day-12-live-gpt-6-luna.jsonl) is
+   tied to each reply's exact text.
 
 If test 2 fails after you edited data/sample/, that is the point: run the Day 07 notebook, read the
 label problems it lists, review those labels, and record a new version (docs/day-07/LEARN.md, section 8).
@@ -48,11 +55,12 @@ FIELDS = ["id", "question", "user", "kind", "split", "origin", "tags", "evidence
           "restricted_chunks", "note"]
 
 
-MANIFESTS = ["manifest.json", "manifest-v2.json", "manifest-v3.json", "manifest-v4.json"]
-NEW_TEST_ORIGIN = {1: "day07-new", 2: "day10-new", 3: "day11-new", 4: "day12-new"}   # each version's test split is
+MANIFESTS = ["manifest.json", "manifest-v2.json", "manifest-v3.json", "manifest-v4.json", "manifest-v5.json"]
+NEW_TEST_ORIGIN = {1: "day07-new", 2: "day10-new", 3: "day11-new", 4: "day12-new", 5: "day13-new"}   # each version's
 MOVED = {2: " (v1 test split; Day 09 used it to decide, so dev from v2 on)",     # that day's new questions; the note a
          3: " (v2 test split; Day 10 used it to decide, so dev from v3 on)",     # used test question gets when it moves
-         4: " (v3 test split; Day 11 used it to decide, so dev from v4 on)"}     # to dev (rule 4)
+         4: " (v3 test split; Day 11 used it to decide, so dev from v4 on)",     # to dev (rule 4)
+         5: " (v4 test split; Day 12 used it to decide, so dev from v5 on)"}
 
 
 def _manifest(name: str) -> dict:
@@ -401,3 +409,126 @@ def test_day_12_answers_add_up(chunks: list) -> None:
         agree = sum((baseline["questions"][qid][p]["outcome"] == "correct") == (r["grade"] == "correct")
                     for r, (qid, p) in mine)
         assert baseline["reviews"][label]["pairs"] == len(mine) and baseline["reviews"][label]["agree"] == agree, label
+
+
+def _outcome(status: str, text: str, row: dict) -> str:
+    if status != "answered":
+        return "refused"
+    if not row["answer_chunks"]:
+        return "answered"
+    return "correct" if all(f.lower() in text.lower() for f in row["facts"]) else "wrong"
+
+
+def test_day_13_questions_follow_the_preregistered_protocol() -> None:
+    # Every 8th answerable v4 question gets a paraphrase and a near neighbour, every 8th unanswerable one a paraphrase;
+    # a paraphrase keeps its source's user, answerability and facts; a near neighbour keeps the user
+    v4 = [r for r in _rows(_manifest("manifest-v4.json")) if r["kind"] == "question"]
+    v5 = _rows(_manifest("manifest-v5.json"))
+    by_id = {r["id"]: r for r in v5}
+    new = [r for r in v5 if r["split"] == "test"]
+    sources_a = [r["id"] for r in v4 if r["answer_chunks"]][::8]
+    sources_u = [r["id"] for r in v4 if not r["answer_chunks"]][::8]
+    written_from = []
+    for r in new:
+        kind = r["tags"][0]
+        match = re.fullmatch(r"(paraphrase|near neighbour) of (d\d\d-[a-z]?\d+)(: .+)?", r["note"])
+        assert match and kind == match.group(1).replace(" ", "-"), r["id"]
+        source = by_id[match.group(2)]
+        written_from.append((source["id"], kind))
+        assert source["split"] == "dev" and source["user"] == r["user"] and r["kind"] == "question", r["id"]
+        if kind == "paraphrase":
+            assert bool(r["answer_chunks"]) == bool(source["answer_chunks"]) and r["facts"] == source["facts"], r["id"]
+            assert not match.group(3), r["id"]
+        else:
+            assert match.group(3), f"{r['id']}: a near neighbour says what changed"
+        assert re.fullmatch(r"d13-[au]\d\d", r["id"]) and (r["id"][4] == "a") == bool(r["answer_chunks"]), r["id"]
+    assert written_from == [(s, k) for s in sources_a for k in ("paraphrase", "near-neighbour")] + \
+        [(s, "paraphrase") for s in sources_u]
+    prereg = (EVALS / "preregistration" / "day-13.md").read_text(encoding="utf-8")
+    assert "**33 answerable** (21 paraphrases,\n  12 near neighbours with a different answer) and **18 not**" in prereg
+    assert sum(bool(r["answer_chunks"]) for r in new) == 33 and len(new) == 51
+
+
+def test_day_13_answers_add_up(chunks: list) -> None:
+    # Day 13's answer baseline, checked against the labels and itself (no model): the current pipeline's outcomes,
+    # stages and metrics; every semantic-cache lookup against the threshold; the curves and both decisions
+    manifest = _manifest("manifest-v5.json")
+    rows = {r["id"]: r for r in _rows(manifest)}
+    new = [qid for qid, r in rows.items() if r["split"] == "test"]
+    baseline = json.loads((EVALS / "baselines" / "day-13-answers-v5.json").read_text(encoding="utf-8"))
+    assert baseline["dataset"] == {"questions": f"evals/{manifest['questions_file']}", "version": manifest["version"],
+                                   "sha256": manifest["questions_sha256"], "snapshot": manifest["snapshot"]["fingerprint"]}
+    assert list(baseline["questions"]) == new and list(baseline["pipelines"]) == ["current"]
+    day12 = json.loads((EVALS / "baselines" / "day-12-answers-v4.json").read_text(encoding="utf-8"))
+    assert baseline["rubric"] == day12["rubric"]
+    prereg = (REPO_ROOT / baseline["decisions"]["preregistration"]).read_text(encoding="utf-8")
+    theta = baseline["semantic_cache"]["theta"]
+    assert theta == 0.89 and "So **θ = 0.89**" in prereg
+    by_cid = {c.chunk_id: c for c in chunks}
+    value = {"correct": 1, "refused": 0, "wrong": -2, "answered": -2}
+    rank = {"correct": 2, "refused": 1, "wrong": 0, "answered": 0}
+    hits, better, worse, delta = [], [], [], {c: 0 for c in (1, 2, 3)}
+    for qid, e in baseline["questions"].items():
+        r, a, cache = rows[qid], baseline["questions"][qid]["current"], baseline["questions"][qid]["semantic_cache"]
+        top3 = e["retrieval"]["top3"]
+        assert e["split"] == "test" and e["type"] == r["tags"][0] and r["note"].split(" of ")[1].startswith(e["written_from"])
+        assert all(set(by_cid[cid].allowed_groups) & answering.DIRECTORY[r["user"]] for cid in top3), qid
+        assert set(a["cited"]) <= set(top3) and a["outcome"] == _outcome(a["status"], a["text"], r), qid
+        assert a["label_in_context"] == (bool(set(top3) & set(r["answer_chunks"])) if r["answer_chunks"] else None)
+        nearest = rows[cache["nearest"]]
+        assert nearest["split"] == "dev" and answering.DIRECTORY[nearest["user"]] == answering.DIRECTORY[r["user"]]
+        assert cache["hit"] == (cache["cosine"] >= theta) and (cache["served_outcome"] is None) == (not cache["hit"])
+        if cache["hit"]:
+            hits.append(qid)
+            served = day12["questions"][cache["nearest"]]["names-v2"]
+            assert cache["served_outcome"] == _outcome(served["status"], served["text"], r), qid
+            change = rank[cache["served_outcome"]] - rank[a["outcome"]]
+            (better if change > 0 else worse if change < 0 else []).append(qid)
+            for c in delta:
+                v = {"correct": 1, "refused": 0, "wrong": -c, "answered": -c}
+                delta[c] += v[cache["served_outcome"]] - v[a["outcome"]]
+    test = baseline["semantic_cache"]["v5 test"]
+    assert (test["hits"], test["better"], test["worse"], test["near"]) == (hits, better, worse, []) and \
+        test["delta"] == {str(c): d for c, d in delta.items()}
+    assert baseline["semantic_cache"]["v5 test, every threshold (description)"][f"{theta:.2f}"]["hits"] == len(hits)
+    dev = baseline["semantic_cache"]["dev (in-sample, leave one out)"]
+    assert min(t for t, v in dev.items() if v["worse"] == 0) == f"{theta:.2f}" and dev[f"{theta:.2f}"]["hits"] == 0
+    for t, (n, b, w) in {"0.80": (53, 2, 14), "0.85": (16, 0, 4), "0.88": (6, 0, 1)}.items():
+        assert (dev[t]["hits"], dev[t]["better"], dev[t]["worse"]) == (n, b, w) and f"| {t} | {n} | {b} | {w} |" in prereg
+    outs = [baseline["questions"][qid]["current"]["outcome"] for qid in new]
+    ans = [o for qid, o in zip(new, outs) if rows[qid]["answer_chunks"]]
+    un = [o for qid, o in zip(new, outs) if not rows[qid]["answer_chunks"]]
+    assert baseline["metrics"]["v5 test"]["current"] == {
+        "correct": ans.count("correct"), "wrong": ans.count("wrong"), "refused": ans.count("refused"),
+        "unanswerable refused": un.count("refused"), "unanswerable answered": un.count("answered"),
+        "value at cost 2": sum(value[o] for o in outs)}
+    for cost in (1, 2, 3):
+        v = {"correct": 1, "refused": 0, "wrong": -cost, "answered": -cost}
+        assert baseline["fallback"]["v5 test"]["value"][str(cost)] == sum(v[o] for o in outs)
+    assert baseline["fallback"]["dev (in-sample)"]["value"] == {"1": 68, "2": 12, "3": -44}
+    assert "value **+68** at cost 1, **+12** at cost 2, **−44** at cost 3" in prereg
+    assert baseline["decisions"] == {
+        "preregistration": "evals/preregistration/day-13.md",
+        "D1 a semantic answer cache (theta 0.89)": "adopted" if hits and not worse else "not adopted",
+        "D2 the API-free reader as the fallback when the model fails":
+            "adopted" if baseline["fallback"]["v5 test"]["value"]["2"] > 0 else "not adopted"}
+
+
+def test_day_12_live_review_is_tied_to_each_reply() -> None:
+    # The reading of Day 12's 40 live replies: one per request, tied to the reply's exact text, with the provider's
+    # recorded token counts (their totals are the ones Claude Code's report gave)
+    questions = {r["id"]: r for r in _rows(_manifest("manifest-v4.json"))}
+    rows = [json.loads(line) for line in (EVALS / "reviews" / "day-12-live-gpt-6-luna.jsonl").read_text(
+        encoding="utf-8").splitlines() if line.strip()]
+    assert len(rows) == 40 and len({r["id"] for r in rows}) == 40
+    for r in rows:
+        assert set(r) == {"id", "split", "model", "provider", "run", "status", "model_reply", "reply_sha256", "rubric",
+                          "usage", "seconds", "reading", "note"}, r["id"]
+        assert r["split"] == questions[r["id"]]["split"] and r["model"] == "gpt-6-luna"
+        assert r["reply_sha256"] == hashlib.sha256(r["model_reply"].encode("utf-8")).hexdigest()[:16]
+        assert r["status"] in ("answered", "abstained", "blocked")
+        assert (r["reading"] == "abstained") == (r["status"] == "abstained")
+        assert r["reading"] in ("correct", "partly", "wrong", "abstained") and (r["reading"] == "correct" or r["note"])
+        assert r["rubric"]["outcome"] == ("refused" if r["status"] != "answered" else
+                                          _outcome(r["status"], r["model_reply"], questions[r["id"]]))
+    assert (sum(r["usage"]["input_tokens"] for r in rows), sum(r["usage"]["output_tokens"] for r in rows)) == (18075, 1133)
